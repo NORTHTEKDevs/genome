@@ -1,0 +1,68 @@
+# Node / TS SDK
+node_modules/
+*.tsbuildinfo
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+.venv/
+env/
+ENV/
+.env
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+build/
+dist/
+*.whl
+*.tar.gz
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb_checkpoints
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Models and large data
+models/
+*.pt
+*.pth
+*.bin
+*.safetensors
+embeddings_cache/
+
+# Results (keep structure, exclude large outputs)
+results/*.npz
+results/*.pkl
+results/checkpoints/
+
+# Local-only
+scratch/
+tmp/
+probes/
+benchmarks/ab_result.txt
+benchmarks/ab_graph.txt
+
+# Benchmark datasets (third-party licenses; see benchmarks/data/README.md)
+# (data/README.md is force-added to the repo; everything else here is ignored)
+benchmarks/data/
+# Benchmark run artifacts (regenerable via the scripts)
+results/
+# Stray/personal assets, internal notes, local DBs
+public/
+CRYSTAL.md
+*.db
+*.sqlite

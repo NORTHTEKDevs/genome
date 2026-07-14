@@ -1,0 +1,606 @@
+{
+  "version": "0.2.0",
+  "description": "Curated parent pairs for recombination validation. Each pair has two parent concepts and expected hybrid concepts. 100 pairs across tech, food, animals, sports, professions, tools, and abstract ideas.",
+  "pairs": [
+    {
+      "id": "pair_001",
+      "parent_a": "machine learning engineer",
+      "parent_b": "product manager",
+      "expected_hybrids": ["technical product manager", "AI product manager", "ML product lead"]
+    },
+    {
+      "id": "pair_002",
+      "parent_a": "fast",
+      "parent_b": "cheap",
+      "expected_hybrids": ["efficient", "economical", "optimized"]
+    },
+    {
+      "id": "pair_003",
+      "parent_a": "dog",
+      "parent_b": "wolf",
+      "expected_hybrids": ["wolf-dog hybrid", "wild canine", "husky"]
+    },
+    {
+      "id": "pair_004",
+      "parent_a": "software engineer",
+      "parent_b": "designer",
+      "expected_hybrids": ["design engineer", "frontend developer", "UX engineer"]
+    },
+    {
+      "id": "pair_005",
+      "parent_a": "running",
+      "parent_b": "swimming",
+      "expected_hybrids": ["triathlon", "cross-training", "endurance sport"]
+    },
+    {
+      "id": "pair_006",
+      "parent_a": "coffee",
+      "parent_b": "milk",
+      "expected_hybrids": ["latte", "cappuccino", "macchiato"]
+    },
+    {
+      "id": "pair_007",
+      "parent_a": "lion",
+      "parent_b": "tiger",
+      "expected_hybrids": ["liger", "big cat hybrid", "large feline"]
+    },
+    {
+      "id": "pair_008",
+      "parent_a": "electric car",
+      "parent_b": "motorcycle",
+      "expected_hybrids": ["electric motorcycle", "e-bike", "scooter"]
+    },
+    {
+      "id": "pair_009",
+      "parent_a": "novel",
+      "parent_b": "movie",
+      "expected_hybrids": ["graphic novel", "film adaptation", "screenplay"]
+    },
+    {
+      "id": "pair_010",
+      "parent_a": "database",
+      "parent_b": "search engine",
+      "expected_hybrids": ["vector database", "document search", "elasticsearch"]
+    },
+    {
+      "id": "pair_011",
+      "parent_a": "research scientist",
+      "parent_b": "software developer",
+      "expected_hybrids": ["research engineer", "ML engineer", "applied scientist"]
+    },
+    {
+      "id": "pair_012",
+      "parent_a": "pizza",
+      "parent_b": "sandwich",
+      "expected_hybrids": ["calzone", "stromboli", "flatbread"]
+    },
+    {
+      "id": "pair_013",
+      "parent_a": "doctor",
+      "parent_b": "programmer",
+      "expected_hybrids": ["bioinformatics researcher", "medical software engineer", "health tech engineer"]
+    },
+    {
+      "id": "pair_014",
+      "parent_a": "yoga",
+      "parent_b": "weightlifting",
+      "expected_hybrids": ["functional fitness", "pilates", "mobility training"]
+    },
+    {
+      "id": "pair_015",
+      "parent_a": "bicycle",
+      "parent_b": "motor",
+      "expected_hybrids": ["motorcycle", "e-bike", "moped"]
+    },
+    {
+      "id": "pair_016",
+      "parent_a": "teacher",
+      "parent_b": "YouTuber",
+      "expected_hybrids": ["educational content creator", "online instructor", "tutorial maker"]
+    },
+    {
+      "id": "pair_017",
+      "parent_a": "python",
+      "parent_b": "rust",
+      "expected_hybrids": ["mojo", "cython", "pyo3"]
+    },
+    {
+      "id": "pair_018",
+      "parent_a": "Apple",
+      "parent_b": "watch",
+      "expected_hybrids": ["Apple Watch", "smartwatch", "wearable"]
+    },
+    {
+      "id": "pair_019",
+      "parent_a": "encyclopedia",
+      "parent_b": "social network",
+      "expected_hybrids": ["Wikipedia", "crowdsourced knowledge", "wiki"]
+    },
+    {
+      "id": "pair_020",
+      "parent_a": "agent",
+      "parent_b": "memory",
+      "expected_hybrids": ["memory-augmented agent", "persistent AI assistant", "stateful agent"]
+    },
+    {
+      "id": "pair_021",
+      "parent_a": "horse",
+      "parent_b": "donkey",
+      "expected_hybrids": ["mule", "hinny", "equine hybrid"]
+    },
+    {
+      "id": "pair_022",
+      "parent_a": "whale",
+      "parent_b": "dolphin",
+      "expected_hybrids": ["cetacean", "marine mammal", "orca"]
+    },
+    {
+      "id": "pair_023",
+      "parent_a": "jazz",
+      "parent_b": "hip hop",
+      "expected_hybrids": ["jazz rap", "nu jazz", "hip hop jazz fusion"]
+    },
+    {
+      "id": "pair_024",
+      "parent_a": "rock",
+      "parent_b": "electronic music",
+      "expected_hybrids": ["electronic rock", "synthwave", "industrial rock"]
+    },
+    {
+      "id": "pair_025",
+      "parent_a": "classical music",
+      "parent_b": "orchestra",
+      "expected_hybrids": ["symphony", "philharmonic", "classical ensemble"]
+    },
+    {
+      "id": "pair_026",
+      "parent_a": "salsa",
+      "parent_b": "tomato",
+      "expected_hybrids": ["tomato salsa", "pico de gallo", "marinara"]
+    },
+    {
+      "id": "pair_027",
+      "parent_a": "burger",
+      "parent_b": "mushroom",
+      "expected_hybrids": ["mushroom burger", "portobello burger", "veggie burger"]
+    },
+    {
+      "id": "pair_028",
+      "parent_a": "chocolate",
+      "parent_b": "peanut butter",
+      "expected_hybrids": ["Reese's", "chocolate peanut butter cup", "peanut butter cup"]
+    },
+    {
+      "id": "pair_029",
+      "parent_a": "ice cream",
+      "parent_b": "cake",
+      "expected_hybrids": ["ice cream cake", "frozen dessert", "baked alaska"]
+    },
+    {
+      "id": "pair_030",
+      "parent_a": "pancake",
+      "parent_b": "waffle",
+      "expected_hybrids": ["crepe", "griddle breakfast", "breakfast batter"]
+    },
+    {
+      "id": "pair_031",
+      "parent_a": "helicopter",
+      "parent_b": "airplane",
+      "expected_hybrids": ["tiltrotor", "osprey aircraft", "VTOL aircraft"]
+    },
+    {
+      "id": "pair_032",
+      "parent_a": "submarine",
+      "parent_b": "drone",
+      "expected_hybrids": ["underwater drone", "autonomous submersible", "ROV"]
+    },
+    {
+      "id": "pair_033",
+      "parent_a": "telescope",
+      "parent_b": "microscope",
+      "expected_hybrids": ["optical instrument", "scientific lens", "imaging device"]
+    },
+    {
+      "id": "pair_034",
+      "parent_a": "camera",
+      "parent_b": "phone",
+      "expected_hybrids": ["smartphone", "camera phone", "iPhone"]
+    },
+    {
+      "id": "pair_035",
+      "parent_a": "television",
+      "parent_b": "internet",
+      "expected_hybrids": ["streaming service", "smart TV", "Netflix"]
+    },
+    {
+      "id": "pair_036",
+      "parent_a": "piano",
+      "parent_b": "guitar",
+      "expected_hybrids": ["keytar", "stringed instrument", "hybrid instrument"]
+    },
+    {
+      "id": "pair_037",
+      "parent_a": "violin",
+      "parent_b": "guitar",
+      "expected_hybrids": ["electric violin", "violin guitar", "fiddle"]
+    },
+    {
+      "id": "pair_038",
+      "parent_a": "chess",
+      "parent_b": "video game",
+      "expected_hybrids": ["online chess", "chess engine", "strategy game"]
+    },
+    {
+      "id": "pair_039",
+      "parent_a": "boxing",
+      "parent_b": "kickboxing",
+      "expected_hybrids": ["muay thai", "mixed martial arts", "MMA"]
+    },
+    {
+      "id": "pair_040",
+      "parent_a": "surfing",
+      "parent_b": "snowboarding",
+      "expected_hybrids": ["wakeboarding", "kiteboarding", "board sport"]
+    },
+    {
+      "id": "pair_041",
+      "parent_a": "bird",
+      "parent_b": "reptile",
+      "expected_hybrids": ["archaeopteryx", "dinosaur", "flying reptile"]
+    },
+    {
+      "id": "pair_042",
+      "parent_a": "shark",
+      "parent_b": "dolphin",
+      "expected_hybrids": ["marine predator", "apex predator", "ocean hunter"]
+    },
+    {
+      "id": "pair_043",
+      "parent_a": "fox",
+      "parent_b": "cat",
+      "expected_hybrids": ["fennec fox", "small carnivore", "wild feline"]
+    },
+    {
+      "id": "pair_044",
+      "parent_a": "goose",
+      "parent_b": "duck",
+      "expected_hybrids": ["swan", "waterfowl", "aquatic bird"]
+    },
+    {
+      "id": "pair_045",
+      "parent_a": "bee",
+      "parent_b": "flower",
+      "expected_hybrids": ["pollination", "honey", "honeybee"]
+    },
+    {
+      "id": "pair_046",
+      "parent_a": "accountant",
+      "parent_b": "engineer",
+      "expected_hybrids": ["financial engineer", "quantitative analyst", "quant"]
+    },
+    {
+      "id": "pair_047",
+      "parent_a": "journalist",
+      "parent_b": "blogger",
+      "expected_hybrids": ["digital journalist", "content writer", "news blogger"]
+    },
+    {
+      "id": "pair_048",
+      "parent_a": "lawyer",
+      "parent_b": "software engineer",
+      "expected_hybrids": ["patent attorney", "legal tech specialist", "compliance engineer"]
+    },
+    {
+      "id": "pair_049",
+      "parent_a": "chef",
+      "parent_b": "scientist",
+      "expected_hybrids": ["food scientist", "molecular gastronomist", "culinary chemist"]
+    },
+    {
+      "id": "pair_050",
+      "parent_a": "pilot",
+      "parent_b": "engineer",
+      "expected_hybrids": ["aerospace engineer", "test pilot", "flight engineer"]
+    },
+    {
+      "id": "pair_051",
+      "parent_a": "artist",
+      "parent_b": "programmer",
+      "expected_hybrids": ["creative coder", "generative artist", "digital artist"]
+    },
+    {
+      "id": "pair_052",
+      "parent_a": "photographer",
+      "parent_b": "editor",
+      "expected_hybrids": ["photojournalist", "photo editor", "retoucher"]
+    },
+    {
+      "id": "pair_053",
+      "parent_a": "architect",
+      "parent_b": "software engineer",
+      "expected_hybrids": ["software architect", "systems architect", "solution architect"]
+    },
+    {
+      "id": "pair_054",
+      "parent_a": "therapist",
+      "parent_b": "coach",
+      "expected_hybrids": ["life coach", "mental health coach", "wellness coach"]
+    },
+    {
+      "id": "pair_055",
+      "parent_a": "farmer",
+      "parent_b": "scientist",
+      "expected_hybrids": ["agronomist", "agricultural scientist", "crop scientist"]
+    },
+    {
+      "id": "pair_056",
+      "parent_a": "server",
+      "parent_b": "client",
+      "expected_hybrids": ["peer-to-peer", "client-server", "distributed system"]
+    },
+    {
+      "id": "pair_057",
+      "parent_a": "blockchain",
+      "parent_b": "database",
+      "expected_hybrids": ["distributed ledger", "decentralized storage", "immutable database"]
+    },
+    {
+      "id": "pair_058",
+      "parent_a": "neural network",
+      "parent_b": "symbolic reasoning",
+      "expected_hybrids": ["neurosymbolic AI", "hybrid AI", "neuro-symbolic system"]
+    },
+    {
+      "id": "pair_059",
+      "parent_a": "compiler",
+      "parent_b": "interpreter",
+      "expected_hybrids": ["JIT compiler", "bytecode compiler", "hybrid runtime"]
+    },
+    {
+      "id": "pair_060",
+      "parent_a": "container",
+      "parent_b": "virtual machine",
+      "expected_hybrids": ["microVM", "firecracker", "kata container"]
+    },
+    {
+      "id": "pair_061",
+      "parent_a": "laptop",
+      "parent_b": "tablet",
+      "expected_hybrids": ["convertible laptop", "Surface Pro", "2-in-1 device"]
+    },
+    {
+      "id": "pair_062",
+      "parent_a": "bluetooth",
+      "parent_b": "speaker",
+      "expected_hybrids": ["wireless speaker", "bluetooth speaker", "portable speaker"]
+    },
+    {
+      "id": "pair_063",
+      "parent_a": "car",
+      "parent_b": "autonomous",
+      "expected_hybrids": ["self-driving car", "autonomous vehicle", "robotaxi"]
+    },
+    {
+      "id": "pair_064",
+      "parent_a": "robot",
+      "parent_b": "vacuum",
+      "expected_hybrids": ["Roomba", "robotic vacuum", "autonomous cleaner"]
+    },
+    {
+      "id": "pair_065",
+      "parent_a": "3D printer",
+      "parent_b": "factory",
+      "expected_hybrids": ["additive manufacturing", "print farm", "automated factory"]
+    },
+    {
+      "id": "pair_066",
+      "parent_a": "VR headset",
+      "parent_b": "phone",
+      "expected_hybrids": ["mobile VR", "Quest standalone", "AR glasses"]
+    },
+    {
+      "id": "pair_067",
+      "parent_a": "beer",
+      "parent_b": "wine",
+      "expected_hybrids": ["cider", "fermented beverage", "alcoholic drink"]
+    },
+    {
+      "id": "pair_068",
+      "parent_a": "tea",
+      "parent_b": "coffee",
+      "expected_hybrids": ["yerba mate", "chai latte", "caffeinated beverage"]
+    },
+    {
+      "id": "pair_069",
+      "parent_a": "water",
+      "parent_b": "soda",
+      "expected_hybrids": ["sparkling water", "seltzer", "carbonated water"]
+    },
+    {
+      "id": "pair_070",
+      "parent_a": "smoothie",
+      "parent_b": "ice cream",
+      "expected_hybrids": ["milkshake", "frozen smoothie", "açai bowl"]
+    },
+    {
+      "id": "pair_071",
+      "parent_a": "taco",
+      "parent_b": "burrito",
+      "expected_hybrids": ["quesadilla", "enchilada", "chimichanga"]
+    },
+    {
+      "id": "pair_072",
+      "parent_a": "ramen",
+      "parent_b": "pasta",
+      "expected_hybrids": ["noodle dish", "Asian pasta", "udon"]
+    },
+    {
+      "id": "pair_073",
+      "parent_a": "sushi",
+      "parent_b": "burrito",
+      "expected_hybrids": ["sushi burrito", "poke bowl", "rice wrap"]
+    },
+    {
+      "id": "pair_074",
+      "parent_a": "pilot",
+      "parent_b": "astronaut",
+      "expected_hybrids": ["test pilot", "space pilot", "flight commander"]
+    },
+    {
+      "id": "pair_075",
+      "parent_a": "cloud",
+      "parent_b": "computing",
+      "expected_hybrids": ["cloud computing", "AWS", "serverless"]
+    },
+    {
+      "id": "pair_076",
+      "parent_a": "edge",
+      "parent_b": "server",
+      "expected_hybrids": ["edge computing", "CDN", "edge server"]
+    },
+    {
+      "id": "pair_077",
+      "parent_a": "startup",
+      "parent_b": "bank",
+      "expected_hybrids": ["fintech startup", "neobank", "digital bank"]
+    },
+    {
+      "id": "pair_078",
+      "parent_a": "coffee shop",
+      "parent_b": "coworking space",
+      "expected_hybrids": ["remote work cafe", "work cafe", "digital nomad hub"]
+    },
+    {
+      "id": "pair_079",
+      "parent_a": "gym",
+      "parent_b": "app",
+      "expected_hybrids": ["fitness app", "workout app", "Peloton"]
+    },
+    {
+      "id": "pair_080",
+      "parent_a": "podcast",
+      "parent_b": "radio",
+      "expected_hybrids": ["internet radio", "audio show", "streaming audio"]
+    },
+    {
+      "id": "pair_081",
+      "parent_a": "email",
+      "parent_b": "chat",
+      "expected_hybrids": ["Slack", "team messaging", "async chat"]
+    },
+    {
+      "id": "pair_082",
+      "parent_a": "meditation",
+      "parent_b": "app",
+      "expected_hybrids": ["Headspace", "Calm app", "mindfulness app"]
+    },
+    {
+      "id": "pair_083",
+      "parent_a": "bread",
+      "parent_b": "pizza",
+      "expected_hybrids": ["focaccia", "pita", "naan"]
+    },
+    {
+      "id": "pair_084",
+      "parent_a": "cheese",
+      "parent_b": "bread",
+      "expected_hybrids": ["grilled cheese", "cheese toast", "cheese bread"]
+    },
+    {
+      "id": "pair_085",
+      "parent_a": "language",
+      "parent_b": "model",
+      "expected_hybrids": ["large language model", "LLM", "GPT"]
+    },
+    {
+      "id": "pair_086",
+      "parent_a": "image",
+      "parent_b": "model",
+      "expected_hybrids": ["diffusion model", "image generator", "Stable Diffusion"]
+    },
+    {
+      "id": "pair_087",
+      "parent_a": "voice",
+      "parent_b": "assistant",
+      "expected_hybrids": ["Alexa", "Siri", "voice assistant"]
+    },
+    {
+      "id": "pair_088",
+      "parent_a": "chat",
+      "parent_b": "assistant",
+      "expected_hybrids": ["ChatGPT", "chatbot", "AI assistant"]
+    },
+    {
+      "id": "pair_089",
+      "parent_a": "code",
+      "parent_b": "assistant",
+      "expected_hybrids": ["Copilot", "coding assistant", "AI pair programmer"]
+    },
+    {
+      "id": "pair_090",
+      "parent_a": "map",
+      "parent_b": "app",
+      "expected_hybrids": ["Google Maps", "navigation app", "GPS app"]
+    },
+    {
+      "id": "pair_091",
+      "parent_a": "taxi",
+      "parent_b": "app",
+      "expected_hybrids": ["Uber", "Lyft", "ride-sharing app"]
+    },
+    {
+      "id": "pair_092",
+      "parent_a": "hotel",
+      "parent_b": "app",
+      "expected_hybrids": ["Airbnb", "booking app", "vacation rental"]
+    },
+    {
+      "id": "pair_093",
+      "parent_a": "food",
+      "parent_b": "delivery",
+      "expected_hybrids": ["DoorDash", "food delivery app", "meal delivery"]
+    },
+    {
+      "id": "pair_094",
+      "parent_a": "wallet",
+      "parent_b": "phone",
+      "expected_hybrids": ["mobile wallet", "Apple Pay", "digital wallet"]
+    },
+    {
+      "id": "pair_095",
+      "parent_a": "crypto",
+      "parent_b": "currency",
+      "expected_hybrids": ["Bitcoin", "cryptocurrency", "stablecoin"]
+    },
+    {
+      "id": "pair_096",
+      "parent_a": "security",
+      "parent_b": "camera",
+      "expected_hybrids": ["surveillance camera", "CCTV", "Ring doorbell"]
+    },
+    {
+      "id": "pair_097",
+      "parent_a": "smart",
+      "parent_b": "home",
+      "expected_hybrids": ["smart home", "home automation", "IoT home"]
+    },
+    {
+      "id": "pair_098",
+      "parent_a": "data",
+      "parent_b": "scientist",
+      "expected_hybrids": ["data scientist", "ML practitioner", "analytics engineer"]
+    },
+    {
+      "id": "pair_099",
+      "parent_a": "cloud",
+      "parent_b": "database",
+      "expected_hybrids": ["managed database", "BigQuery", "Snowflake"]
+    },
+    {
+      "id": "pair_100",
+      "parent_a": "virtual",
+      "parent_b": "reality",
+      "expected_hybrids": ["VR", "immersive experience", "metaverse"]
+    }
+  ]
+}

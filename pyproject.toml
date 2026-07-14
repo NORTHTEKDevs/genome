@@ -1,0 +1,80 @@
+[project]
+name = "genome-memory"
+version = "1.0.0"
+description = "DNA-inspired memory layer for AI agents: zero-LLM-call ingestion, retrieval that beats full-context on overflowing histories."
+readme = "README.md"
+license = "BUSL-1.1"
+authors = [
+    { name = "Northtek", email = "info@northtek.io" },
+]
+maintainers = [
+    { name = "FrostByte Digital", email = "info@northtek.io" },
+]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Operating System :: OS Independent",
+]
+requires-python = ">=3.11,<3.14"
+dependencies = [
+    "numpy>=1.26,<3.0",
+    "sentence-transformers>=2.7,<4.0",
+    "scikit-learn>=1.4,<2.0",
+    "matplotlib>=3.8,<4.0",
+    "rank-bm25>=0.2.2",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+    "ruff>=0.4",
+    "jupyter>=1.0",
+    "pandas>=2.0",
+    "ipykernel>=6.0",
+    "langchain-core>=0.3",
+    "llama-index-core>=0.10",
+]
+langchain = ["langchain-core>=0.3"]
+llamaindex = ["llama-index-core>=0.10"]
+postgres = ["psycopg[binary]>=3.1", "pgvector>=0.2"]
+fastapi = ["fastapi>=0.110", "uvicorn[standard]>=0.27", "pydantic>=2.5"]
+mcp = ["mcp>=1.2"]
+all = [
+    "mcp>=1.2",
+    "langchain-core>=0.3",
+    "llama-index-core>=0.10",
+    "psycopg[binary]>=3.1",
+    "pgvector>=0.2",
+    "fastapi>=0.110",
+    "uvicorn[standard]>=0.27",
+    "pydantic>=2.5",
+]
+
+[project.scripts]
+genome-eval = "genome.cli:main"
+genome-mcp = "genome.mcp.server:main"
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["genome*"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP"]
+ignore = [
+    "E501",  # line too long (not enforced strictly)
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra --strict-markers"

@@ -1,0 +1,92 @@
+name: tests
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+
+jobs:
+  test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest]
+        python-version: ["3.11", "3.12", "3.13"]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+
+      - name: Install package and dev deps
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev]"
+
+      - name: Cache HuggingFace model
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/huggingface
+          key: ${{ runner.os }}-hf-all-MiniLM-L6-v2
+
+      - name: Lint with ruff
+        run: ruff check genome tests
+
+      - name: Run tests
+        run: pytest tests/ -v
+
+      - name: Smoke-run CLI
+        run: genome-eval --limit-pairs 5 --output results/ci_smoke.json
+
+  # Separate job: exercises the Postgres/pgvector backend against a real
+  # Postgres 16 + pgvector service container. Runs alongside the SQLite matrix.
+  test-postgres:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: pgvector/pgvector:pg16
+        env:
+          POSTGRES_USER: genome
+          POSTGRES_PASSWORD: genome
+          POSTGRES_DB: memorydb
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U genome -d memorydb"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install package with Postgres extra
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev,postgres]"
+
+      - name: Cache HuggingFace model
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/huggingface
+          key: ubuntu-latest-hf-all-MiniLM-L6-v2
+
+      - name: Run Postgres integration tests
+        env:
+          POSTGRES_DSN: "postgresql://genome:genome@localhost:5432/memorydb"
+        run: pytest tests/memory/test_postgres_store.py -v

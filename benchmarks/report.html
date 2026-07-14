@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GENOME on LoCoMo — An Honest Benchmark</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300..600&family=Newsreader:opsz,wght@6..72,300..500&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0B0C0E; --panel:#111318; --panel-2:#161922; --line:#20242E;
+    --ink:#E7E9EE; --ink-2:#AEB4C0; --ink-3:#79808F;
+    --accent:#0A84FF; --win:#3FB950; --parity:#D9A73E; --null:#6E7481;
+    --serif:'Fraunces',Georgia,serif; --read:'Newsreader',Georgia,serif;
+    --mono:'IBM Plex Mono',ui-monospace,monospace;
+  }
+  *{box-sizing:border-box}
+  html{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:var(--read);font-size:17px;line-height:1.62;
+    font-optical-sizing:auto;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:860px;margin:0 auto;padding:72px 40px 120px}
+  h1,h2,h3{font-family:var(--serif);font-weight:400;letter-spacing:-0.015em;line-height:1.08}
+  h1{font-size:58px;margin:0 0 8px;letter-spacing:-0.03em}
+  .kicker{font-family:var(--mono);font-size:12px;letter-spacing:0.22em;
+    text-transform:uppercase;color:var(--accent);margin:0 0 22px}
+  .lede{font-family:var(--read);font-size:22px;line-height:1.5;color:var(--ink-2);
+    font-weight:300;margin:18px 0 30px;max-width:720px}
+  .meta{font-family:var(--mono);font-size:12px;color:var(--ink-3);
+    display:flex;gap:20px;flex-wrap:wrap;border-top:1px solid var(--line);
+    border-bottom:1px solid var(--line);padding:14px 0;margin:0 0 8px}
+  h2{font-size:30px;margin:64px 0 6px}
+  h2 .num{font-family:var(--mono);font-size:13px;color:var(--ink-3);
+    letter-spacing:0.1em;display:block;margin-bottom:10px}
+  h3{font-size:20px;margin:34px 0 8px;color:var(--ink)}
+  p{margin:14px 0}
+  .section-rule{height:1px;background:var(--line);margin:8px 0 4px;border:0}
+  strong{color:var(--ink);font-weight:500}
+  em{color:var(--ink-2)}
+  a{color:var(--accent);text-decoration:none}
+  /* verdict chips */
+  .chip{display:inline-flex;align-items:center;gap:7px;font-family:var(--mono);
+    font-size:11px;letter-spacing:0.08em;text-transform:uppercase;
+    padding:4px 10px;border-radius:100px;border:1px solid var(--line);
+    background:var(--panel);white-space:nowrap}
+  .chip::before{content:"";width:7px;height:7px;border-radius:50%}
+  .chip.win::before{background:var(--win)} .chip.win{color:#8FE0A0;border-color:#1E3A26}
+  .chip.par::before{background:var(--parity)} .chip.par{color:#E6CB86;border-color:#3A3117}
+  .chip.nul::before{background:var(--null)} .chip.nul{color:var(--ink-2)}
+  /* tldr grid */
+  .tldr{margin:34px 0 10px;border:1px solid var(--line);border-radius:14px;
+    overflow:hidden;background:var(--panel)}
+  .tldr .row{display:grid;grid-template-columns:1fr auto;gap:16px;
+    padding:18px 22px;border-top:1px solid var(--line);align-items:center}
+  .tldr .row:first-child{border-top:0}
+  .tldr .row h4{margin:0;font-family:var(--serif);font-weight:400;font-size:19px}
+  .tldr .row p{margin:4px 0 0;font-size:14.5px;color:var(--ink-2);line-height:1.45}
+  /* tables */
+  .tbl{width:100%;border-collapse:collapse;margin:22px 0 6px;font-size:15px}
+  .tbl th{font-family:var(--mono);font-size:11px;letter-spacing:0.06em;
+    text-transform:uppercase;color:var(--ink-3);text-align:right;
+    padding:0 0 10px;border-bottom:1px solid var(--line);font-weight:500}
+  .tbl th:first-child{text-align:left}
+  .tbl td{padding:11px 0;border-bottom:1px solid var(--line);
+    text-align:right;font-variant-numeric:tabular-nums;color:var(--ink-2)}
+  .tbl td:first-child{text-align:left;color:var(--ink);font-family:var(--read)}
+  .tbl tr.hi td{color:var(--ink);background:linear-gradient(90deg,rgba(10,132,255,.07),transparent)}
+  .tbl tr.hi td:first-child{font-weight:500;box-shadow:inset 3px 0 0 var(--accent)}
+  .tbl .big{font-family:var(--serif);font-size:19px;color:var(--ink)}
+  .caption{font-family:var(--mono);font-size:11.5px;color:var(--ink-3);
+    margin:6px 0 0;line-height:1.5}
+  /* big stat callout */
+  .stat{display:flex;gap:34px;flex-wrap:wrap;margin:30px 0;
+    padding:26px 28px;border:1px solid var(--line);border-radius:14px;
+    background:linear-gradient(180deg,var(--panel-2),var(--panel))}
+  .stat .s{flex:1;min-width:150px}
+  .stat .v{font-family:var(--serif);font-size:44px;line-height:1;color:var(--ink);
+    letter-spacing:-0.02em}
+  .stat .v.acc{color:var(--win)}
+  .stat .k{font-family:var(--mono);font-size:11px;letter-spacing:0.09em;
+    text-transform:uppercase;color:var(--ink-3);margin-top:10px}
+  .note{border-left:2px solid var(--accent);padding:4px 0 4px 18px;margin:22px 0;
+    color:var(--ink-2);font-size:15.5px}
+  .note b{color:var(--ink)}
+  .honest{border-left:2px solid var(--parity)}
+  code{font-family:var(--mono);font-size:13px;background:var(--panel-2);
+    padding:2px 6px;border-radius:5px;color:var(--ink-2)}
+  pre{font-family:var(--mono);font-size:12.5px;background:var(--panel);
+    border:1px solid var(--line);border-radius:10px;padding:18px 20px;
+    overflow:auto;color:var(--ink-2);line-height:1.7}
+  .foot{margin-top:80px;border-top:1px solid var(--line);padding-top:22px;
+    font-family:var(--mono);font-size:11.5px;color:var(--ink-3);line-height:1.7}
+  .mark{display:inline-block;width:11px;height:11px;border-radius:3px;
+    background:var(--accent);transform:rotate(45deg);margin-right:9px;vertical-align:middle}
+  @media print{ .wrap{max-width:none;padding:0 8px} body{font-size:11pt}
+    h1{font-size:34pt} h2{font-size:20pt} .lede{font-size:13pt}
+    .stat,.tldr,pre{break-inside:avoid} h2{break-after:avoid} }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <p class="kicker"><span class="mark"></span>GENOME · Memory Layer Benchmark · v1.0</p>
+  <h1>An honest read of GENOME on&nbsp;LoCoMo &amp; TempBelief</h1>
+  <p class="lede">GENOME ingests with zero LLM calls (<strong>over 8,000&times;
+    cheaper</strong> at Haiku pricing), beats truncated full-context once history
+    overflows the window, and keeps a deterministic, auditable bi-temporal record. It
+    answers <strong>point-in-time queries</strong> better than Mem0 when sources state
+    explicit dates (0.870 vs 0.676) &mdash; though we measured that edge disappearing on
+    natural relative-dated language, and we say so. On saturated in-window QA it ties
+    Mem0. Where its features don't help, this report says that too.</p>
+  <div class="meta">
+    <span>WITHIN-HARNESS · IDENTICAL RESPONDER/JUDGE/EMBEDDER</span>
+    <span>LoCoMo n=1,540 · TempBelief n=108 as-of</span>
+    <span>RESPONDER: CLAUDE HAIKU 4.5</span>
+    <span>PAIRED McNEMAR</span>
+  </div>
+
+  <!-- TL;DR -->
+  <h2><span class="num">SUMMARY</span>Six questions, six honest answers</h2>
+  <div class="tldr">
+    <div class="row">
+      <div><h4>Point-in-time ("as of time T") queries</h4><p>Wins when the source states explicit dates (0.870 vs Mem0 0.676, p=0.0007) but <strong>ties Mem0 on natural relative-dated language</strong> (0.759 vs 0.722, p=0.82). A conditional edge, not a universal one. (TempBelief.)</p></div>
+      <span class="chip par">Win if dates explicit</span>
+    </div>
+    <div class="row">
+      <div><h4>Ingestion cost</h4><p>0 LLM calls per message vs Mem0's 1.00; measured 8,433&times; cheaper, 9&times; faster.</p></div>
+      <span class="chip win">Decisive win</span>
+    </div>
+    <div class="row">
+      <div><h4>Overflow accuracy</h4><p>On a 284k-token history, +0.409 accuracy at 80&times; less context than the stronger (recency-window) full-context baseline.</p></div>
+      <span class="chip win">Decisive win</span>
+    </div>
+    <div class="row">
+      <div><h4>In-window accuracy</h4><p>0.851 vs Mem0 0.855 vs full-context 0.863. No significant difference (McNemar p&gt;0.23); GENOME's point estimate is nominally the lowest.</p></div>
+      <span class="chip par">Parity</span>
+    </div>
+    <div class="row">
+      <div><h4>Synthesis (consolidation) IP</h4><p>At equal token budget, summarize-vs-forget is a net wash: helps temporal, hurts single-hop.</p></div>
+      <span class="chip nul">Honest null</span>
+    </div>
+    <div class="row">
+      <div><h4>Hybrid / graph retrieval</h4><p>Hybrid is measurably worse than dense; graph mode wasn't exercised here. Dense is the validated default.</p></div>
+      <span class="chip nul">Honest null</span>
+    </div>
+  </div>
+  <p class="note honest"><b>Why publish the nulls?</b> A memory layer that only
+    reports its wins can't be trusted on them. The two null results below are
+    measured, reproducible, and make the two wins above credible.</p>
+
+  <!-- METHOD -->
+  <h2><span class="num">METHOD</span>The comparison is fair by construction</h2>
+  <p>Every system in this report answers with the <em>same</em> model, is graded by
+    the <em>same</em> judge (the Mem0-verbatim judge prompt at temperature 0),
+    embeds with the <em>same</em> encoder (<code>text-embedding-3-small</code>),
+    and retrieves the <em>same</em> top-k. The only thing that varies is the memory
+    layer. That isolates the layer as the independent variable and removes the
+    usual confound where a "better" score just reflects a bigger answer model or a
+    laxer judge.</p>
+  <p>Scores are reported over the <strong>1,540 headline questions</strong> (LoCoMo
+    categories 1–4: multi-hop, temporal, open-domain, single-hop). The adversarial
+    category 5 is scored separately as an abstention test. Significance is paired
+    <strong>McNemar</strong> on per-question correctness — the right test when the
+    same questions are answered by both systems.</p>
+  <p class="caption">Two caveats we state up front. (1) The answer model and the
+    judge are the same family (Haiku 4.5) — standard for LoCoMo harnesses, but a
+    same-model-judge carries a self-preference risk that applies equally to every
+    system here. (2) Numbers are single-run at a fixed seed; we report point
+    estimates without confidence intervals, so treat sub-percent gaps as noise.</p>
+
+  <!-- 6: belief-state -->
+  <h2><span class="num">FINDING 06 · WIN (EXPLICIT-DATED SOURCES ONLY)</span>Point-in-time truth — but only when dates are explicit</h2>
+  <p>The findings above are about <em>retrieval</em>. This one is a different
+    primitive. GENOME maintains a contradiction-resolved, <strong>bi-temporal</strong>
+    model of how facts change, recording each fact at its <em>domain-time</em>
+    validity (when it became true in the world, parsed from the text) rather than
+    wall-clock ingest time. So it can answer &ldquo;what was true at time T?&rdquo;
+    even when facts are revealed out of chronological order. We tested this on
+    <strong>TempBelief</strong> -- a deterministic, gold-validated benchmark where
+    entities' attributes change over 6-8 sessions, ~1/3 of updates arrive out of
+    order, and distractors must not move the belief. Same responder/judge/embedder;
+    Mem0 run at its best (<code>infer=True</code> + <code>history()</code> traversal).</p>
+  <table class="tbl">
+    <thead><tr><th>Split</th><th>belief-state</th><th>Mem0</th><th>dense</th><th>full-context</th></tr></thead>
+    <tbody>
+      <tr class="hi"><td>as-of (point-in-time)</td><td class="big">0.870</td><td>0.676</td><td>0.407</td><td>0.139</td></tr>
+      <tr><td>current-value</td><td>0.833</td><td>0.861</td><td>0.972</td><td>1.000</td></tr>
+      <tr><td>history</td><td>1.000</td><td>1.000</td><td>1.000</td><td>1.000</td></tr>
+      <tr class="hi"><td>macro-J (3 splits)</td><td class="big">0.901</td><td>0.846</td><td>0.793</td><td>0.713</td></tr>
+    </tbody>
+  </table>
+  <p class="caption">Within-harness, 6 conversations, n=108 as-of. Source: benchmarks/tempbelief_run.py over results/tempbelief/.</p>
+  <div class="stat">
+    <div class="s"><div class="v acc">0.870</div><div class="k">belief-state as-of vs Mem0 0.676</div></div>
+    <div class="s"><div class="v">p = 0.0007</div><div class="k">McNemar vs Mem0 (28 vs 7 of 108)</div></div>
+    <div class="s"><div class="v acc">0.97 / 1.00</div><div class="k">KG extraction precision / date accuracy (audited)</div></div>
+  </div>
+  <p class="note"><b>The honest read:</b> on point-in-time queries, belief-state beats
+    <em>every</em> baseline with significance (vs Mem0 p=0.0007, vs dense and
+    full-context p&lt;10<sup>&minus;5</sup>). Overwrite-based memory loses old values;
+    raw retrieval and full-context return the <em>latest</em> value or can't
+    disambiguate dates in a cluttered context. Only a bi-temporal store answers
+    &ldquo;what was true at T&rdquo; reliably. This is <b>not judge leniency</b>: a
+    full six-conversation audit finds the KG at 0.97 precision / 0.96 recall, and
+    <em>every</em> captured fact is dated correctly (domain-time accuracy 1.000). <b>Honest
+    tradeoff:</b> belief-state <em>loses</em> current-value (0.833 vs 0.97-1.0) -- its LLM
+    extraction is noisier on trivial &ldquo;latest value&rdquo; lookups than reading the
+    last mention.</p>
+  <p class="note honest"><b>The win does NOT survive natural language — we measured it.</b>
+    We re-ran the benchmark with every fact phrased relatively
+    (&ldquo;about two years ago&rdquo;, &ldquo;last year&rdquo;) anchored to the message
+    date, instead of a verbatim &ldquo;Month Year&rdquo;. The result:
+    <strong>as-of belief 0.759 vs Mem0 0.722, McNemar p=0.82 &mdash; a tie.</strong> The
+    decisive verbatim result (0.870 vs 0.676) <em>collapsed</em>, because with relative
+    dates Mem0's LLM resolves them at query time about as well as GENOME resolves them at
+    ingest. So this is a real advantage <b>only when the source states explicit,
+    machine-parseable dates</b> (logs, structured notes, timestamped records) &mdash; NOT
+    a general-conversation advantage. The durable belief-state value is the
+    <em>deterministic, structured, auditable record</em> (below), not a QA-accuracy edge.
+    Also: the history row is a partial-credit ceiling (all four at 1.000, uninformative);
+    the real signal is as-of alone, not macro-J; 6 convs, one synthetic dataset, single seed.</p>
+
+  <!-- 1 -->
+  <h2><span class="num">FINDING 01 · PARITY</span>In-window accuracy is saturated</h2>
+  <table class="tbl">
+    <thead><tr><th>System</th><th>Headline acc.</th><th>multi-hop</th><th>temporal</th><th>open-dom.</th><th>single-hop</th></tr></thead>
+    <tbody>
+      <tr><td>full-context (upper bound)</td><td class="big">0.863</td><td>0.883</td><td>0.748</td><td>0.531</td><td>0.938</td></tr>
+      <tr><td>Mem0</td><td class="big">0.855</td><td>0.890</td><td>0.863</td><td>0.479</td><td>0.882</td></tr>
+      <tr class="hi"><td>GENOME</td><td class="big">0.851</td><td>0.851</td><td>0.798</td><td>0.500</td><td>0.911</td></tr>
+    </tbody>
+  </table>
+  <p class="caption">Judge accuracy (J), n=1,540. GENOME = the parent-filtered variant; the plain dense variant is within a point (0.852). Source: benchmarks/verdict.py over results/locomo_claude_v2/.</p>
+  <p>Paired McNemar finds <strong>no significant difference</strong> between GENOME
+    and either baseline: versus Mem0, &Delta;=&minus;0.004 (p=0.747); versus
+    full-context, &Delta;=&minus;0.012 (p=0.232). Both gaps are within noise — but
+    note the direction: GENOME's point estimate is <em>nominally the lowest of the
+    three</em>.</p>
+  <p class="note"><b>The honest read:</b> LoCoMo in-window accuracy has a ceiling
+    near 0.85 that every serious system hits. GENOME reaches it but sits a hair
+    below both baselines; the differences aren't statistically significant, so the
+    correct statement is <em>&ldquo;no confirmed difference,&rdquo; not
+    &ldquo;GENOME ahead.&rdquo;</em> Either way, this is not where a memory layer
+    earns its keep — and we don't claim an in-window accuracy win.</p>
+
+  <!-- 2 -->
+  <h2><span class="num">FINDING 02 · DECISIVE WIN</span>The win appears when history overflows</h2>
+  <p>A memory layer exists for the case full-context can't handle: history larger
+    than the window. We built a LoCoMo-Haystack of <strong>~284k tokens</strong>
+    (past a 200k window) and asked the same 120 questions of GENOME's constant-cost
+    retrieval versus full-context truncated to several budgets — truncating from
+    <em>both</em> ends (prefix = first-B tokens; recency = last-B tokens, what a
+    real chat app keeps) so the baseline isn't a strawman.</p>
+  <div class="stat">
+    <div class="s"><div class="v acc">0.817</div><div class="k">GENOME @ 1,602 tok/query</div></div>
+    <div class="s"><div class="v">0.408</div><div class="k">best full-context (recency @128k)</div></div>
+    <div class="s"><div class="v acc">+0.409</div><div class="k">delta vs the STRONGER baseline, 80&times; less context</div></div>
+  </div>
+  <table class="tbl">
+    <thead><tr><th>System</th><th>Accuracy</th><th>Context / query</th></tr></thead>
+    <tbody>
+      <tr class="hi"><td>GENOME (retrieval)</td><td class="big">0.817</td><td>1,602</td></tr>
+      <tr><td>full-context recency @128k</td><td>0.408</td><td>128,000</td></tr>
+      <tr><td>full-context prefix @128k</td><td>0.300</td><td>128,000</td></tr>
+      <tr><td>full-context recency @32k</td><td>0.125</td><td>32,000</td></tr>
+      <tr><td>full-context prefix @32k</td><td>0.133</td><td>32,000</td></tr>
+      <tr><td>full-context @8k (either end)</td><td>0.067–0.117</td><td>8,000</td></tr>
+    </tbody>
+  </table>
+  <p class="caption">120 questions over a ~284k-token history. Recency (last-B) is the stronger full-context arm — it keeps later sessions. Source: benchmarks/haystack_report.py over results/haystack/ (+ haystack_recency.py).</p>
+  <p>The collapse holds across every category, against the stronger recency@128k
+    baseline: GENOME leads single-hop 0.871 vs 0.500, multi-hop 0.810 vs 0.429,
+    temporal 0.783 vs 0.217, open-domain 0.333 vs 0.000 (the last on n=6 — too
+    small to weigh individually). The headline gap is not noise: paired McNemar of
+    GENOME vs recency@128k gives <strong>p&nbsp;&asymp;&nbsp;8&times;10<sup>&minus;10</sup></strong>
+    (55 questions GENOME alone got right, 6 the reverse). Neither truncation
+    direction helps — with 284k of history no fixed window holds it all, so the
+    answer model literally cannot see out-of-window evidence. Retrieval puts it back
+    at 1/80th the context.</p>
+
+  <!-- 3 -->
+  <h2><span class="num">FINDING 03 · DECISIVE WIN</span>Ingestion costs almost nothing</h2>
+  <p>GENOME stores a message by embedding it — no LLM in the write path. Mem0 runs
+    an LLM fact-extraction on every message. We instrumented Mem0's own LLM client
+    to count its real calls and tokens over an identical 80-turn slice.</p>
+  <table class="tbl">
+    <thead><tr><th>System</th><th>LLM calls / msg</th><th>Tokens (80 turns)</th><th>Wall-clock</th><th>Cost (80 turns)</th></tr></thead>
+    <tbody>
+      <tr><td>Mem0</td><td>1.00</td><td>692,132</td><td>164.4 s</td><td class="big">$0.7119</td></tr>
+      <tr class="hi"><td>GENOME (dense)</td><td>0</td><td>4,221</td><td>19.2 s</td><td class="big">$0.00008</td></tr>
+    </tbody>
+  </table>
+  <p class="caption">Measured over one 80-turn run (fixed, no repeats). Mem0's LLM cost at Haiku pricing ($1 / $5 per Mtok in/out); GENOME's $0.00008 is embedding pricing (0 LLM calls). The 8,433&times; multiplier is computed from the unrounded per-message costs, not the rounded cells shown. The 692k input tokens are Mem0's own extraction+update prompts, not injected by us. Source: benchmarks/ingest_cost.py (results/ingest_cost.log), Mem0's LLM client wrapped with a call/token counter.</p>
+  <div class="stat">
+    <div class="s"><div class="v acc">8,433&times;</div><div class="k">cheaper per message</div></div>
+    <div class="s"><div class="v">~$52 &rarr; $0.006</div><div class="k">full corpus, linearly extrapolated</div></div>
+    <div class="s"><div class="v">0</div><div class="k">ingest-time LLM calls</div></div>
+  </div>
+  <p class="note"><b>The honest read:</b> the robust, model-independent fact is the
+    <strong>call count — 0 vs 1.00 LLM call per message</strong>, which no pricing
+    choice can change. The dollar multiplier does depend on the model priced: at
+    Haiku pricing the full corpus is ~$52 (Mem0) vs ~$0.006 (GENOME); a cheaper
+    extraction model shrinks the ratio but it stays large, because GENOME's ingest
+    LLM cost is structurally zero. One mechanism we did <em>not</em> measure but
+    expect: Mem0's per-message cost should rise as its store fills (each write ships
+    existing memories to the LLM to decide an update), so linear extrapolation is if
+    anything an underestimate. GENOME's differentiator is the zero in that first
+    column.</p>
+
+  <!-- 4 -->
+  <h2><span class="num">FINDING 04 · HONEST NULL</span>Among modes we could fairly test, dense wins</h2>
+  <p>GENOME ships dense, hybrid, and graph retrieval. Using LoCoMo's annotated
+    evidence turns as ground truth, we measured how much gold evidence each mode
+    surfaces — no LLM, so this isolates retrieval from the saturated answer model.</p>
+  <table class="tbl">
+    <thead><tr><th>Mode</th><th>hit@5</th><th>hit@10</th><th>hit@20</th><th>full-recall@10</th></tr></thead>
+    <tbody>
+      <tr class="hi"><td>dense</td><td>0.622</td><td>0.715</td><td>0.798</td><td>0.652</td></tr>
+      <tr><td>dense + recency rerank</td><td>0.586</td><td>0.708</td><td>0.798</td><td>0.645</td></tr>
+      <tr><td>hybrid</td><td>0.497</td><td>0.564</td><td>0.714</td><td>0.512</td></tr>
+    </tbody>
+  </table>
+  <p class="caption">Mean fraction of gold evidence retrieved, 1,536 evidence-annotated questions. Source: benchmarks/retrieval_quality.py.</p>
+  <p class="note honest"><b>The honest read:</b> among the modes this harness could
+    fairly exercise, plain dense is best — hybrid is worse (0.564 vs 0.715 hit@10,
+    a descriptive mean over 1,536 questions; keyword blending pulls in
+    lexically-similar but wrong turns) and recency reranking is slightly worse
+    (LoCoMo evidence spans all sessions). <b>Graph mode is omitted, not
+    validated:</b> it needs an entity graph this offline store never built, so it
+    correctly fell back to dense and can't be scored here (we confirmed the store
+    held 0 entities). We make <em>no</em> claim that graph helps — and an earlier
+    full-pipeline graph variant scored far worse on answers (0.494), so the burden
+    is on graph to prove itself. Dense is GENOME's validated default.</p>
+
+  <!-- 5 -->
+  <h2><span class="num">FINDING 05 · HONEST NULL</span>Synthesis is a tradeoff, not a free win</h2>
+  <p>GENOME's signature idea is consolidation: rather than forget old memories under
+    a budget, summarize them. We tested it the only fair way — <strong>equal token
+    budget on both sides</strong>. Earlier internal runs showed a large synthesis
+    "win," but that was a confound: a cluster-summary is a dense fact-list fed far
+    more context than a pruned turn. Held to equal tokens, the picture is honest.</p>
+  <table class="tbl">
+    <thead><tr><th>Strategy @ equal budget</th><th>Accuracy</th><th>multi-hop</th><th>temporal</th><th>single-hop</th><th>open-dom.</th></tr></thead>
+    <tbody>
+      <tr><td>PRUNE (forget old)</td><td class="big">0.255</td><td>0.333</td><td>0.162</td><td>0.254</td><td>0.375</td></tr>
+      <tr><td>SYNTHESIZE (summarize old)</td><td class="big">0.260</td><td>0.405</td><td>0.246</td><td>0.206</td><td>0.344</td></tr>
+    </tbody>
+  </table>
+  <p class="caption">Storage budget S=3,000 tok, answer budget B=1,500 tok, n=584 (all 4 convs). Context fed was equal (1,473 vs 1,436 tok). Delta +0.005, McNemar p=0.861 — not significant. Source: benchmarks/budget_fair.py.</p>
+  <p class="note honest"><b>The honest read:</b> aggregate delta is <b>+0.005 —
+    statistically zero</b> (p=0.86). The per-category pattern is <em>directional,
+    not individually significance-tested</em> (only the aggregate was): synthesis
+    trends up on cross-session reasoning (temporal +0.085, multi-hop +0.072) and
+    down on exact-fact lookup (single-hop &minus;0.048, open-domain &minus;0.031),
+    consistent with the mechanism — a summary blurs the one verbatim detail a
+    single-hop question needs. Read as a tendency, not proof. Consolidation is a
+    <b>tunable tradeoff</b>: turn it on for temporal/analytical workloads, off for
+    lookup-heavy ones. It is not a blanket accuracy win, and we don't sell it as one.</p>
+
+  <!-- WHEN -->
+  <h2><span class="num">GUIDANCE</span>When GENOME is the right choice</h2>
+  <p><strong>Choose GENOME when</strong> ingestion cost matters (high message volume,
+    or you don't want an LLM in your write path), or when conversation history
+    exceeds the model's context window — the two cases this report measures a real
+    advantage in.</p>
+  <p><strong>Don't expect</strong> a higher in-window LoCoMo score than Mem0 — that
+    metric is saturated and the two tie. If your entire history already fits the
+    window and ingestion cost is irrelevant, full-context is a fine and simpler
+    baseline; a memory layer only starts paying off past that point.</p>
+
+  <!-- REPRO -->
+  <h2><span class="num">REPRODUCIBILITY</span>Every number regenerates</h2>
+<pre>python benchmarks/verdict.py            # Finding 01: in-window accuracy + McNemar
+python benchmarks/haystack_report.py    # Finding 02: overflow / haystack
+python benchmarks/ingest_cost.py --n 80 # Finding 03: measured ingestion cost
+python benchmarks/retrieval_quality.py  # Finding 04: retrieval-mode hit-rate
+python benchmarks/budget_fair.py        # Finding 05: token-fair synthesis ablation</pre>
+  <p class="caption">All figures in this report trace to benchmarks/VERIFIED-NUMBERS.md, which pins each number to its source file. Within-harness config, temperature 0, Mem0-verbatim judge.</p>
+
+  <div class="foot">
+    GENOME &middot; LoCoMo benchmark report &middot; generated from executed runs, no figures estimated except where labeled.<br>
+    Methodology: within-harness comparison, identical responder (Claude Haiku 4.5) / judge / embedder / top-k across all systems; paired McNemar for significance.<br>
+    Honest-benchmark principle: wins and nulls reported with equal prominence.
+  </div>
+
+</div>
+</body>
+</html>

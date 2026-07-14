@@ -1,0 +1,33 @@
+{
+  "name": "@frostbyte/genome-memory",
+  "version": "1.0.0",
+  "description": "TypeScript / JavaScript client for GENOME, an open-source memory layer for AI agents.",
+  "author": "FrostByte Digital",
+  "license": "BUSL-1.1",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": [
+    "dist",
+    "src",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "test": "node --test --experimental-strip-types src/*.test.ts",
+    "prepublishOnly": "npm run build"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "devDependencies": {
+    "@types/node": "^22",
+    "typescript": "^5.5"
+  }
+}
