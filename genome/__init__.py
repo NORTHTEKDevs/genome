@@ -1,7 +1,7 @@
 """GENOME: DNA-inspired memory primitives for AI."""
 
 # Copyright 2026 Northtek (FrostByte Digital LLC)
-# SPDX-License-Identifier: BUSL-1.1
+# SPDX-License-Identifier: Apache-2.0
 
 __version__ = "1.0.0"
 

@@ -20,7 +20,7 @@ expressing confidence.
 """
 
 # Copyright 2026 Northtek (FrostByte Digital LLC)
-# SPDX-License-Identifier: BUSL-1.1
+# SPDX-License-Identifier: Apache-2.0
 
 from __future__ import annotations
 

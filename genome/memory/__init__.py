@@ -7,7 +7,7 @@ full provenance tracking and parent-filtered retrieval.
 """
 
 # Copyright 2026 Northtek (FrostByte Digital LLC)
-# SPDX-License-Identifier: BUSL-1.1
+# SPDX-License-Identifier: Apache-2.0
 
 from genome.memory.graph import (
     CAUSES,

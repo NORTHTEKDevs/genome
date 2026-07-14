@@ -2,8 +2,8 @@
 
 ## Install
 
-GENOME is source-available under the Business Source License 1.1 (converts to Apache-2.0 on
-2030-07-12). A PyPI release is pending; for now, install from source:
+GENOME is open source under the Apache License 2.0. A PyPI release is pending; for now,
+install from source:
 
 ```bash
 pip install "git+https://github.com/NORTHTEKDevs/genome.git"

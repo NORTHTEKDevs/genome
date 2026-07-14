@@ -2,7 +2,7 @@
 
 **Open memory for AI agents. Same answer accuracy as Mem0 — but ~1,000× cheaper to store, runs fully offline, and keeps an auditable record.**
 
-[![License: BSL 1.1](https://img.shields.io/badge/License-BSL_1.1-blue.svg)](./LICENSE)
+[![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](./LICENSE)
 ![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue)
 
 Most agent-memory tools (like Mem0) call an LLM on **every message** to decide what to
@@ -218,12 +218,10 @@ python benchmarks/tempbelief_run.py --convs 6   # bi-temporal point-in-time vs b
 
 ## License
 
-**Business Source License 1.1 (BUSL-1.1)** — see [LICENSE](./LICENSE) and [NOTICE](./NOTICE).
+**Apache License 2.0** — see [LICENSE](./LICENSE) and [NOTICE](./NOTICE).
 
-GENOME is **source-available**: free to read, modify, self-host, embed in your own
-applications, evaluate, and use in research and development. The one restriction is that you
-may not offer GENOME to third parties as a competing hosted/managed memory service without a
-commercial license. On the **Change Date (2030-07-12)** it automatically converts to
-**Apache 2.0**. For commercial licensing outside that grant, contact info@northtek.io.
+GENOME is free and open source: read it, modify it, self-host it, and embed it in your own
+applications — commercial use included — under the terms of Apache 2.0. Questions:
+info@northtek.io.
 
 Copyright 2026 Northtek (FrostByte Digital LLC).

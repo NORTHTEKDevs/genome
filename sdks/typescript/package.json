@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "TypeScript / JavaScript client for GENOME, an open-source memory layer for AI agents.",
   "author": "FrostByte Digital",
-  "license": "BUSL-1.1",
+  "license": "Apache-2.0",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",

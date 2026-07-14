@@ -3,7 +3,7 @@ name = "genome-memory"
 version = "1.0.0"
 description = "DNA-inspired memory layer for AI agents: zero-LLM-call ingestion, retrieval that beats full-context on overflowing histories."
 readme = "README.md"
-license = "BUSL-1.1"
+license = "Apache-2.0"
 authors = [
     { name = "Northtek", email = "info@northtek.io" },
 ]

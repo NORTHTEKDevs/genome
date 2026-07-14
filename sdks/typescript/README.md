@@ -1,7 +1,7 @@
 # @frostbyte/genome-memory
 
-TypeScript / JavaScript client for GENOME, a source-available memory layer for AI
-agents (BUSL-1.1, converts to Apache-2.0 on 2030-07-12).
+TypeScript / JavaScript client for GENOME, an open-source memory layer for AI
+agents (Apache-2.0).
 
 Works against any running genome REST server. Mirrors the Python `Memory` API
 shape.
@@ -124,5 +124,4 @@ npm test        # node --test on src/*.test.ts
 
 ## License
 
-Business Source License 1.1 (BUSL-1.1) — converts to Apache-2.0 on 2030-07-12.
-See [`../../LICENSE`](../../LICENSE) at the repo root.
+Apache License 2.0. See [`../../LICENSE`](../../LICENSE) at the repo root.

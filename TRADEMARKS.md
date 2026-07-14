@@ -8,11 +8,8 @@ Northtek ("the Owner"):
 - **FrostByte**™
 - the genome and FrostByte logos (when/if published)
 
-These marks are reserved. The Business Source License 1.1 covering the genome
-source code does **not** grant any trademark rights (see the "This License does
-not grant you any right in any trademark or logo" paragraph of the LICENSE). When
-the license converts to Apache-2.0 on the Change Date, trademark rights remain
-reserved (Apache-2.0 section 6 likewise excludes trademarks).
+These marks are reserved. The Apache-2.0 license covering the genome source code
+does **not** grant any trademark rights (see Apache-2.0 section 6).
 
 ## Prohibited without written permission
 

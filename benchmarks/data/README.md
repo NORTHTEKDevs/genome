@@ -36,5 +36,5 @@ python genome/evals/tempbelief.py 12 > benchmarks/data/tempbelief.json
 
 Attribution note: LoCoMo is © its authors (Maharana et al., "Evaluating Very
 Long-Term Conversational Memory of LLM Agents"), used here under CC BY-NC 4.0 for
-non-commercial evaluation. GENOME's own source is licensed separately (BUSL-1.1);
+non-commercial evaluation. GENOME's own source is licensed separately (Apache-2.0);
 the dataset licenses are independent of GENOME's license and are not altered by it.
