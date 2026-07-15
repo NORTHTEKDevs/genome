@@ -17,6 +17,22 @@ completely offline.
 > it there (two independent benchmark runs confirm parity). The advantage is cost, speed,
 > offline operation, and a temporal/auditable record Mem0 can't produce.
 
+## Add persistent memory to your agent in one line (MCP)
+
+GENOME ships a **fully-local MCP server** — cross-session memory for Claude Desktop, Claude
+Code, or Cursor with **no API key and no data leaving your machine**:
+
+```bash
+pip install "genome-memory[mcp] @ git+https://github.com/NORTHTEKDevs/genome.git"
+```
+
+```json
+{ "mcpServers": { "genome": { "command": "genome-mcp" } } }
+```
+
+Tools the agent gets: **`remember`**, **`recall`**, **`forget`**, **`reset_memories`**.
+Memories persist locally in `~/.genome/memories.db`. [Full MCP details ↓](#use-it-as-an-mcp-server-fully-local-memory-for-any-agent)
+
 ## GENOME vs Mem0 at a glance
 
 | | GENOME | Mem0 |
