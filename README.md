@@ -24,12 +24,14 @@ GENOME ships a **fully-local MCP server** — cross-session memory for Claude De
 Code, or Cursor with **no API key and no data leaving your machine**:
 
 ```bash
-pip install "genome-memory[mcp] @ git+https://github.com/NORTHTEKDevs/genome.git"
+pip install "genome-memory[mcp]"
 ```
 
 ```json
 { "mcpServers": { "genome": { "command": "genome-mcp" } } }
 ```
+
+Or zero-install via uv: `{ "command": "uvx", "args": ["--from", "genome-memory[mcp]", "genome-mcp"] }`
 
 Tools the agent gets: **`remember`**, **`recall`**, **`forget`**, **`reset_memories`**.
 Memories persist locally in `~/.genome/memories.db`. [Full MCP details ↓](#use-it-as-an-mcp-server-fully-local-memory-for-any-agent)
@@ -87,15 +89,13 @@ capability, not a price point.
 
 ## Install
 
-Until the PyPI release lands, install from source:
-
 ```bash
-pip install "git+https://github.com/NORTHTEKDevs/genome.git"
+pip install genome-memory
 ```
 
-(`pip install genome-memory` is coming.) The default embedder is local
-(`sentence-transformers/all-MiniLM-L6-v2`) — no API key, works offline; the first run
-downloads the ~90 MB model once. OpenAI embeddings are optional for higher-dimensional retrieval.
+The default embedder is local (`sentence-transformers/all-MiniLM-L6-v2`) — no API key,
+works offline; the first run downloads the ~90 MB model once. OpenAI embeddings are
+optional for higher-dimensional retrieval.
 
 ## Quickstart (fully local, no API key)
 
@@ -131,7 +131,7 @@ no API keys, no data leaves the box. Most memory MCPs can't say that.
 Install with the `mcp` extra, then add it to your client's config:
 
 ```bash
-pip install "genome-memory[mcp] @ git+https://github.com/NORTHTEKDevs/genome.git"
+pip install "genome-memory[mcp]"
 ```
 
 ```json

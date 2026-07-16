@@ -2,11 +2,10 @@
 
 ## Install
 
-GENOME is open source under the Apache License 2.0. A PyPI release is pending; for now,
-install from source:
+GENOME is open source under the Apache License 2.0. Install from PyPI:
 
 ```bash
-pip install "git+https://github.com/NORTHTEKDevs/genome.git"
+pip install genome-memory
 ```
 
 Or clone and install in editable mode for development:
