@@ -23,8 +23,9 @@ from __future__ import annotations
 import re
 import time
 from calendar import timegm
+from collections.abc import Callable
 from dataclasses import dataclass
-from typing import Any, Callable
+from typing import Any
 
 import numpy as np
 

@@ -10,7 +10,7 @@
  *
  * @example
  * ```ts
- * import { Memory } from "@frostbyte/genome-memory";
+ * import { Memory } from "@northtek/genome-memory";
  *
  * const mem = new Memory({ baseUrl: "http://localhost:8080" });
  * await mem.add({ text: "I love pour-over coffee", userId: "alice" });

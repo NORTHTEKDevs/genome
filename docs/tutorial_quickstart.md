@@ -222,6 +222,5 @@ docker-compose up
 ## Next
 
 - [Architecture](architecture.md) -- how genome works internally
-- [Mem0 migration guide](migration_from_mem0.md) -- switching from Mem0
 - [API reference](api_reference.md) -- every method and its options
 - [Changelog](../CHANGELOG.md)

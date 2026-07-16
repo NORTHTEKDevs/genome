@@ -5,7 +5,30 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
-## [Unreleased] - locomo-readiness branch
+## [1.0.0] - 2026-07-13 — initial public release
+
+First public release at [NORTHTEKDevs/genome](https://github.com/NORTHTEKDevs/genome),
+under the Apache License 2.0.
+
+### Added
+- **MCP server** (`genome-mcp`, `genome/mcp/server.py`): fully-local persistent agent
+  memory over the Model Context Protocol — `remember` / `recall` / `forget` /
+  `reset_memories`, no API keys, no network. Install extra: `genome-memory[mcp]`.
+- **Cross-encoder reranking** (`genome/memory/rerank.py`, `Memory(reranker=...)`):
+  local, free retrieval reranking with RRF fusion against the dense order.
+- **Bi-temporal belief-state layer** (`genome/memory/belief.py`): domain-time fact
+  ingestion, point-in-time (`as-of`) answering, and the `explain_belief` audit surface.
+- Honest benchmark suite and results: LoCoMo + LongMemEval within-harness comparisons
+  vs Mem0 (`benchmarks/RESULTS.md`), measured ingest cost, local write-path proof
+  (`benchmarks/local_writepath.py`), deployment TCO projection
+  (`benchmarks/tco_project.py`), and the TempBelief bi-temporal benchmark.
+
+### Changed
+- License: Apache-2.0. Copyright Northtek (FrostByte Digital LLC).
+- README rewritten around measured results (accuracy parity with Mem0; ~1,000× lower
+  ingest cost; ~10 ms air-gapped local writes; point-in-time capability).
+
+## [Pre-release] - locomo-readiness branch
 
 ### Changed
 - **Behavior change**: `LLMExtractor` now defaults to `prompt_version="v2"`

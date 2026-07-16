@@ -54,6 +54,12 @@ all = [
     "pydantic>=2.5",
 ]
 
+[project.urls]
+Homepage = "https://github.com/NORTHTEKDevs/genome"
+Repository = "https://github.com/NORTHTEKDevs/genome"
+Issues = "https://github.com/NORTHTEKDevs/genome/issues"
+Changelog = "https://github.com/NORTHTEKDevs/genome/blob/main/CHANGELOG.md"
+
 [project.scripts]
 genome-eval = "genome.cli:main"
 genome-mcp = "genome.mcp.server:main"

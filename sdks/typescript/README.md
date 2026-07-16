@@ -1,4 +1,4 @@
-# @frostbyte/genome-memory
+# @northtek/genome-memory
 
 TypeScript / JavaScript client for GENOME, an open-source memory layer for AI
 agents (Apache-2.0).
@@ -28,7 +28,7 @@ python -m genome.server  # listens on :8080
 Then from your Node/TS app:
 
 ```ts
-import { Memory } from "@frostbyte/genome-memory";
+import { Memory } from "@northtek/genome-memory";
 
 const mem = new Memory({
   baseUrl: "http://localhost:8080",
@@ -95,7 +95,7 @@ All methods are async. Full type definitions ship with the package.
 ## Error handling
 
 ```ts
-import { GenomeError } from "@frostbyte/genome-memory";
+import { GenomeError } from "@northtek/genome-memory";
 
 try {
   await mem.synthesize({ memoryIds: [a, b], userId: "alice" });

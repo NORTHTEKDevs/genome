@@ -225,7 +225,7 @@ from genome import Memory
 
 Client-side connection (TypeScript):
 ```ts
-import { Memory } from "@frostbyte/genome-memory";
+import { Memory } from "@northtek/genome-memory";
 const mem = new Memory({
   baseUrl: "https://my-genome.fly.dev",
   apiKey: process.env.GENOME_API_KEY,

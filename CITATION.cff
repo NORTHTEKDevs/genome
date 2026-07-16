@@ -1,0 +1,25 @@
+cff-version: 1.2.0
+message: "If you use GENOME or its benchmark results, please cite it as below."
+title: "GENOME: a zero-LLM-call, bi-temporal memory layer for AI agents"
+type: software
+authors:
+  - name: "Northtek (FrostByte Digital LLC)"
+    email: info@northtek.io
+repository-code: "https://github.com/NORTHTEKDevs/genome"
+license: Apache-2.0
+version: 1.0.0
+date-released: 2026-07-13
+keywords:
+  - agent memory
+  - retrieval
+  - bi-temporal
+  - LoCoMo
+  - LongMemEval
+  - MCP
+abstract: >-
+  GENOME is a memory layer for AI agents that ingests with zero LLM calls
+  (local embedding write path, ~10 ms/message, runs air-gapped), matches
+  LLM-extraction memory (Mem0) on answer accuracy on LoCoMo and LongMemEval,
+  and maintains a deterministic bi-temporal belief-state that answers
+  point-in-time queries with full provenance. Benchmarks are within-harness
+  with paired significance tests; null results are reported.

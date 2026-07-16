@@ -112,7 +112,8 @@ def test_graph_falls_back_when_no_entities():
     emb = {"q": [1.0, 0.0], "a": [0.9, 0.1], "b": [0.1, 0.9]}
     mem = Memory(embedding_provider=ControlledEmbedder(emb, dim=2))
     try:
-        _mk(mem, "a", emb["a"]); _mk(mem, "b", emb["b"])
+        _mk(mem, "a", emb["a"])
+        _mk(mem, "b", emb["b"])
         res = mem.search("q", user_id="u", limit=2, filter_parents=False,
                          mode="graph")
         assert len(res) >= 1

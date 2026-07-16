@@ -25,7 +25,7 @@ from __future__ import annotations
 
 import json
 from calendar import timegm
-from dataclasses import dataclass, field, asdict
+from dataclasses import asdict, dataclass, field
 from pathlib import Path
 
 
@@ -219,7 +219,7 @@ def _build_conversation(cid: str, seed: int, relative: bool = False) -> TBConver
                 vals[1] = pool[(pool.index(vals[1]) + 1) % len(pool)]
             if vals[2] in (vals[0], vals[1]):
                 vals[2] = pool[(pool.index(vals[2]) + 2) % len(pool)]
-            for k, (v, fi) in enumerate(zip(vals, idxs)):
+            for k, (v, fi) in enumerate(zip(vals, idxs, strict=False)):
                 until = idxs[k + 1] if k + 1 < len(idxs) else None
                 events.append(FactEvent(ent, a, v, fi, until))
 
@@ -284,7 +284,8 @@ def _build_conversation(cid: str, seed: int, relative: bool = False) -> TBConver
         questions.append(TBQuestion(
             question=f"What is {ent}'s current {noun}?",
             answer=seq[-1].value, category="current-value",
-            question_id=f"{cid}:q{qid}", entity=ent, attribute=attr)); qid += 1
+            question_id=f"{cid}:q{qid}", entity=ent, attribute=attr))
+        qid += 1
         # as-of: one per completed interval (query at midpoint of the interval)
         for k in range(len(seq)):
             start = seq[k].from_idx
@@ -295,20 +296,23 @@ def _build_conversation(cid: str, seed: int, relative: bool = False) -> TBConver
             questions.append(TBQuestion(
                 question=f"What was {ent}'s {noun} in {_month_year(mid)}?",
                 answer=seq[k].value, category="as-of",
-                question_id=f"{cid}:q{qid}", entity=ent, attribute=attr)); qid += 1
+                question_id=f"{cid}:q{qid}", entity=ent, attribute=attr))
+            qid += 1
         # history
         hist = "; ".join(f"{e.value} (from {_month_year(e.from_idx)})" for e in seq)
         questions.append(TBQuestion(
             question=f"List every {noun} {ent} has had over time, in order.",
             answer=hist, category="history",
-            question_id=f"{cid}:q{qid}", entity=ent, attribute=attr)); qid += 1
+            question_id=f"{cid}:q{qid}", entity=ent, attribute=attr))
+        qid += 1
         # as-of-abstention: a date strictly BEFORE the first known fact
         before = seq[0].from_idx - 6
         if before >= 0:
             questions.append(TBQuestion(
                 question=f"What was {ent}'s {noun} in {_month_year(before)}?",
                 answer="no information available", category="as-of-abstention",
-                question_id=f"{cid}:q{qid}", entity=ent, attribute=attr)); qid += 1
+                question_id=f"{cid}:q{qid}", entity=ent, attribute=attr))
+            qid += 1
 
     return TBConversation(conversation_id=cid, turns=turns, questions=questions)
 
