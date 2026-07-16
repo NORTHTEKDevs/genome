@@ -1,14 +1,19 @@
 services:
   genome:
     build: .
-    image: genome:v0.6.0
+    image: genome:1.0.0
     ports:
       - "8080:8080"
     environment:
       GENOME_STORAGE: "postgresql://genome:genome@postgres:5432/memory"
       GENOME_EMBED_MODEL: "sentence-transformers/all-MiniLM-L6-v2"
       GENOME_CACHE_SIZE: "2048"
-      # GENOME_API_KEY: "set-a-real-key-here"
+      # Bind all interfaces inside the container so the published port is reachable.
+      GENOME_HOST: "0.0.0.0"
+      # REQUIRED. The API is destructive (delete/reset) and must be authenticated.
+      # `docker-compose up` fails fast if GENOME_API_KEY is unset (set it in a .env
+      # file or the shell): export GENOME_API_KEY=$(openssl rand -hex 32)
+      GENOME_API_KEY: "${GENOME_API_KEY:?Set GENOME_API_KEY before starting -- the memory API is destructive and must not run unauthenticated}"
     depends_on:
       postgres:
         condition: service_healthy

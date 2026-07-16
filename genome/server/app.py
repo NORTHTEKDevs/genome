@@ -15,9 +15,12 @@ Env vars:
 - GENOME_LAZY_INIT           -- if set to "1", build Memory on first request
                                  (recommended for uvicorn --reload)
 
-Example:
-    GENOME_STORAGE=memories.db \\
-    uvicorn genome.server.app:app --host 0.0.0.0 --port 8080
+Example (local, loopback default):
+    GENOME_STORAGE=memories.db python -m genome.server
+
+To expose beyond localhost you MUST set an API key (the API is destructive):
+    GENOME_STORAGE=memories.db GENOME_HOST=0.0.0.0 \\
+    GENOME_API_KEY=$(openssl rand -hex 32) python -m genome.server
 """
 
 # Copyright 2026 Northtek (FrostByte Digital LLC)
@@ -95,12 +98,17 @@ def validate_env_config() -> list[str]:
     # API key presence warning: if the server listens on 0.0.0.0 without an
     # API key, that's almost certainly a misconfiguration. We warn but don't
     # refuse (e.g. local dev on localhost is fine).
-    host = os.environ.get("GENOME_HOST", "")
-    if host in ("0.0.0.0", "::") and not os.environ.get("GENOME_API_KEY"):
+    # Default matches the actual bind default in genome/server/__main__.py so the
+    # check sees the real effective host, not a phantom "". Any non-loopback bind
+    # without an API key is flagged (the API is destructive and would be open).
+    host = os.environ.get("GENOME_HOST", "127.0.0.1")
+    if host not in ("127.0.0.1", "localhost", "::1") and not os.environ.get(
+        "GENOME_API_KEY"
+    ):
         issues.append(
-            "GENOME_HOST is bound to all interfaces but GENOME_API_KEY is not "
-            "set. This exposes the memory layer unauthenticated. Set "
-            "GENOME_API_KEY or bind to 127.0.0.1."
+            f"GENOME_HOST={host!r} binds a non-loopback interface but "
+            "GENOME_API_KEY is not set. This exposes the memory layer "
+            "unauthenticated. Set GENOME_API_KEY or bind to 127.0.0.1."
         )
 
     return issues
