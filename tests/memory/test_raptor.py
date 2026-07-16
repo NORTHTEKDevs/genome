@@ -65,8 +65,12 @@ def test_build_raptor_tree_creates_summaries(mem):
     # At least one summary memory exists
     summaries = [r for r in mem.list_all(user_id="u") if r.operator == RAPTOR_OPERATOR]
     assert len(summaries) > 0
+    # max_levels=2 permits a second level; how many levels actually build depends
+    # on how the clusterer groups the fake embeddings (platform/sklearn-sensitive),
+    # so assert consistency with the build result rather than an exact level.
+    assert 1 <= result.levels <= 2
     for s in summaries:
-        assert s.metadata.get("raptor_level") == 1
+        assert 1 <= s.metadata.get("raptor_level") <= result.levels
         assert len(s.parents) >= 2
         assert s.operator == RAPTOR_OPERATOR
 

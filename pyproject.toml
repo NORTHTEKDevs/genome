@@ -37,6 +37,10 @@ dev = [
     "ipykernel>=6.0",
     "langchain-core>=0.3",
     "llama-index-core>=0.10",
+    "fastapi>=0.110",
+    "uvicorn[standard]>=0.27",
+    "pydantic>=2.5",
+    "httpx>=0.27",
 ]
 langchain = ["langchain-core>=0.3"]
 llamaindex = ["llama-index-core>=0.10"]
