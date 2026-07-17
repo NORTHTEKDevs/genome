@@ -17,6 +17,11 @@ security reports until a fix is released.
   (add/update/delete/reset). To expose it beyond localhost, set `GENOME_API_KEY`
   (sent in the `X-API-Key` header) and `GENOME_HOST`. The shipped `docker-compose.yml`
   requires `GENOME_API_KEY` and fails fast if it is unset.
+- **Default-deny auth:** independently of how it's launched (including
+  `uvicorn ... --host 0.0.0.0`, which bypasses the bind guard), the server returns
+  `503` on every endpoint when no `GENOME_API_KEY` is configured, unless the operator
+  explicitly sets `GENOME_ALLOW_NO_AUTH=1` for local development. It cannot be run
+  unauthenticated by accident.
 - Memory *content* is treated as data, not instructions: extraction and conflict
   prompts sanitize stored text against prompt-injection delimiters (see
   `genome/memory/conflict.py`, `extraction.py`), and the test suite includes

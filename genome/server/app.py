@@ -11,6 +11,10 @@ Env vars:
 - GENOME_EMBED_MODEL         -- sentence-transformers model name
 - GENOME_CACHE_SIZE          -- response cache LRU capacity
 - GENOME_API_KEY             -- if set, required in X-API-Key header on all endpoints
+- GENOME_ALLOW_NO_AUTH       -- set to "1" to run WITHOUT an API key (local dev only).
+                                Default-deny: with no GENOME_API_KEY and no opt-in,
+                                every endpoint returns 503, so the server is never
+                                accidentally exposed unauthenticated.
 - GENOME_MAX_REQUEST_BYTES   -- request body size limit (default 1 MiB)
 - GENOME_LAZY_INIT           -- if set to "1", build Memory on first request
                                  (recommended for uvicorn --reload)
@@ -193,6 +197,14 @@ def create_app(memory: Memory | None = None):
         origins = ["*"] if cors_origins == "*" else [
             o.strip() for o in cors_origins.split(",") if o.strip()
         ]
+        if origins == ["*"] and os.environ.get("GENOME_API_KEY"):
+            import warnings
+            warnings.warn(
+                "GENOME_CORS_ORIGINS='*' with header-based auth (GENOME_API_KEY) "
+                "lets any origin drive the API from a browser. Set explicit origins "
+                "instead of '*'.",
+                stacklevel=2,
+            )
         app.add_middleware(
             CORSMiddleware,
             allow_origins=origins,
@@ -202,6 +214,14 @@ def create_app(memory: Memory | None = None):
         )
 
     API_KEY = os.environ.get("GENOME_API_KEY", "")
+    # Default-deny: with no API key configured, the server refuses to serve
+    # (503) unless the operator explicitly opts into unauthenticated local dev
+    # with GENOME_ALLOW_NO_AUTH=1. This closes the case where the app is bound
+    # to a public interface by a launcher (e.g. `uvicorn --host 0.0.0.0`) that
+    # bypasses the bind guard in genome/server/__main__.py.
+    ALLOW_NO_AUTH = os.environ.get("GENOME_ALLOW_NO_AUTH", "").strip().lower() in (
+        "1", "true", "yes", "on"
+    )
     MAX_REQUEST_BYTES = int(os.environ.get("GENOME_MAX_REQUEST_BYTES", 1 << 20))
     ERROR_CAPTURE = get_error_capture()
     METRICS = get_metrics()
@@ -221,8 +241,21 @@ def create_app(memory: Memory | None = None):
         return JSONResponse(status_code=500, content={"detail": "internal error"})
 
     def require_api_key(x_api_key: str | None = Header(default=None)) -> None:
-        if API_KEY and not _constant_time_api_key_eq(x_api_key, API_KEY):
-            raise HTTPException(status_code=401, detail="invalid or missing X-API-Key")
+        if API_KEY:
+            if not _constant_time_api_key_eq(x_api_key, API_KEY):
+                raise HTTPException(
+                    status_code=401, detail="invalid or missing X-API-Key"
+                )
+            return
+        # No key configured: refuse to serve unless explicitly opted in.
+        if not ALLOW_NO_AUTH:
+            raise HTTPException(
+                status_code=503,
+                detail=(
+                    "server refuses to serve unauthenticated: set GENOME_API_KEY, "
+                    "or set GENOME_ALLOW_NO_AUTH=1 for local-only development."
+                ),
+            )
 
     @app.middleware("http")
     async def limit_request_size(request: Request, call_next):

@@ -193,12 +193,21 @@ relevant = chat_memory.get_relevant("what did I say?", top_k=3)
 
 ## REST API
 
+The server is safe by default: it binds `127.0.0.1` and won't serve without auth.
+For **local development** without a key, opt in explicitly:
+
 ```bash
-pip install "genome[fastapi]"
-python -m genome.server
+pip install "genome-memory[fastapi]"
+GENOME_ALLOW_NO_AUTH=1 python -m genome.server   # local dev only, loopback
 ```
 
-Then:
+For anything exposed, set a key instead (required to bind beyond localhost):
+
+```bash
+GENOME_API_KEY=$(openssl rand -hex 32) GENOME_HOST=0.0.0.0 python -m genome.server
+```
+
+Then (add `-H "X-API-Key: <key>"` when a key is set):
 ```bash
 curl -X POST http://localhost:8080/v1/memories \
   -H "Content-Type: application/json" \
