@@ -120,3 +120,38 @@ def test_optin_still_denies_remote_peer(monkeypatch):
     monkeypatch.setattr(appmod, "_is_local_client", lambda request: False)
     c = _app_client(monkeypatch, {"GENOME_ALLOW_NO_AUTH": "1"})
     assert c.get("/health").status_code == 503
+
+
+# --- the opt-in also refuses requests that arrived via a proxy (forwarding
+# --- headers), closing the same-host-reverse-proxy peer-collapse residual.
+
+class _FakeReqH:
+    def __init__(self, headers):
+        self.headers = headers
+
+
+def test_has_proxy_headers_unit():
+    from genome.server.app import _has_proxy_headers
+    assert _has_proxy_headers(_FakeReqH({"x-forwarded-for": "8.8.8.8"})) is True
+    assert _has_proxy_headers(_FakeReqH({"x-real-ip": "8.8.8.8"})) is True
+    assert _has_proxy_headers(_FakeReqH({"forwarded": "for=8.8.8.8"})) is True
+    assert _has_proxy_headers(_FakeReqH({"content-type": "application/json"})) is False
+    assert _has_proxy_headers(_FakeReqH({})) is False
+    assert _has_proxy_headers(_FakeReqH(None)) is False
+
+
+def test_optin_denies_proxied_request(monkeypatch):
+    c = _app_client(monkeypatch, {"GENOME_ALLOW_NO_AUTH": "1"})
+    # direct local client (no forwarding headers) -> served
+    assert c.get("/health").status_code == 200
+    # anything that looks proxied -> refused, even though the peer looks loopback
+    assert c.get("/health", headers={"X-Forwarded-For": "8.8.8.8"}).status_code == 503
+    assert c.get("/health", headers={"Forwarded": "for=8.8.8.8"}).status_code == 503
+    assert c.get("/health", headers={"X-Real-IP": "8.8.8.8"}).status_code == 503
+
+
+def test_proxy_headers_ignored_when_api_key_set(monkeypatch):
+    # With a real key, an authenticated request is fine regardless of proxy headers.
+    c = _app_client(monkeypatch, {"GENOME_API_KEY": "secret"})
+    r = c.get("/health", headers={"X-API-Key": "secret", "X-Forwarded-For": "8.8.8.8"})
+    assert r.status_code == 200

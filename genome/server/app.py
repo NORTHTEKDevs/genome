@@ -14,7 +14,11 @@ Env vars:
 - GENOME_ALLOW_NO_AUTH       -- set to "1" to run WITHOUT an API key (local dev only).
                                 Default-deny: with no GENOME_API_KEY and no opt-in,
                                 every endpoint returns 503, so the server is never
-                                accidentally exposed unauthenticated.
+                                accidentally exposed unauthenticated. The opt-in
+                                serves only direct loopback clients (not proxied).
+- GENOME_REQUIRE_SCOPE       -- set to "1" to require user_id/agent_id on every data
+                                operation and disable the global (all-tenant) reset.
+                                Enforces per-tenant isolation at the API boundary.
 - GENOME_MAX_REQUEST_BYTES   -- request body size limit (default 1 MiB)
 - GENOME_LAZY_INIT           -- if set to "1", build Memory on first request
                                  (recommended for uvicorn --reload)
@@ -194,6 +198,31 @@ def _is_local_client(request) -> bool:
         return False
 
 
+_PROXY_HEADERS = (
+    "x-forwarded-for",
+    "x-forwarded-host",
+    "x-forwarded-proto",
+    "x-real-ip",
+    "forwarded",
+)
+
+
+def _has_proxy_headers(request) -> bool:
+    """True if the request carries forwarding headers, i.e. it arrived through a
+    reverse proxy. In that case the loopback peer is the proxy, not a genuine
+    local client, so the GENOME_ALLOW_NO_AUTH keyless opt-in must not serve it --
+    the peer-address check cannot see the real client behind the proxy. Denying
+    here only ever refuses more; it can never grant access, so it is a strictly
+    safe tightening that closes the same-host-reverse-proxy caveat."""
+    headers = getattr(request, "headers", None)
+    if headers is None:
+        return False
+    try:
+        return any(h in headers for h in _PROXY_HEADERS)
+    except TypeError:
+        return False
+
+
 def create_app(memory: Memory | None = None):
     """Create the FastAPI app. Accepts an optional pre-built Memory for testing."""
     _require_fastapi()
@@ -251,6 +280,13 @@ def create_app(memory: Memory | None = None):
     ALLOW_NO_AUTH = os.environ.get("GENOME_ALLOW_NO_AUTH", "").strip().lower() in (
         "1", "true", "yes", "on"
     )
+    # Strict tenant isolation: when set, every data operation must carry a
+    # user_id or agent_id, and the global (all-tenant) reset is disabled. Closes
+    # the single-global-key footgun where a key holder that omits the scope can
+    # read/mutate across all tenants. Default off preserves single-user use.
+    REQUIRE_SCOPE = os.environ.get("GENOME_REQUIRE_SCOPE", "").strip().lower() in (
+        "1", "true", "yes", "on"
+    )
     MAX_REQUEST_BYTES = int(os.environ.get("GENOME_MAX_REQUEST_BYTES", 1 << 20))
     ERROR_CAPTURE = get_error_capture()
     METRICS = get_metrics()
@@ -279,19 +315,38 @@ def create_app(memory: Memory | None = None):
                 )
             return
         # No key configured: serve only when the operator opted in AND the request
-        # comes from a loopback peer. The loopback check keys off the actual peer
-        # address (which the app can see), not the bind arg (which it can't), so it
-        # holds even when a launcher binds 0.0.0.0 directly (uvicorn/gunicorn
-        # --host, docker --entrypoint override) and skips __main__.py's bind gate.
-        if ALLOW_NO_AUTH and _is_local_client(request):
+        # comes from a loopback peer that did NOT arrive via a proxy. The loopback
+        # check keys off the actual peer address (which the app can see), not the
+        # bind arg (which it can't), so it holds even when a launcher binds 0.0.0.0
+        # directly (uvicorn/gunicorn --host, docker --entrypoint override) and skips
+        # __main__.py's bind gate. The proxy-header check closes the residual where
+        # a same-host reverse proxy makes the peer loopback: any forwarding header
+        # means the real client is remote, so the keyless opt-in refuses it.
+        if ALLOW_NO_AUTH and _is_local_client(request) and not _has_proxy_headers(
+            request
+        ):
             return
         raise HTTPException(
             status_code=503,
             detail=(
                 "server refuses to serve unauthenticated: set GENOME_API_KEY, or "
-                "set GENOME_ALLOW_NO_AUTH=1 and connect from localhost (local dev)."
+                "set GENOME_ALLOW_NO_AUTH=1 and connect directly from localhost "
+                "(local dev; not served through a proxy)."
             ),
         )
+
+    def _require_scope(user_id: str | None, agent_id: str | None) -> None:
+        """When GENOME_REQUIRE_SCOPE is set, every data operation must be scoped to
+        a tenant. Blocks the single-global-key case where a caller holding the key
+        but omitting user_id/agent_id reads or mutates across all tenants."""
+        if REQUIRE_SCOPE and not user_id and not agent_id:
+            raise HTTPException(
+                status_code=400,
+                detail=(
+                    "GENOME_REQUIRE_SCOPE=1: this request must include user_id or "
+                    "agent_id (per-tenant isolation is enforced)."
+                ),
+            )
 
     @app.middleware("http")
     async def limit_request_size(request: Request, call_next):
@@ -337,6 +392,7 @@ def create_app(memory: Memory | None = None):
         dependencies=[Depends(require_api_key)],
     )
     def add_memory(req: AddRequest):
+        _require_scope(req.user_id, req.agent_id)
         mem = _memory()
         records = mem.add(
             req.text,
@@ -355,6 +411,7 @@ def create_app(memory: Memory | None = None):
         user_id: str | None = Query(default=None),
         agent_id: str | None = Query(default=None),
     ):
+        _require_scope(user_id, agent_id)
         r = _memory().get(memory_id, user_id=user_id, agent_id=agent_id)
         if r is None:
             raise HTTPException(status_code=404, detail="memory not found")
@@ -370,6 +427,7 @@ def create_app(memory: Memory | None = None):
         user_id: str | None = Query(default=None),
         agent_id: str | None = Query(default=None),
     ):
+        _require_scope(user_id, agent_id)
         r = _memory().update(
             memory_id,
             content=req.content,
@@ -391,6 +449,7 @@ def create_app(memory: Memory | None = None):
         user_id: str | None = Query(default=None),
         agent_id: str | None = Query(default=None),
     ):
+        _require_scope(user_id, agent_id)
         ok = _memory().delete(memory_id, user_id=user_id, agent_id=agent_id)
         if not ok:
             raise HTTPException(status_code=404, detail="memory not found")
@@ -401,6 +460,7 @@ def create_app(memory: Memory | None = None):
         dependencies=[Depends(require_api_key)],
     )
     def search(req: SearchRequest):
+        _require_scope(req.user_id, req.agent_id)
         results = _memory().search(
             req.query,
             user_id=req.user_id,
@@ -423,6 +483,7 @@ def create_app(memory: Memory | None = None):
         dependencies=[Depends(require_api_key)],
     )
     def synthesize(req: SynthesizeRequest):
+        _require_scope(req.user_id, req.agent_id)
         try:
             r = _memory().synthesize(
                 memory_ids=req.memory_ids,
@@ -461,6 +522,7 @@ def create_app(memory: Memory | None = None):
         user_id: str | None = Query(default=None),
         agent_id: str | None = Query(default=None),
     ):
+        _require_scope(user_id, agent_id)
         ok = _memory().unlink(edge_id, user_id=user_id, agent_id=agent_id)
         if not ok:
             raise HTTPException(status_code=404, detail="edge not found")
@@ -478,6 +540,7 @@ def create_app(memory: Memory | None = None):
         user_id: str | None = Query(default=None, max_length=_MAX_ID_LEN),
         agent_id: str | None = Query(default=None, max_length=_MAX_ID_LEN),
     ):
+        _require_scope(user_id, agent_id)
         # A bad `direction` is client error (400), not a server fault (500).
         # Mirrors the try/except pattern used by synthesize/link.
         try:
@@ -499,17 +562,28 @@ def create_app(memory: Memory | None = None):
         confirm: bool = Query(default=False),
     ):
         """Reset a scope. If both user_id and agent_id are omitted, requires
-        `confirm=true` as a guardrail against accidental global wipe.
+        `confirm=true` as a guardrail against accidental global wipe. When
+        GENOME_REQUIRE_SCOPE is set, the global (all-tenant) reset is disabled
+        entirely -- a scope is mandatory.
         """
-        if user_id is None and agent_id is None and not confirm:
-            raise HTTPException(
-                status_code=400,
-                detail=(
-                    "global reset requires ?confirm=true. Pass user_id or "
-                    "agent_id to scope, or explicitly confirm to wipe all "
-                    "memories."
-                ),
-            )
+        if user_id is None and agent_id is None:
+            if REQUIRE_SCOPE:
+                raise HTTPException(
+                    status_code=403,
+                    detail=(
+                        "GENOME_REQUIRE_SCOPE=1: global reset (all tenants) is "
+                        "disabled. Pass user_id or agent_id."
+                    ),
+                )
+            if not confirm:
+                raise HTTPException(
+                    status_code=400,
+                    detail=(
+                        "global reset requires ?confirm=true. Pass user_id or "
+                        "agent_id to scope, or explicitly confirm to wipe all "
+                        "memories."
+                    ),
+                )
         count = _memory().reset(user_id=user_id, agent_id=agent_id)
         return ResetResponse(deleted=count)
 
@@ -518,6 +592,7 @@ def create_app(memory: Memory | None = None):
         dependencies=[Depends(require_api_key)],
     )
     def count(user_id: str | None = None, agent_id: str | None = None):
+        _require_scope(user_id, agent_id)
         return CountResponse(count=_memory().count(user_id=user_id, agent_id=agent_id))
 
     @app.get(
