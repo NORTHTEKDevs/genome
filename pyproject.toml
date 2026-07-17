@@ -67,6 +67,7 @@ Changelog = "https://github.com/NORTHTEKDevs/genome/blob/main/CHANGELOG.md"
 [project.scripts]
 genome-eval = "genome.cli:main"
 genome-mcp = "genome.mcp.server:main"
+genome-verify = "genome.verify:main"
 
 [build-system]
 requires = ["setuptools>=68"]

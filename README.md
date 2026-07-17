@@ -19,6 +19,29 @@ completely offline.
 > it there (two independent benchmark runs confirm parity). The advantage is cost, speed,
 > offline operation, and a temporal/auditable record Mem0 can't produce.
 
+## Don't believe it? Prove it yourself (60 seconds, no API key)
+
+Every claim here is measured on *your* machine, not ours. Clone it and run the receipt:
+
+```bash
+git clone https://github.com/NORTHTEKDevs/genome && cd genome
+pip install -e . && python -m genome.verify
+```
+
+It writes memories with your **outbound network physically blocked** and prints a live
+pass/fail receipt — 0 network calls, 0 LLM calls, single-digit-ms writes, retrieval that
+works:
+
+```
+  [PASS] Air-gapped write path: wrote 200 memories with every outbound socket blocked -> 0 network attempts, 0 LLM calls
+  [PASS] Write latency: 7.1 ms/message  (Mem0's measured write path: ~2,055 ms + 1 LLM call/message)
+  [PASS] Retrieval works: top hit score 0.598
+  VERDICT: ALL CORE CLAIMS REPRODUCED LOCALLY.
+```
+
+The full test suite runs in public CI (badge above); the benchmark numbers are reproducible
+from `benchmarks/`. The pitch isn't "trust me" — it's "run it."
+
 ## Add persistent memory to your agent in one line (MCP)
 
 GENOME ships a **fully-local MCP server** — cross-session memory for Claude Desktop, Claude
