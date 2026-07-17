@@ -20,6 +20,12 @@ Quick start (single OpenAI key -- responder, judge, and both embedders):
       https://raw.githubusercontent.com/snap-research/locomo/main/data/locomo10.json
     python benchmarks/head_to_head.py --n 2 --q 10        # small + cheap to start
 
+One key only, via OpenRouter (LLM through OpenRouter + local MiniLM embedder on
+both sides -- no OpenAI/embeddings key needed):
+    pip install genome-memory mem0ai qdrant-client sentence-transformers
+    export OPENROUTER_API_KEY=sk-or-...
+    python benchmarks/head_to_head.py --provider openrouter --n 2 --q 10
+
 Faithful to RESULTS.md (Haiku responder+judge, OpenAI embedder -- needs both keys):
     python benchmarks/head_to_head.py --provider anthropic --n 10
 
@@ -54,7 +60,13 @@ from genome.evals.locomo import (  # noqa: E402
 # (adversarial is judged separately). Mirrors benchmarks/verdict.py:21.
 HEADLINE = {"multi-hop", "temporal", "open-domain", "single-hop"}
 _LOCOMO_URL = "https://raw.githubusercontent.com/snap-research/locomo/main/data/locomo10.json"
-_MODEL_DEFAULTS = {"openai": "gpt-4o-mini", "anthropic": "claude-haiku-4-5-20251001"}
+_OR_BASE = "https://openrouter.ai/api/v1"
+_MODEL_DEFAULTS = {
+    "openai": "gpt-4o-mini",
+    "anthropic": "claude-haiku-4-5-20251001",
+    # OpenRouter: one key runs everything (LLM); embeddings are local (no OpenAI).
+    "openrouter": "anthropic/claude-haiku-4.5",
+}
 
 
 def _rows(results) -> dict[str, dict]:
@@ -106,16 +118,61 @@ def _build_llms(provider: str, model: str, meter_r, meter_j):
         _require_key("OPENAI_API_KEY")
         from openai import OpenAI
         client = OpenAI()
+        metered_provider = "openai"
+    elif provider == "openrouter":
+        _require_key("OPENROUTER_API_KEY")
+        from openai import OpenAI
+        # mem0's openai-provider LLM reads base_url from the ENV (it ignores a
+        # base_url set in its config), so point both there. Embeddings are local.
+        os.environ["OPENAI_API_KEY"] = os.environ["OPENROUTER_API_KEY"]
+        os.environ["OPENAI_BASE_URL"] = _OR_BASE
+        client = OpenAI(base_url=_OR_BASE, api_key=os.environ["OPENROUTER_API_KEY"])
+        metered_provider = "openai"  # OpenRouter is OpenAI-compatible
     elif provider == "anthropic":
         _require_key("ANTHROPIC_API_KEY")
         _require_key("OPENAI_API_KEY")  # embedder is OpenAI on both sides (matched)
         from anthropic import Anthropic
         client = Anthropic()
+        metered_provider = "anthropic"
     else:
         raise SystemExit(f"unknown provider {provider!r}")
-    responder = _make_metered_llm(provider, client, model, 512, meter_r)
-    judge = _make_metered_llm(provider, client, model, 256, meter_j)
+    responder = _make_metered_llm(metered_provider, client, model, 512, meter_r)
+    judge = _make_metered_llm(metered_provider, client, model, 256, meter_j)
     return responder, judge
+
+
+class _Mem0LocalBaseline(Mem0Baseline):
+    """Mem0 with a LOCAL MiniLM embedder (384d) + on-disk qdrant, so the whole
+    head-to-head runs on one OpenRouter key with no OpenAI embeddings. Same ingest/
+    answer/close protocol as the parent; only the embedder + vector store differ
+    (the proven recipe from benchmarks/lme_qa_or.py). The LLM still routes through
+    OpenRouter via the OPENAI_BASE_URL env set in _build_llms."""
+
+    def __init__(self, responder, top_k: int = 30,
+                 llm_model: str = "anthropic/claude-haiku-4.5",
+                 llm_provider: str = "openai") -> None:
+        import tempfile
+
+        from mem0 import Memory as _Mem0Memory
+        self._responder = responder
+        self._top_k = top_k
+        self._qdrant_path = tempfile.mkdtemp(prefix="genome_h2h_qdrant_")
+        self._mem = _Mem0Memory.from_config({
+            "llm": {"provider": llm_provider,
+                    "config": {"model": llm_model, "temperature": 0.0}},
+            "embedder": {"provider": "huggingface",
+                         "config": {"model": "sentence-transformers/all-MiniLM-L6-v2"}},
+            "vector_store": {"provider": "qdrant",
+                             "config": {"embedding_model_dims": 384,
+                                        "path": self._qdrant_path}},
+        })
+        self._user_id = "locomo_mem0"
+        self._version = self._detect_version()
+
+    def close(self) -> None:
+        super().close()
+        import shutil
+        shutil.rmtree(getattr(self, "_qdrant_path", "") or "", ignore_errors=True)
 
 
 def _report(g_results, b_results, genome_name: str) -> None:
@@ -232,7 +289,9 @@ def main() -> int:
     ap.add_argument("--dataset", default="benchmarks/data/locomo10.json")
     ap.add_argument("--n", type=int, default=2, help="conversations to run (max 10)")
     ap.add_argument("--q", type=int, default=None, help="cap questions per conversation")
-    ap.add_argument("--provider", choices=["openai", "anthropic"], default="openai")
+    ap.add_argument("--provider", choices=["openai", "anthropic", "openrouter"],
+                    default="openai",
+                    help="openrouter = one key, LLM via OpenRouter + local embedder")
     ap.add_argument("--model", default=None, help="override responder+judge model")
     ap.add_argument("--top-k", type=int, default=30)
     ap.add_argument("--workers", type=int, default=1)
@@ -270,10 +329,14 @@ def main() -> int:
             f"config {args.config!r} not found. Available: "
             f"{[c.name for c in DEFAULT_CONFIGS]}"
         )
-    # Match the embedder to Mem0's (OpenAI text-embedding-3-small) so retrieval
-    # quality is identical and only the memory ARCHITECTURE differs.
-    genome_cfg = replace(genome_cfg, embed_model="openai:text-embedding-3-small",
-                         top_k=args.top_k)
+    # Match the embedder across both systems so retrieval quality is identical and
+    # only the memory ARCHITECTURE differs. openrouter -> local MiniLM on both sides
+    # (no OpenAI); openai/anthropic -> OpenAI text-embedding-3-small on both sides.
+    if args.provider == "openrouter":
+        genome_cfg = replace(genome_cfg, embed_model=None, top_k=args.top_k)
+    else:
+        genome_cfg = replace(genome_cfg, embed_model="openai:text-embedding-3-small",
+                             top_k=args.top_k)
 
     print(f"Running GENOME ({genome_cfg.name})...")
     g_results = run_locomo_eval(conversations, [genome_cfg], responder, judge,
@@ -281,9 +344,12 @@ def main() -> int:
                                 progress=lambda m: print(f"  {m}"))
 
     print("Running Mem0...")
-    mem0 = Mem0Baseline(responder, top_k=args.top_k, llm_model=model,
-                        embed_model="text-embedding-3-small",
-                        llm_provider=args.provider)
+    if args.provider == "openrouter":
+        mem0 = _Mem0LocalBaseline(responder, top_k=args.top_k, llm_model=model)
+    else:
+        mem0 = Mem0Baseline(responder, top_k=args.top_k, llm_model=model,
+                            embed_model="text-embedding-3-small",
+                            llm_provider=args.provider)
     b_results = run_baseline_eval(conversations, mem0, judge, judge_mode="mem0",
                                   workers=args.workers,
                                   progress=lambda m: print(f"  {m}"))
