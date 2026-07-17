@@ -78,3 +78,45 @@ def test_key_set_requires_it(monkeypatch):
     c = _app_client(monkeypatch, {"GENOME_API_KEY": "secret"})
     assert c.get("/health").status_code == 401
     assert c.get("/health", headers={"X-API-Key": "secret"}).status_code == 200
+
+
+# --- the opt-in is confined to loopback peers, so it can't be abused when the
+# --- process is bound to 0.0.0.0 by a launcher that skips the __main__ bind gate.
+
+class _FakeReq:
+    class _C:
+        def __init__(self, host):
+            self.host = host
+
+    def __init__(self, host):
+        self.client = self._C(host) if host is not None else None
+
+
+def test_is_local_client_rejects_remote():
+    from genome.server.app import _is_local_client
+    assert _is_local_client(_FakeReq("8.8.8.8")) is False
+    assert _is_local_client(_FakeReq("192.168.1.10")) is False
+    assert _is_local_client(_FakeReq("2001:4860:4860::8888")) is False
+
+
+def test_is_local_client_allows_loopback():
+    from genome.server.app import _is_local_client
+    assert _is_local_client(_FakeReq("127.0.0.1")) is True
+    assert _is_local_client(_FakeReq("127.0.0.5")) is True
+    assert _is_local_client(_FakeReq("::1")) is True
+
+
+def test_is_local_client_no_client_is_refused():
+    from genome.server.app import _is_local_client
+    assert _is_local_client(_FakeReq(None)) is False
+
+
+def test_optin_still_denies_remote_peer(monkeypatch):
+    # Even with GENOME_ALLOW_NO_AUTH=1, a non-loopback peer is refused. A real ASGI
+    # server fills request.client from the socket; TestClient can't set it per
+    # request, so force the loopback check to fail to simulate a remote attacker.
+    import genome.server.app as appmod
+
+    monkeypatch.setattr(appmod, "_is_local_client", lambda request: False)
+    c = _app_client(monkeypatch, {"GENOME_ALLOW_NO_AUTH": "1"})
+    assert c.get("/health").status_code == 503

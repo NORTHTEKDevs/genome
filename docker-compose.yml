@@ -5,7 +5,7 @@ services:
     ports:
       - "8080:8080"
     environment:
-      GENOME_STORAGE: "postgresql://genome:genome@postgres:5432/memory"
+      GENOME_STORAGE: "postgresql://genome:${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD before starting -- do not ship the default weak credential}@postgres:5432/memory"
       GENOME_EMBED_MODEL: "sentence-transformers/all-MiniLM-L6-v2"
       GENOME_CACHE_SIZE: "2048"
       # Bind all interfaces inside the container so the published port is reachable.
@@ -23,10 +23,15 @@ services:
     image: pgvector/pgvector:pg16
     environment:
       POSTGRES_USER: genome
-      POSTGRES_PASSWORD: genome
+      # REQUIRED. A published database with a hardcoded credential is a direct
+      # bypass of the API auth gate. `docker-compose up` fails fast if unset.
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD before starting -- do not ship the default weak credential}"
       POSTGRES_DB: memory
+    # Publish only to the host loopback, never to the LAN. The genome service
+    # reaches Postgres over the internal docker network (host "postgres") and does
+    # not need this published port; it exists only for local psql/debugging.
     ports:
-      - "5432:5432"
+      - "127.0.0.1:5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:

@@ -222,9 +222,14 @@ Interactive docs at `http://localhost:8080/docs`.
 
 ## Docker (with Postgres)
 
+Both secrets are required and compose fails fast if either is unset:
+
 ```bash
+export GENOME_API_KEY=$(openssl rand -hex 32)
+export POSTGRES_PASSWORD=$(openssl rand -hex 32)
 docker-compose up
-# genome at http://localhost:8080, Postgres at 5432
+# genome at http://localhost:8080 (send -H "X-API-Key: $GENOME_API_KEY")
+# Postgres is published on 127.0.0.1:5432 only, not the LAN
 ```
 
 ## Next

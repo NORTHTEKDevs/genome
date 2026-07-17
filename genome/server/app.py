@@ -36,6 +36,16 @@ import hmac
 import os
 from typing import Any
 
+# With `from __future__ import annotations`, FastAPI resolves a dependency's type
+# hints against the module globals. require_api_key is annotated `request: Request`,
+# so Request must be importable here (not only locally inside create_app), else
+# FastAPI treats `request` as a query param and every endpoint 422s. fastapi/
+# starlette are optional deps, but app.py only loads when the server is in use.
+try:
+    from starlette.requests import Request
+except ImportError:  # pragma: no cover - create_app raises a friendly error first
+    Request = Any  # type: ignore[assignment,misc]
+
 import genome
 from genome.memory.facade import Memory
 from genome.observability import get_error_capture, get_metrics
@@ -165,10 +175,29 @@ def _constant_time_api_key_eq(provided: str | None, expected: str) -> bool:
     return hmac.compare_digest(provided.encode("utf-8"), expected.encode("utf-8"))
 
 
+def _is_local_client(request) -> bool:
+    """True only if the request's peer address is loopback. Confines the
+    GENOME_ALLOW_NO_AUTH escape hatch to genuinely local connections, so it holds
+    even when the process is bound to a public interface by a launcher that skips
+    the bind guard in __main__.py (e.g. `uvicorn --host 0.0.0.0`). Checks the
+    actual peer address, which the app can see, not the bind arg, which it can't."""
+    import ipaddress
+    client = getattr(request, "client", None)
+    host = getattr(client, "host", None)
+    if host is None:
+        return False
+    if host == "testclient":  # Starlette TestClient's synthetic host; a real ASGI
+        return True           # server (uvicorn/gunicorn) never emits this for a peer.
+    try:
+        return ipaddress.ip_address(host).is_loopback
+    except ValueError:
+        return False
+
+
 def create_app(memory: Memory | None = None):
     """Create the FastAPI app. Accepts an optional pre-built Memory for testing."""
     _require_fastapi()
-    from fastapi import Depends, FastAPI, Header, HTTPException, Query, Request
+    from fastapi import Depends, FastAPI, Header, HTTPException, Query
     from fastapi.responses import JSONResponse
 
     # Lazy memory: wrap in a box so the first request builds it and subsequent
@@ -240,22 +269,29 @@ def create_app(memory: Memory | None = None):
         )
         return JSONResponse(status_code=500, content={"detail": "internal error"})
 
-    def require_api_key(x_api_key: str | None = Header(default=None)) -> None:
+    def require_api_key(
+        request: Request, x_api_key: str | None = Header(default=None)
+    ) -> None:
         if API_KEY:
             if not _constant_time_api_key_eq(x_api_key, API_KEY):
                 raise HTTPException(
                     status_code=401, detail="invalid or missing X-API-Key"
                 )
             return
-        # No key configured: refuse to serve unless explicitly opted in.
-        if not ALLOW_NO_AUTH:
-            raise HTTPException(
-                status_code=503,
-                detail=(
-                    "server refuses to serve unauthenticated: set GENOME_API_KEY, "
-                    "or set GENOME_ALLOW_NO_AUTH=1 for local-only development."
-                ),
-            )
+        # No key configured: serve only when the operator opted in AND the request
+        # comes from a loopback peer. The loopback check keys off the actual peer
+        # address (which the app can see), not the bind arg (which it can't), so it
+        # holds even when a launcher binds 0.0.0.0 directly (uvicorn/gunicorn
+        # --host, docker --entrypoint override) and skips __main__.py's bind gate.
+        if ALLOW_NO_AUTH and _is_local_client(request):
+            return
+        raise HTTPException(
+            status_code=503,
+            detail=(
+                "server refuses to serve unauthenticated: set GENOME_API_KEY, or "
+                "set GENOME_ALLOW_NO_AUTH=1 and connect from localhost (local dev)."
+            ),
+        )
 
     @app.middleware("http")
     async def limit_request_size(request: Request, call_next):
