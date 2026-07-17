@@ -19,6 +19,9 @@ def main() -> int:
     host = os.environ.get("GENOME_HOST", "127.0.0.1")
     port = int(os.environ.get("GENOME_PORT", "8080"))
     api_key = os.environ.get("GENOME_API_KEY")
+    allow_no_auth = os.environ.get("GENOME_ALLOW_NO_AUTH", "").strip().lower() in (
+        "1", "true", "yes", "on"
+    )
 
     # Safe by default. The API is destructive (add/update/delete/reset), so we
     # only allow binding a non-loopback interface when an API key is set;
@@ -34,10 +37,19 @@ def main() -> int:
         )
         return 2
     if not api_key:
-        print(
-            f"NOTE: GENOME_API_KEY not set; the API is unauthenticated. "
-            f"Serving on {host}:{port} (loopback only)."
-        )
+        if allow_no_auth:
+            print(
+                f"NOTE: no GENOME_API_KEY; GENOME_ALLOW_NO_AUTH is set, so the API "
+                f"serves keyless requests from loopback clients only. Serving on "
+                f"{host}:{port}. Set GENOME_API_KEY to serve non-local clients."
+            )
+        else:
+            print(
+                f"NOTE: no GENOME_API_KEY set; the API default-denies every request "
+                f"with 503. Set GENOME_API_KEY to serve clients, or "
+                f"GENOME_ALLOW_NO_AUTH=1 for keyless local-only development. "
+                f"Serving on {host}:{port}."
+            )
 
     uvicorn.run("genome.server.app:app", host=host, port=port, reload=False)
     return 0
