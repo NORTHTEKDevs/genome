@@ -57,6 +57,18 @@ def test_strict_get_and_search_and_count_without_scope_400(monkeypatch):
         mem.close()
 
 
+def test_strict_blank_scope_is_400(monkeypatch):
+    # A whitespace-only scope is not a real tenant; strict mode rejects it.
+    c, mem = _client(monkeypatch, strict=True)
+    try:
+        assert c.get("/v1/count", params={"user_id": "   "}).status_code == 400
+        r = c.post("/v1/memories", json={"text": "x", "user_id": " "})
+        assert r.status_code == 400
+        assert mem.count() == 0
+    finally:
+        mem.close()
+
+
 def test_strict_global_reset_forbidden_even_with_confirm(monkeypatch):
     c, mem = _client(monkeypatch, strict=True)
     try:

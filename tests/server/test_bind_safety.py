@@ -148,6 +148,10 @@ def test_optin_denies_proxied_request(monkeypatch):
     assert c.get("/health", headers={"X-Forwarded-For": "8.8.8.8"}).status_code == 503
     assert c.get("/health", headers={"Forwarded": "for=8.8.8.8"}).status_code == 503
     assert c.get("/health", headers={"X-Real-IP": "8.8.8.8"}).status_code == 503
+    # CDN/load-balancer client-IP headers are covered too
+    assert c.get("/health", headers={"CF-Connecting-IP": "8.8.8.8"}).status_code == 503
+    assert c.get("/health", headers={"True-Client-IP": "8.8.8.8"}).status_code == 503
+    assert c.get("/health", headers={"Via": "1.1 proxy"}).status_code == 503
 
 
 def test_proxy_headers_ignored_when_api_key_set(monkeypatch):

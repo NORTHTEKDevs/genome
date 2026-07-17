@@ -199,11 +199,20 @@ def _is_local_client(request) -> bool:
 
 
 _PROXY_HEADERS = (
+    # Standard forwarding headers.
     "x-forwarded-for",
     "x-forwarded-host",
     "x-forwarded-proto",
+    "x-forwarded-port",
     "x-real-ip",
     "forwarded",
+    "via",
+    # Common CDN/load-balancer client-IP headers.
+    "cf-connecting-ip",
+    "true-client-ip",
+    "fastly-client-ip",
+    "x-cluster-client-ip",
+    "x-client-ip",
 )
 
 
@@ -339,12 +348,16 @@ def create_app(memory: Memory | None = None):
         """When GENOME_REQUIRE_SCOPE is set, every data operation must be scoped to
         a tenant. Blocks the single-global-key case where a caller holding the key
         but omitting user_id/agent_id reads or mutates across all tenants."""
-        if REQUIRE_SCOPE and not user_id and not agent_id:
+        if (
+            REQUIRE_SCOPE
+            and not (user_id or "").strip()
+            and not (agent_id or "").strip()
+        ):
             raise HTTPException(
                 status_code=400,
                 detail=(
-                    "GENOME_REQUIRE_SCOPE=1: this request must include user_id or "
-                    "agent_id (per-tenant isolation is enforced)."
+                    "GENOME_REQUIRE_SCOPE=1: this request must include a non-blank "
+                    "user_id or agent_id (per-tenant isolation is enforced)."
                 ),
             )
 
