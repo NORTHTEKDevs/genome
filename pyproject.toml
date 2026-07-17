@@ -1,6 +1,6 @@
 [project]
 name = "genome-memory"
-version = "1.0.0"
+version = "1.0.1"
 description = "DNA-inspired memory layer for AI agents: zero-LLM-call ingestion, retrieval that beats full-context on overflowing histories."
 readme = "README.md"
 license = "Apache-2.0"

@@ -5,6 +5,29 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [1.0.1] - 2026-07-17
+
+### Added
+- **One-command self-verification** (`genome-verify`, `python -m genome.verify`):
+  reproduces the core claims locally with no API key — writes memories with all
+  outbound sockets blocked and prints a pass/fail receipt (0 network, 0 LLM,
+  single-digit-ms writes, retrieval works).
+- **Head-to-head reproducer** (`benchmarks/head_to_head.py`): runs GENOME and Mem0
+  on the same LoCoMo questions through the same responder/judge/embedder/top-k and
+  prints the paired McNemar significance test — reproduce the accuracy-parity claim
+  with your own key. Includes an offline `--smoke` plumbing test.
+- **README "Run it as an HTTP API"** and **"Prove it yourself"** sections.
+
+### Security
+- REST server: the keyless `GENOME_ALLOW_NO_AUTH` opt-in is confined to direct
+  loopback peers — it now refuses any request carrying proxy/forwarding headers
+  (`X-Forwarded-For`, `X-Real-IP`, `Forwarded`, `Via`, CDN client-IP headers), so a
+  same-host reverse proxy can't make a remote client look local.
+- REST server: new `GENOME_REQUIRE_SCOPE=1` requires `user_id`/`agent_id` on every
+  data operation and disables the global all-tenant reset (multi-tenant isolation).
+- `docker-compose.yml`: Postgres published on `127.0.0.1` only; `POSTGRES_PASSWORD`
+  and `GENOME_API_KEY` are required (fail-fast), no default weak credentials.
+
 ## [1.0.0] - 2026-07-13 — initial public release
 
 First public release at [NORTHTEKDevs/genome](https://github.com/NORTHTEKDevs/genome),
