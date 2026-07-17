@@ -148,6 +148,46 @@ Tools the agent gets: **`remember`** (store a fact/preference, local + 0 LLM), *
 (clear a user's memories). Memories persist in `~/.genome/memories.db` (override with the
 `GENOME_MCP_DB` env var). Run standalone with `genome-mcp` or `python -m genome.mcp.server`.
 
+## Run it as an HTTP API
+
+Prefer HTTP? GENOME ships a FastAPI server that mirrors the library 1:1 (`add` / `search` /
+`get` / `update` / `delete` / `reset` / `synthesize`), with an auto-generated OpenAPI spec at
+`/docs`.
+
+```bash
+pip install "genome-memory[fastapi]"
+```
+
+**Try it locally** (keyless, loopback only — one flag makes the "no auth" intent explicit):
+
+```bash
+GENOME_ALLOW_NO_AUTH=1 python -m genome.server        # serves on 127.0.0.1:8080
+```
+
+```bash
+curl -X POST localhost:8080/v1/memories \
+  -H 'Content-Type: application/json' \
+  -d '{"text": "Ada met Lin at the robotics summit in Berlin.", "user_id": "u1"}'
+
+curl -X POST localhost:8080/v1/search \
+  -H 'Content-Type: application/json' \
+  -d '{"query": "Where did Ada meet Lin?", "user_id": "u1", "limit": 5}'
+```
+
+**Safe by default.** The server refuses to serve unauthenticated unless you opt in as
+above, and it will not bind a non-loopback interface without a key. To expose it, set an
+API key (sent as `X-API-Key`) — required to bind beyond localhost:
+
+```bash
+GENOME_API_KEY=$(openssl rand -hex 32) GENOME_HOST=0.0.0.0 python -m genome.server
+# then add:  -H "X-API-Key: $GENOME_API_KEY"  to every request
+```
+
+For multi-tenant deployments, set `GENOME_REQUIRE_SCOPE=1` to require `user_id`/`agent_id` on
+every call and disable the global reset. Docker: `docker-compose up` (needs `GENOME_API_KEY`
+and `POSTGRES_PASSWORD`; Postgres is published on loopback only). Full guide, including the
+Postgres backend and every env var: [`docs/tutorial_quickstart.md`](./docs/tutorial_quickstart.md).
+
 ## The honest results
 
 Same responder + judge + embedder for every system; only the memory layer changes.
