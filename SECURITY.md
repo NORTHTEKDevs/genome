@@ -25,7 +25,12 @@ security reports until a fix is released.
   refused regardless of how the process was bound, because the check reads the
   actual peer address (which the app sees) rather than the bind argument (which it
   can't). So the opt-in cannot expose the API to the network even if you bind
-  `0.0.0.0` by mistake. To serve real clients, set `GENOME_API_KEY`.
+  `0.0.0.0` by mistake. To serve real clients, set `GENOME_API_KEY`. Caveat: the
+  loopback check reads the real socket peer (it deliberately ignores
+  `X-Forwarded-For`, which a client can forge), so if you put a **reverse proxy on
+  the same host** in front of the server the peer becomes loopback and the opt-in
+  would serve through it. Behind any proxy, set `GENOME_API_KEY` — do not rely on
+  `GENOME_ALLOW_NO_AUTH`, which is strictly a keyless-local-dev convenience.
 - **Single-key trust model (by design):** the REST `GENOME_API_KEY` is a single,
   full-access operator credential. Per-tenant isolation is enforced only when the
   caller passes `user_id`/`agent_id`; a request that holds the key and omits them
