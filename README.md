@@ -220,6 +220,25 @@ every call and disable the global reset. Docker: `docker-compose up` (needs `GEN
 and `POSTGRES_PASSWORD`; Postgres is published on loopback only). Full guide, including the
 Postgres backend and every env var: [`docs/tutorial_quickstart.md`](./docs/tutorial_quickstart.md).
 
+### TypeScript / JavaScript client
+
+[`@northtek/genome-memory`](https://www.npmjs.com/package/@northtek/genome-memory) mirrors the
+Python `Memory` API shape against this server (ESM, Node 20+ or browser):
+
+```bash
+npm install @northtek/genome-memory
+```
+
+```ts
+import { Memory } from "@northtek/genome-memory";
+
+const mem = new Memory({ baseUrl: "http://localhost:8080" });
+await mem.add({ text: "Ada met Lin in Berlin.", userId: "u1" });
+const hits = await mem.search({ query: "Where did Ada meet Lin?", userId: "u1" });
+```
+
+Full client docs: [`sdks/typescript/README.md`](./sdks/typescript/README.md).
+
 ## The honest results
 
 Same responder + judge + embedder for every system; only the memory layer changes.

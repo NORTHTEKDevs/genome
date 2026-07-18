@@ -8,13 +8,11 @@ shape.
 
 ## Install
 
-This package is not published. Build from source:
-
 ```bash
-cd sdks/typescript
-npm install
-npm run build
+npm install @northtek/genome-memory
 ```
+
+ESM-only. Node 20+ or any modern browser.
 
 ## Quickstart
 
