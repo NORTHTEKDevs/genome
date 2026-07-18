@@ -12,7 +12,7 @@ shape.
 npm install @northtek/genome-memory
 ```
 
-ESM-only. Node 20+ or any modern browser.
+ESM package; on Node 20.19+ / 22+, CommonJS `require()` works too. Any modern browser.
 
 ## Quickstart
 
