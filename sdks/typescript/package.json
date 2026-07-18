@@ -1,6 +1,6 @@
 {
   "name": "@northtek/genome-memory",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "TypeScript / JavaScript client for GENOME, an open-source memory layer for AI agents.",
   "author": "FrostByte Digital",
   "license": "Apache-2.0",
@@ -29,13 +29,15 @@
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
+      "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
-      "types": "./dist/index.d.ts"
+      "default": "./dist/index.js"
     }
   },
   "files": [
     "dist",
     "src",
+    "!src/*.test.ts",
     "README.md"
   ],
   "scripts": {
