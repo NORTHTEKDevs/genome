@@ -1,6 +1,6 @@
 [project]
 name = "genome-memory"
-version = "1.0.1"
+version = "1.0.2"
 description = "DNA-inspired memory layer for AI agents: zero-LLM-call ingestion, retrieval that beats full-context on overflowing histories."
 readme = "README.md"
 license = "Apache-2.0"
@@ -24,7 +24,6 @@ dependencies = [
     "numpy>=1.26,<3.0",
     "sentence-transformers>=2.7,<4.0",
     "scikit-learn>=1.4,<2.0",
-    "matplotlib>=3.8,<4.0",
     "rank-bm25>=0.2.2,<0.3",
 ]
 
@@ -41,12 +40,14 @@ dev = [
     "uvicorn[standard]>=0.27",
     "pydantic>=2.5",
     "httpx>=0.27",
+    "matplotlib>=3.8,<4.0",
 ]
 langchain = ["langchain-core>=0.3"]
 llamaindex = ["llama-index-core>=0.10"]
 postgres = ["psycopg[binary]>=3.1", "pgvector>=0.2"]
 fastapi = ["fastapi>=0.110", "uvicorn[standard]>=0.27", "pydantic>=2.5"]
 mcp = ["mcp>=1.2"]
+viz = ["matplotlib>=3.8,<4.0"]  # benchmark charts only; not needed to use the library
 all = [
     "mcp>=1.2",
     "langchain-core>=0.3",
@@ -56,6 +57,7 @@ all = [
     "fastapi>=0.110",
     "uvicorn[standard]>=0.27",
     "pydantic>=2.5",
+    "matplotlib>=3.8,<4.0",
 ]
 
 [project.urls]
@@ -75,6 +77,9 @@ build-backend = "setuptools.build_meta"
 
 [tool.setuptools.packages.find]
 include = ["genome*"]
+
+[tool.setuptools.package-data]
+genome = ["py.typed"]
 
 [tool.ruff]
 line-length = 100

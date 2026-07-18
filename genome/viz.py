@@ -7,9 +7,20 @@ from __future__ import annotations
 
 from pathlib import Path
 
-import matplotlib.pyplot as plt
 import numpy as np
-from sklearn.manifold import TSNE
+
+
+def _plt():
+    """Lazy matplotlib import so the base library never depends on a plotting
+    stack. Charts are a benchmark-only convenience; install with the extra."""
+    try:
+        import matplotlib.pyplot as plt
+    except ImportError as e:  # pragma: no cover - optional extra
+        raise ImportError(
+            'genome.viz needs matplotlib. Install it with: '
+            'pip install "genome-memory[viz]"'
+        ) from e
+    return plt
 
 
 def plot_operator_bar_chart(
@@ -19,6 +30,7 @@ def plot_operator_bar_chart(
     title: str | None = None,
 ) -> None:
     """Save a horizontal bar chart of operators ranked by the given metric."""
+    plt = _plt()
     ranked = sorted(results.items(), key=lambda kv: kv[1].get(metric, 0.0))
     names = [k for k, _ in ranked]
     values = [v.get(metric, 0.0) for _, v in ranked]
@@ -46,6 +58,8 @@ def plot_parent_hybrid_tsne(
     perplexity: float | None = None,
 ) -> None:
     """t-SNE scatter of parent_a (blue), parent_b (orange), hybrid (green) per pair."""
+    from sklearn.manifold import TSNE
+    plt = _plt()
     assert parents_a.shape == parents_b.shape == hybrids.shape
     n = parents_a.shape[0]
     all_vecs = np.concatenate([parents_a, parents_b, hybrids], axis=0)
