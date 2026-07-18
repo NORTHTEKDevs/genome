@@ -19,9 +19,9 @@ completely offline.
 > it there (two independent benchmark runs confirm parity). The advantage is cost, speed,
 > offline operation, and a temporal/auditable record Mem0 can't produce.
 
-## Don't believe it? Prove it yourself (60 seconds, no API key)
+## Don't believe it? Prove it yourself
 
-Every claim here is measured on *your* machine, not ours. Clone it and run the receipt:
+The **cost, speed, and offline** claims need no API key — measure them on *your* machine in 60 seconds:
 
 ```bash
 git clone https://github.com/NORTHTEKDevs/genome && cd genome
@@ -29,18 +29,20 @@ pip install -e . && python -m genome.verify
 ```
 
 It writes memories with your **outbound network physically blocked** and prints a live
-pass/fail receipt — 0 network calls, 0 LLM calls, single-digit-ms writes, retrieval that
-works:
+pass/fail receipt — 0 network calls, 0 LLM calls, single-digit-ms writes, retrieval that works:
 
 ```
   [PASS] Air-gapped write path: wrote 200 memories with every outbound socket blocked -> 0 network attempts, 0 LLM calls
   [PASS] Write latency: 7.1 ms/message  (Mem0's measured write path: ~2,055 ms + 1 LLM call/message)
   [PASS] Retrieval works: top hit score 0.598
-  VERDICT: ALL CORE CLAIMS REPRODUCED LOCALLY.
 ```
 
-The full test suite runs in public CI (badge above); the benchmark numbers are reproducible
-from `benchmarks/`. The pitch isn't "trust me" — it's "run it."
+That receipt covers the cost/speed/offline story only. The **accuracy-parity with Mem0** claim
+is a separate, larger check that needs an LLM key — reproduce it head-to-head on the same
+questions with your own key via `python benchmarks/head_to_head.py` (one OpenRouter key works;
+see [`benchmarks/RESULTS.md`](./benchmarks/RESULTS.md) for the n=90 / n=205 runs, the paired
+significance tests, and the published nulls). The full test suite runs in public CI (badge
+above). The pitch isn't "trust me" — it's "run it."
 
 ## Add persistent memory to your agent in one line (MCP)
 
@@ -120,6 +122,13 @@ pip install genome-memory
 The default embedder is local (`sentence-transformers/all-MiniLM-L6-v2`) — no API key,
 works offline; the first run downloads the ~90 MB model once. OpenAI embeddings are
 optional for higher-dimensional retrieval.
+
+**Dependency footprint, honestly:** the core install is `numpy`, `sentence-transformers`,
+`scikit-learn`, and `rank-bm25`. Local embeddings run on PyTorch (pulled in by
+sentence-transformers), so it isn't a tiny install — that's the deliberate tradeoff for
+offline, zero-cost embedding. Plotting/benchmark-chart deps live in an optional `[viz]`
+extra, not the core. Migrating from Mem0? See
+**[docs/migrating_from_mem0.md](docs/migrating_from_mem0.md)**.
 
 ## Quickstart (fully local, no API key)
 

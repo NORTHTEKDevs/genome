@@ -86,7 +86,7 @@ Source: `benchmarks/retrieval_quality.py` (`results/retrieval_quality.log`),
 | graph | fell back to dense (see caveat) | | | |
 
 HONEST READ: hybrid is WORSE than dense (keyword blend displaces correct evidence);
-recency-rerank slightly worse. GRAPH CAVEAT (from adversarial verification): this
+recency-rerank slightly worse. GRAPH CAVEAT (surfaced by an automated self-check): this
 harness built the store via store.add() directly, WITHOUT entity extraction, so
 list_entities()==0 and the graph gate (needs >=2 named entities in the query) NEVER
 fired -> graph returned dense unchanged. The graph==dense result is VACUOUS, not
@@ -135,7 +135,7 @@ HONEST READ: on as-of, GENOME's belief-state layer beats every baseline because 
 records facts at their DOMAIN-time validity (bi-temporal KG, `facts_valid_at`).
 Overwrite memory (Mem0, even with history traversal), dense retrieval, and
 full-context all fail this materially. NUMBERS reproduce bit-for-bit from
-answers.jsonl (independent adversarial recompute, verdict CONFIRMED); fairness
+answers.jsonl (automated recompute from our own tooling, not third-party; verdict CONFIRMED); fairness
 CONFIRMED (all systems ingest identical raw turns; Mem0 run at infer=True + history();
 same responder/judge/embedder/model; no ground-truth leakage into GENOME).
 NOT judge-leniency: full 6-conv extraction audit (benchmarks/tempbelief_verify.py

@@ -14,7 +14,7 @@ def test_verify_reproduces_core_claims(monkeypatch, capsys):
     rc = v.main()
     out = capsys.readouterr().out
     assert rc == 0
-    assert "ALL CORE CLAIMS REPRODUCED LOCALLY" in out
+    assert "REPRODUCED LOCALLY" in out
     assert "Air-gapped write path" in out
     assert "0 network attempts" in out  # the socket block saw no phone-home
     assert "[FAIL]" not in out

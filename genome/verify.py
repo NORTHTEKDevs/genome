@@ -108,7 +108,8 @@ def main() -> int:
     print("  air-gapped latency, longer run:              python benchmarks/local_writepath.py --n 1000")
     print("  accuracy parity vs Mem0 (bring your key):    benchmarks/RESULTS.md + GENOME-LoCoMo-Report.pdf")
 
-    print("\nVERDICT:", "ALL CORE CLAIMS REPRODUCED LOCALLY." if all_ok
+    print("\nVERDICT:", "COST + SPEED + OFFLINE CLAIMS REPRODUCED LOCALLY "
+          "(accuracy parity is a separate check -- see below)." if all_ok
           else "SOME CHECKS FAILED (see above) -- please open an issue.")
     return 0 if all_ok else 1
 

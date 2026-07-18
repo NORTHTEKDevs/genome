@@ -5,6 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [1.0.2] - 2026-07-17
+
+### Changed
+- Lighter core install: `matplotlib` moved to an optional `[viz]` extra (it was only ever used
+  for benchmark charts). Core deps are now numpy + sentence-transformers + scikit-learn +
+  rank-bm25.
+- PEP 561 typing: added `genome/py.typed` so downstream type-checkers see GENOME's type hints.
+
+### Docs
+- Honest-framing pass on the benchmark docs: `python -m genome.verify` is now scoped explicitly
+  to the cost/speed/offline claims (accuracy parity is a separate `benchmarks/head_to_head.py`
+  check); non-significant results are phrased "nominally higher, not significant" (no "lead");
+  automated self-checks are no longer described as "independent".
+- New "Migrating from Mem0" guide (`docs/migrating_from_mem0.md`) and an honest
+  dependency-footprint note in the README.
+
 ## [1.0.1] - 2026-07-17
 
 ### Added

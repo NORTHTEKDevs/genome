@@ -3,7 +3,7 @@
 # Copyright 2026 Northtek (FrostByte Digital LLC)
 # SPDX-License-Identifier: Apache-2.0
 
-__version__ = "1.0.1"
+__version__ = "1.0.2"
 
 
 _RELATION_CONSTANTS = {"SUPERSEDES", "CONTRADICTS", "DERIVED_FROM", "RELATES_TO", "CAUSES"}

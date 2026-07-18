@@ -183,8 +183,10 @@ On as-of, belief-state beats **every** baseline with significance: vs Mem0 p=0.0
 (28 belief-only vs 7 Mem0-only of 108 paired), vs dense p<1e-5, vs full-context p<1e-5.
 Overwrite-based memory loses older values; raw retrieval and full-context return the
 *latest* value or can't disambiguate dates in a cluttered context. Only the bi-temporal
-KG answers point-in-time reliably. (Numbers independently reproduced bit-for-bit from
-the run log by an adversarial recompute; Mem0 confirmed run at its best, not hobbled.)
+KG answers point-in-time reliably. (Numbers recomputed bit-for-bit from the run log by an
+automated cross-check — our own tooling, **not** an independent third party; Mem0 was run at
+its best, not hobbled. Independent replication is welcome and encouraged — the harness is in
+this repo.)
 
 **Not judge leniency:** a full 6-conversation extraction audit
 (`benchmarks/tempbelief_verify.py --convs 6`) finds the belief KG at **precision 0.972,
@@ -257,16 +259,17 @@ the answer step, gold + 4 distractor sessions; `benchmarks/lme_qa.py`):**
 | GENOME dense | 0.689 | 0.917 |
 | Mem0 (`infer=True`, session-ingest) | 0.622 | — |
 
-On this *hard, non-saturated* benchmark GENOME **leads Mem0 on answer accuracy by +0.078**
-(rerank 0.700 vs Mem0 0.622) — winning 4 of 6 question types (single-session-assistant
-1.00 vs 0.60, multi-session 0.73 vs 0.60, single-session-user 1.00 vs 0.93). Paired
-McNemar: GENOME-only wins 14 vs Mem0-only 7 (2:1), **p=0.19 — a directional lead, NOT
-statistically significant at n=90** (would need ~2x the sample to confirm if the ratio
-holds). **Two honest corrections vs an earlier small-n (n=24, Haiku-responder) read:**
-that run showed 0.542/0.500/0.500 and suggested reranking *hurt* answers — both were
-small-n noise. At n=90 with a stronger responder, **reranking is the best system (0.700)**,
-helping answers as well as retrieval, and GENOME's lead over Mem0 is clearer than the
-earlier tie. Caveat that remains: temporal-reasoning is ~0.07 for all systems — those
+On this *hard, non-saturated* benchmark GENOME scores **nominally higher than Mem0 by +0.078**
+(rerank 0.700 vs Mem0 0.622) — but **this is NOT statistically significant, and the larger
+n=205 run below confirms the honest conclusion is parity, not a beat.** It answers 4 of 6
+question types higher (single-session-assistant 1.00 vs 0.60, multi-session 0.73 vs 0.60,
+single-session-user 1.00 vs 0.93). Paired McNemar: GENOME-only correct 14 vs Mem0-only 7,
+**p=0.19 — nominally higher, NOT statistically significant at n=90**. **Two honest corrections
+vs an earlier small-n (n=24, Haiku-responder) read:** that run showed 0.542/0.500/0.500 and
+suggested reranking *hurt* answers — both were small-n noise. At n=90 with a stronger
+responder, **reranking is the best of GENOME's own configs (0.700)**, helping answers as well
+as retrieval; the apparent edge over Mem0 is not significant (see the n=205 update). Caveat
+that remains: temporal-reasoning is ~0.07 for all systems — those
 questions need GENOME's belief-state (as-of) resolution wired into answering, which this
 retrieval-only harness does not do (a concrete next upgrade).
 
