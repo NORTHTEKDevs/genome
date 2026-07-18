@@ -1,9 +1,29 @@
 {
   "name": "@northtek/genome-memory",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "TypeScript / JavaScript client for GENOME, an open-source memory layer for AI agents.",
   "author": "FrostByte Digital",
   "license": "Apache-2.0",
+  "keywords": [
+    "ai",
+    "agents",
+    "memory",
+    "llm",
+    "embeddings",
+    "mcp",
+    "rag",
+    "vector-search",
+    "mem0"
+  ],
+  "homepage": "https://github.com/NORTHTEKDevs/genome",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/NORTHTEKDevs/genome.git",
+    "directory": "sdks/typescript"
+  },
+  "bugs": {
+    "url": "https://github.com/NORTHTEKDevs/genome/issues"
+  },
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
