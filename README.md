@@ -28,6 +28,9 @@ git clone https://github.com/NORTHTEKDevs/genome && cd genome
 pip install -e . && python -m genome.verify
 ```
 
+The **first** run downloads the local embedding model (~90 MB, one time) before printing
+anything — expect 30-120s of apparent silence on a cold machine. Every run after is instant.
+
 It writes memories with your **outbound network physically blocked** and prints a live
 pass/fail receipt — 0 network calls, 0 LLM calls, single-digit-ms writes, retrieval that works:
 
@@ -313,7 +316,8 @@ mem.search("Where did the user go on vacation?", user_id="u1", limit=5)  # reran
 
 The LoCoMo and LongMemEval datasets are **not bundled** (they carry their own licenses —
 LoCoMo is CC BY-NC 4.0). See [`benchmarks/data/README.md`](./benchmarks/data/README.md) to
-download them. The first two lines need no dataset and no API keys:
+download them. The benchmark scripts need the dev extra (`pip install -e ".[dev]"`) for
+`tiktoken` and `matplotlib`. The first two lines need no dataset and no API keys:
 
 ```bash
 python benchmarks/local_writepath.py        # local write path: ~10ms/msg, 0 network
