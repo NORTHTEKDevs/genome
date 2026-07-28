@@ -393,6 +393,8 @@ def test_openapi_includes_all_response_models():
     """All endpoints that return JSON must declare a Pydantic response_model
     so the OpenAPI spec advertises an accurate response schema. Regression
     for R7: 7 endpoints previously returned raw dicts."""
+    pytest.importorskip("fastapi", reason="requires the [fastapi] extra")
+
     from fastapi.testclient import TestClient
 
     from genome.server.app import create_app
@@ -436,6 +438,8 @@ def test_rest_rejects_oversize_user_id_with_422():
     """REST AddRequest must enforce MAX_USER_ID_LEN at the API boundary so
     oversize ids surface as 422 validation errors, not 500 internal errors.
     """
+    pytest.importorskip("fastapi", reason="requires the [fastapi] extra")
+
     from fastapi.testclient import TestClient
 
     from genome.server.app import create_app
@@ -454,6 +458,8 @@ def test_rest_rejects_oversize_user_id_with_422():
 
 def test_rest_rejects_oversize_query_with_422():
     """REST SearchRequest must reject oversize query at the boundary."""
+    pytest.importorskip("fastapi", reason="requires the [fastapi] extra")
+
     from fastapi.testclient import TestClient
 
     from genome.server.app import create_app
