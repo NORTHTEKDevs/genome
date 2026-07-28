@@ -1,9 +1,12 @@
-import matplotlib
+import pytest
+
+# matplotlib is the optional [viz] extra; skip rather than fail collection on a base install.
+matplotlib = pytest.importorskip("matplotlib", reason="requires the [viz] extra")
 
 matplotlib.use("Agg")
-import numpy as np
+import numpy as np  # noqa: E402
 
-from genome.viz import plot_operator_bar_chart, plot_parent_hybrid_tsne
+from genome.viz import plot_operator_bar_chart, plot_parent_hybrid_tsne  # noqa: E402
 
 
 def test_plot_operator_bar_chart_saves_file(tmp_path):

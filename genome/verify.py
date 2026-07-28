@@ -103,7 +103,7 @@ def main() -> int:
     all_ok = all("[PASS]" in r for r in rows)
 
     print("\nReproduce the harder claims yourself:")
-    print("  full test suite (also runs in public CI):   pytest -q")
+    print('  full test suite (also runs in public CI):   pip install -e ".[dev]" && pytest -q')
     print("  cost model, no API key:                      python benchmarks/tco_project.py")
     print("  air-gapped latency, longer run:              python benchmarks/local_writepath.py --n 1000")
     print("  accuracy parity vs Mem0 (bring your key):    benchmarks/RESULTS.md + GENOME-LoCoMo-Report.pdf")
