@@ -1,4 +1,7 @@
-import matplotlib
+import pytest
+
+# matplotlib is the optional [viz] extra; skip rather than fail collection on a base install.
+matplotlib = pytest.importorskip("matplotlib", reason="requires the [viz] extra")
 
 matplotlib.use("Agg")
 import numpy as np

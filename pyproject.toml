@@ -41,6 +41,7 @@ dev = [
     "pydantic>=2.5",
     "httpx>=0.27",
     "matplotlib>=3.8,<4.0",
+    "tiktoken>=0.7",
 ]
 langchain = ["langchain-core>=0.3"]
 llamaindex = ["llama-index-core>=0.10"]
