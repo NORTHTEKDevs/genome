@@ -32,12 +32,17 @@ for r in results:
     print(f"{r.score:.3f}  {r.content}")
 ```
 
-Expected output:
+Output (captured from an actual run on the default local embedder,
+`all-MiniLM-L6-v2`):
 ```
-0.452  I love pour-over coffee
-0.219  I moved to Tokyo last month
-0.161  I work as a data scientist
+0.474  I love pour-over coffee
+0.074  I moved to Tokyo last month
+0.066  I work as a data scientist
 ```
+
+The **ranking** is what matters and is stable. The exact scores depend on the embedding
+model, so they will shift if you swap embedders or the model version changes — do not
+treat these three decimals as a self-test.
 
 ## Persist to a file
 

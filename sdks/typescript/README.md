@@ -16,12 +16,24 @@ ESM package; on Node 20.19+ / 22+, CommonJS `require()` works too. Any modern br
 
 ## Quickstart
 
-First, run the genome server (from the Python package):
+First, run the genome server (from the Python package). **The server is default-deny: it
+refuses to serve without an API key**, so set one — otherwise every call below returns
+`503`.
 
 ```bash
-pip install -e ".[fastapi]"
+pip install "genome-memory[fastapi]"
+
+export GENOME_API_KEY="$(python -c 'import secrets;print(secrets.token_urlsafe(32))')"
 python -m genome.server  # listens on :8080
 ```
+
+<details>
+<summary>Local development without a key</summary>
+
+`GENOME_ALLOW_NO_AUTH=1` lets a keyless server answer requests that arrive **directly
+from loopback** and carry no proxy headers. It is for local development only; anything
+reached through a proxy is still refused.
+</details>
 
 Then from your Node/TS app:
 
@@ -30,7 +42,7 @@ import { Memory } from "@northtek/genome-memory";
 
 const mem = new Memory({
   baseUrl: "http://localhost:8080",
-  apiKey: process.env.GENOME_API_KEY, // optional
+  apiKey: process.env.GENOME_API_KEY, // required unless the server runs in keyless local-dev mode
 });
 
 // Add
