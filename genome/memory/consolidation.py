@@ -127,7 +127,6 @@ def consolidate(
     before = len(all_records)
 
     protected = _protected_operators()
-    structural = [r for r in all_records if r.operator in protected]
     records = [r for r in all_records if r.operator not in protected]
 
     if len(records) <= max_memories:
