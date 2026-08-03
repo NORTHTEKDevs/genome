@@ -5,6 +5,55 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [1.0.3] - 2026-08-03
+
+### Fixed
+
+- **Installable on Python 3.14.** `requires-python` was `>=3.11,<3.14`, so `pip install
+  genome-memory` failed with "no matching distribution" on the current Python release
+  while the README badge advertised "3.11+". The suite passes on 3.14; the cap was stale.
+  Now `>=3.11,<3.15`, and CI covers 3.14.
+- **`consolidate()` no longer deletes entity and temporal-fact records.** They were ranked
+  by the same access/recency fitness as episodic memories and pruned as low scorers, so
+  combining the knowledge graph with consolidation silently destroyed the entity graph and
+  all fact history. Entities, entity facts, RAPTOR summaries, and agent core-memory blocks
+  are now excluded from pruning; `max_memories` bounds episodic memories, which is the
+  growth that needs bounding.
+- **Response cache no longer invalidates across tenants.** `ScopeEpochs` incremented a
+  global counter on every mutation and folded it into every scoped lookup, so any tenant's
+  write invalidated every other tenant's cached queries. Scoped queries now read only their
+  own counter; unscoped queries read the global one.
+- **`search()` rejects a negative `limit`** instead of silently returning all-but-the-last
+  result via Python slice semantics.
+- **`add()` raises actionable errors** for a non-string `text`, a non-string `user_id` /
+  `agent_id` (an integer ORM primary key is the common case), and non-dict `metadata`.
+  These previously surfaced as bare `AttributeError` / `TypeError` from internal lines.
+- Install instructions in five shipped code paths and the troubleshooting guide named the
+  wrong package (`genome[postgres]`, `genome[fastapi]`); the correct name is
+  `genome-memory[...]`.
+- TypeScript SDK quickstart returned `503` on every call as written — the server is
+  default-deny and the README marked `apiKey` "optional".
+- `genome-verify` pointed at `pytest` and `benchmarks/*.py`, neither of which exists in a
+  pip install. Now labelled as repo-only.
+- Tutorial "Expected output" listed scores no run produces; regenerated from an actual run
+  and reframed (the ranking is stable, the decimals are embedder-dependent).
+
+### Added
+
+- CI now covers Windows and macOS in addition to Linux, and Python 3.14.
+- Regression tests for every fix above (`tests/memory/test_audit_regressions.py`).
+- `CODE_OF_CONDUCT.md` and `SUPPORT.md`.
+
+### Changed
+
+- `docs/api_reference.md` now documents all 18 `Memory()` constructor parameters (it
+  covered 6), grouped by concern and marking which are opt-in because they cost LLM calls.
+- `benchmarks/RESULTS.md` states plainly that a `Source:` line names the script that
+  regenerates a number rather than a file present in a fresh clone (`results/` is
+  gitignored and the LoCoMo dataset is CC BY-NC and cannot be redistributed).
+- Trademark policy rewritten to state permitted uses, not only prohibitions.
+- Removed a stale internal release runbook from the public tree.
+
 ## [1.0.2] - 2026-07-17
 
 ### Changed

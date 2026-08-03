@@ -325,12 +325,30 @@ python benchmarks/lme_qa.py --n 90          # LongMemEval head-to-head vs Mem0
 python benchmarks/tempbelief_run.py --convs 6   # bi-temporal point-in-time vs baselines
 ```
 
+## Support and commercial tier
+
+Bugs and questions: [issues](https://github.com/NORTHTEKDevs/genome/issues) and
+[discussions](https://github.com/NORTHTEKDevs/genome/discussions). Community support is
+best-effort — see [SUPPORT.md](./SUPPORT.md).
+
+**GENOME Enterprise** is a separate commercial product for regulated and on-premise buyers
+who have to answer to an auditor for what an AI system knew and when: a tamper-evident
+hash-chained audit record, point-in-time reconstruction, compliance reports, retention with
+erasure proofs, RBAC and SSO. Self-hosted and licensed per deployment — there is no hosted
+version, deliberately, because the value is that your data never leaves. That tier is what
+funds this one. Evaluating it, or want commercial support on the open core?
+**info@northtek.io**
+
 ## License
 
 **Apache License 2.0** — see [LICENSE](./LICENSE) and [NOTICE](./NOTICE).
 
 GENOME is free and open source: read it, modify it, self-host it, and embed it in your own
-applications — commercial use included — under the terms of Apache 2.0. Questions:
-info@northtek.io.
+applications — commercial use included — under the terms of Apache 2.0. There is no
+"open core bait and switch" planned: the core stays Apache-2.0.
+
+The Apache-2.0 grant covers the code, not the name — see
+[TRADEMARKS.md](./TRADEMARKS.md), which leads with what you may do without asking.
+Questions: info@northtek.io.
 
 Copyright 2026 Northtek (FrostByte Digital LLC).

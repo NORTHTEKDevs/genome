@@ -11,21 +11,81 @@ The primary synchronous memory layer.
 ```python
 Memory(
     *,
+    # Storage and embedding
     storage: str | Path | MemoryStore = ":memory:",
     embedding_provider: EmbeddingProvider | None = None,
+    # Extraction
     llm_call: LLMCallFn | None = None,
     extractor: FactExtractor | None = None,
+    # Response cache
     cache_size: int = 1024,
     enable_cache: bool = True,
+    # Conflict resolution (opt-in; costs LLM calls)
+    resolve_conflicts: bool = False,
+    conflict_llm: LLMCallFn | None = None,
+    conflict_topk: int = 3,
+    conflict_skip_unrelated: bool = False,
+    # Entity + temporal fact extraction (opt-in; costs LLM calls)
+    auto_extract_entities: bool = False,
+    auto_fact_confidence_threshold: float = 0.7,
+    # Auto-consolidation (opt-in)
+    auto_consolidate_threshold: int | None = None,
+    auto_consolidate_target: int = 150,
+    auto_consolidate_synthesize: bool = True,
+    auto_consolidate_operator: str = "frequency_crossover",
+    # Retrieval
+    reranker: Reranker | None = None,
+    # Shutdown
+    close_drain_timeout_seconds: float = 30.0,
 )
 ```
 
+**Storage and embedding**
+
 - `storage`: SQLite file path (`"memories.db"`), `":memory:"` for ephemeral, or a pre-built `MemoryStore` instance for Postgres / custom backends.
-- `embedding_provider`: defaults to `EmbeddingProvider()` (loads `all-MiniLM-L6-v2`).
+- `embedding_provider`: defaults to `EmbeddingProvider()` (loads `all-MiniLM-L6-v2` locally). This is the default write path: no network, no LLM.
+
+**Extraction**
+
 - `llm_call`: optional sync callable `(prompt: str) -> str` for auto fact-extraction. If provided, wraps into `LLMExtractor`.
-- `extractor`: explicit `FactExtractor` overriding both default and `llm_call`.
+- `extractor`: explicit `FactExtractor` overriding both the default and `llm_call`.
+
+> The default extractor is `IdentityExtractor` — it stores text as-is. Supplying
+> `llm_call` or `extractor` is what makes `add()` call an LLM. **Everything below marked
+> "opt-in" is off by default precisely because it costs LLM calls**, which is the cost
+> GENOME exists to avoid. Turn them on deliberately.
+
+**Response cache**
+
 - `cache_size`: response-cache LRU capacity.
-- `enable_cache`: if False, no cache at all.
+- `enable_cache`: if `False`, no cache at all.
+
+**Conflict resolution** (opt-in — costs LLM calls)
+
+- `resolve_conflicts`: when `True`, each extracted fact is compared against existing memories in the same scope and an LLM decides ADD / UPDATE / DELETE / NONE.
+- `conflict_llm`: the callable used for that decision. Falls back to `llm_call`.
+- `conflict_topk`: how many existing memories are offered to the LLM as candidates.
+- `conflict_skip_unrelated`: skip the LLM call when no candidate is semantically close, trading a little recall for fewer calls.
+
+**Entity and temporal facts** (opt-in — costs LLM calls)
+
+- `auto_extract_entities`: extract entities and record temporal facts on every `add()`.
+- `auto_fact_confidence_threshold`: minimum confidence `[0, 1]` before a detected fact is recorded.
+
+**Auto-consolidation** (opt-in)
+
+- `auto_consolidate_threshold`: when a scope exceeds this many memories, consolidate it automatically. `None` disables it.
+- `auto_consolidate_target`: the number of **episodic** memories to keep. Entities, temporal facts, RAPTOR summaries, and agent core-memory blocks are structural and are never pruned.
+- `auto_consolidate_synthesize`: recombine pairs of low-fitness memories into hybrids before deleting the originals, compressing forward instead of forgetting.
+- `auto_consolidate_operator`: which recombination operator to use (see `genome.operators`).
+
+**Retrieval**
+
+- `reranker`: optional `Reranker` (e.g. `CrossEncoderReranker`) applied to the candidate pool in `search()`. Local and free; see [`../README.md`](../README.md) for the measured effect.
+
+**Shutdown**
+
+- `close_drain_timeout_seconds`: how long `close()` waits for in-flight background work before giving up.
 
 ### Core methods
 
