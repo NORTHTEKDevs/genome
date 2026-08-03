@@ -93,17 +93,38 @@ def test_smoke_all_five_fixes_wired_together():
     assert final_count <= 20, (
         f"auto-consolidate should have pruned to <=20, got {final_count}"
     )
-    # Synthesis is asserted with an EXPLICIT consolidate rather than by inspecting what
-    # the incidental auto-consolidate passes happened to leave behind. Synthesis needs
-    # at least two records in the prune set to pair, and whether the *final* automatic
-    # pass clears that bar depends on how many records in scope are structural
-    # (entities/facts, which are never pruned) versus episodic. Entity extraction is
-    # platform-sensitive, so the old assertion passed on Linux and Windows and failed on
-    # macOS for reasons unrelated to whether synthesis works. This tests the same wiring
-    # deterministically.
-    m.consolidate(user_id="alice", max_memories=3, synthesize_before_prune=True)
-    hybrids = [r for r in m.list_all(user_id="alice") if r.parents]
-    assert len(hybrids) >= 1, (
-        "consolidate with synthesize_before_prune=True should have created at "
-        "least one hybrid record"
+    # Synthesis is asserted separately, in test_synthesize_before_prune_creates_hybrids
+    # below. Asserting it here made the test depend on how many of the 27 adds actually
+    # became episodic records, which varies by platform: conflict resolution admits or
+    # skips records based on embedding neighbours, and entity extraction decides how many
+    # records are structural (and therefore never pruned). That ratio decides whether the
+    # prune set has the two records synthesis needs to pair. The assertion held on Linux
+    # and Windows and failed on macOS for reasons unrelated to whether synthesis works.
+
+
+def test_synthesize_before_prune_creates_hybrids():
+    """Synthesis wiring, isolated from conflict resolution and entity extraction.
+
+    Both of those decide how many records end up in the prune set, and both vary by
+    platform. Here the record set is fixed and entirely episodic, so the prune set size
+    is known: consolidating 12 records down to 4 leaves 8 to prune, which pairs into 4
+    hybrids. That is a property of the code, not of the embedder's neighbourhoods.
+    """
+    m = Memory(extractor=IdentityExtractor())
+    for i in range(12):
+        m.add(f"episodic memory number {i}", user_id="bob")
+    assert m.count(user_id="bob") == 12
+
+    result = m.consolidate(
+        user_id="bob", max_memories=4, synthesize_before_prune=True
     )
+
+    assert result.pruned == 8
+    assert result.synthesized >= 1
+    hybrids = [r for r in m.list_all(user_id="bob") if r.parents]
+    assert len(hybrids) >= 1, (
+        "synthesize_before_prune=True should have created at least one hybrid"
+    )
+    for hybrid in hybrids:
+        assert len(hybrid.parents) == 2
+        assert hybrid.operator is not None
