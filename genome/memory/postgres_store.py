@@ -3,7 +3,7 @@
 Production-scale alternative to SQLite. Supports millions of memories per user
 with sub-second retrieval via pgvector's HNSW index.
 
-Install: `pip install "genome[postgres]"` (adds psycopg[binary] and pgvector)
+Install: `pip install "genome-memory[postgres]"` (adds psycopg[binary] and pgvector)
 
 Requires a Postgres 14+ instance with the pgvector extension enabled:
     CREATE EXTENSION IF NOT EXISTS vector;
@@ -56,7 +56,7 @@ def _require_psycopg():
     except ImportError as e:
         raise ImportError(
             "PostgresMemoryStore requires psycopg[binary]. "
-            "Install: pip install \"genome[postgres]\" or pip install psycopg[binary] pgvector"
+            "Install: pip install \"genome-memory[postgres]\" or pip install psycopg[binary] pgvector"
         ) from e
 
 

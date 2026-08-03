@@ -219,6 +219,29 @@ class Memory:
         only ADD-decided facts produce a new INSERT. Returns the list of
         newly-stored records.
         """
+        # Type-guard the public boundary. Without these, a null text field, an
+        # integer ORM primary key as user_id, or pre-serialized metadata each
+        # crash deep inside an unrelated internal line with a stdlib error that
+        # names neither the argument nor the fix.
+        if not isinstance(text, str):
+            raise TypeError(
+                f"text must be a string, got {type(text).__name__}. "
+                f"If this came from a nullable field, guard it before calling "
+                f"add() -- there is nothing to remember in a null."
+            )
+        for name, value in (("user_id", user_id), ("agent_id", agent_id)):
+            if value is not None and not isinstance(value, str):
+                raise TypeError(
+                    f"{name} must be a string or None, got "
+                    f"{type(value).__name__}. Integer primary keys are common "
+                    f"here -- call str({name})."
+                )
+        if metadata is not None and not isinstance(metadata, dict):
+            raise TypeError(
+                f"metadata must be a dict or None, got {type(metadata).__name__}. "
+                f"Pass the object itself, not a JSON string."
+            )
+
         with self._metrics.histogram(
             "memory.add.duration", tags={"user_id": user_id or ""}
         ).time():
@@ -645,6 +668,16 @@ If no clean attribute can be extracted, output FACT_TYPE: none and CONFIDENCE: 0
         if mode not in {"dense", "hybrid", "graph"}:
             raise ValueError(
                 f"mode must be 'dense', 'hybrid' or 'graph', got {mode!r}"
+            )
+        # A negative limit used to hit Python slice semantics downstream
+        # (scored[:-1]), silently returning all-but-the-last result. Silent
+        # truncation is worse than a crash: it looks like it worked.
+        if not isinstance(limit, int) or isinstance(limit, bool):
+            raise TypeError(f"limit must be an int, got {type(limit).__name__}")
+        if limit < 0:
+            raise ValueError(
+                f"limit must be >= 0, got {limit}. genome has no 'unlimited' "
+                f"sentinel; pass an explicit count."
             )
         if mode == "graph":
             return self._graph_search(

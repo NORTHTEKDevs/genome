@@ -11,7 +11,7 @@ def main() -> int:
         import uvicorn
     except ImportError:
         print(
-            "uvicorn not installed. Install with: pip install \"genome[fastapi]\""
+            "uvicorn not installed. Install with: pip install \"genome-memory[fastapi]\""
         )
         return 1
     import os

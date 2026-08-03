@@ -1,6 +1,6 @@
 """REST API server for genome.
 
-Install with: pip install "genome[fastapi]"
+Install with: pip install "genome-memory[fastapi]"
 Run with:     uvicorn genome.server.app:app --reload
 Or:           python -m genome.server
 """

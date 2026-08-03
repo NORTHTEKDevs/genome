@@ -27,7 +27,7 @@ cost below; with a local embedder the write path is single-digit milliseconds.
 
 ## Projected to deployment (10,000 users × 50 msgs/day = 15M messages/month)
 
-Reproduce: `.venv/Scripts/python.exe benchmarks/tco_project.py`
+Reproduce: `python benchmarks/tco_project.py`
 
 | Extraction model | Mem0 $/month | Mem0 $/year | GENOME $/year | Ratio |
 |---|---|---|---|---|

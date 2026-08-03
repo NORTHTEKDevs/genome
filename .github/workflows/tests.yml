@@ -16,7 +16,17 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest]
-        python-version: ["3.11", "3.12", "3.13"]
+        python-version: ["3.11", "3.12", "3.13", "3.14"]
+        # The package is developed on Windows and installed on macOS, but only Linux
+        # was ever tested. One leg each converts the "OS Independent" claim from an
+        # assumption into something CI actually proves. Kept to a single Python
+        # version per OS to hold CI time down; Postgres stays Linux-only since it
+        # needs a service container.
+        include:
+          - os: windows-latest
+            python-version: "3.12"
+          - os: macos-latest
+            python-version: "3.12"
 
     steps:
       - uses: actions/checkout@v4

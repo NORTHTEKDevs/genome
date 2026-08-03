@@ -7,8 +7,8 @@ authors:
     email: info@northtek.io
 repository-code: "https://github.com/NORTHTEKDevs/genome"
 license: Apache-2.0
-version: 1.0.0
-date-released: 2026-07-13
+version: 1.0.3
+date-released: 2026-08-02
 keywords:
   - agent memory
   - retrieval

@@ -129,29 +129,50 @@ class ScopeEpochs:
         self._lock = threading.Lock()
         self._epochs: dict[tuple[str | None, str | None], int] = {}
         self._global_epoch = 0
+        self._generation = 0
 
     def _key(self, user_id: str | None, agent_id: str | None) -> tuple:
         return (user_id, agent_id)
 
     def bump(self, user_id: str | None, agent_id: str | None) -> None:
-        """Call on every mutation. Also bumps the global epoch so unscoped
-        queries invalidate correctly."""
+        """Call on every mutation.
+
+        Bumps this scope's counter, and the global counter that unscoped queries
+        read (an unscoped search spans every scope, so any mutation anywhere must
+        invalidate it).
+        """
         with self._lock:
             k = self._key(user_id, agent_id)
             self._epochs[k] = self._epochs.get(k, 0) + 1
             self._global_epoch += 1
 
     def current(self, user_id: str | None, agent_id: str | None) -> int:
-        """Current epoch for a scope. Combines scope-local + global to also
-        invalidate when a parent scope (None, None) mutates."""
+        """Current epoch for a scope.
+
+        A SCOPED query reads only its own counter, so a write to some other
+        tenant's scope leaves this scope's cached entries valid. Folding the
+        global counter in here (as this once did) meant any tenant's write
+        invalidated every other tenant's cache, collapsing the hit rate to zero
+        in exactly the multi-tenant workload the per-scope epoch exists for.
+
+        An UNSCOPED query reads the global counter, because it spans every scope
+        and therefore must invalidate on any mutation.
+
+        `_generation` is folded into both so that `reset_all` invalidates
+        everything without ever moving an epoch backwards -- decreasing a counter
+        could let a stale entry be re-hit once the scope caught back up.
+        """
         with self._lock:
             k = self._key(user_id, agent_id)
-            return self._epochs.get(k, 0) + self._global_epoch
+            if k == self._GLOBAL:
+                return self._global_epoch + self._generation
+            return self._epochs.get(k, 0) + self._generation
 
     def reset_all(self) -> None:
         with self._lock:
             self._epochs.clear()
             self._global_epoch += 1
+            self._generation += 1
 
 
 __all__ = ["ResponseCache", "CacheStats", "ScopeEpochs"]

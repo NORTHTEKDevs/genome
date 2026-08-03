@@ -5,6 +5,13 @@ LoCoMo long-conversation memory benchmark. Wins and null results are reported wi
 equal prominence. Every number regenerates from `benchmarks/` and is pinned to its
 source in [`VERIFIED-NUMBERS.md`](./VERIFIED-NUMBERS.md).
 
+> **About the `results/...` paths cited below.** Those are the raw artifacts from our
+> own runs. They are **not shipped in this repository** — `results/` is gitignored, and
+> the LoCoMo dataset itself is CC BY-NC and cannot be redistributed here. So a `Source:`
+> line tells you **which script regenerates that number**, not a file you can open in a
+> fresh clone. Run the named script to produce your own artifact and compare. If you
+> want ours for a specific number, ask at info@northtek.io and we will send it.
+
 ## Methodology (why the comparison is fair)
 
 Every system answers with the **same** model (Claude Haiku 4.5), is graded by the

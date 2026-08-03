@@ -80,7 +80,7 @@ def _require_fastapi():
     except ImportError as e:
         raise ImportError(
             "genome.server requires fastapi + pydantic. "
-            "Install: pip install \"genome[fastapi]\""
+            "Install: pip install \"genome-memory[fastapi]\""
         ) from e
 
 

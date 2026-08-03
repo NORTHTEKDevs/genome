@@ -62,6 +62,22 @@ def _fitness(
     return access * recency + 0.1 * density
 
 
+def _protected_operators() -> frozenset[str]:
+    """Operator tags that mark structural records consolidation must never delete.
+
+    Imported lazily: `agent.memory` and `memory.temporal` sit above this module in
+    the import graph, and pulling them in at module scope would risk a cycle.
+    """
+    from genome.agent.memory import CORE_MEMORY_OPERATOR
+    from genome.memory.entities import ENTITY_OPERATOR
+    from genome.memory.raptor import RAPTOR_OPERATOR
+    from genome.memory.temporal import FACT_OPERATOR
+
+    return frozenset(
+        {ENTITY_OPERATOR, FACT_OPERATOR, RAPTOR_OPERATOR, CORE_MEMORY_OPERATOR}
+    )
+
+
 def score_memories(
     records: list[MemoryRecord],
     *,
@@ -92,15 +108,29 @@ def consolidate(
     synthesize_before_prune: bool = False,
     synthesis_operator: str = "frequency_crossover",
 ) -> ConsolidationResult:
-    """Prune memories in scope down to `max_memories` by fitness.
+    """Prune episodic memories in scope down to `max_memories` by fitness.
 
     If `synthesize_before_prune` is True, pairs of adjacent low-fitness memories
     are recombined into hybrids before the originals are deleted. This preserves
     the information in compressed form.
+
+    STRUCTURAL RECORDS ARE NEVER PRUNED. Entity records, temporal entity-facts,
+    RAPTOR summaries, and agent core-memory blocks are knowledge structure, not
+    episodic recall, and the recency/access fitness function is meaningless for
+    them: an entity written once and never "accessed" scores near zero and would
+    be deleted first. Before this exclusion existed, combining the temporal
+    knowledge graph with consolidation silently destroyed the entity graph and
+    all fact history -- no error, no warning. `max_memories` therefore bounds
+    episodic memories only, which is the growth that actually needs bounding.
     """
-    records = store.list_by_scope(user_id=user_id, agent_id=agent_id)
-    before = len(records)
-    if before <= max_memories:
+    all_records = store.list_by_scope(user_id=user_id, agent_id=agent_id)
+    before = len(all_records)
+
+    protected = _protected_operators()
+    structural = [r for r in all_records if r.operator in protected]
+    records = [r for r in all_records if r.operator not in protected]
+
+    if len(records) <= max_memories:
         return ConsolidationResult(
             user_id=user_id,
             agent_id=agent_id,

@@ -5,7 +5,7 @@
 [![tests](https://github.com/NORTHTEKDevs/genome/actions/workflows/tests.yml/badge.svg)](https://github.com/NORTHTEKDevs/genome/actions/workflows/tests.yml)
 [![PyPI](https://img.shields.io/pypi/v/genome-memory)](https://pypi.org/project/genome-memory/)
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](./LICENSE)
-![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue)
+![Python 3.11-3.14](https://img.shields.io/badge/python-3.11--3.14-blue)
 
 Most agent-memory tools (like Mem0) call an LLM on **every message** to decide what to
 remember. That's the slow, expensive part — and GENOME's bet is that you don't need it.

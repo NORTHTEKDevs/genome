@@ -13,17 +13,17 @@ pyenv install 3.12
 pyenv local 3.12
 python -m venv .venv
 source .venv/bin/activate
-pip install genome
+pip install genome-memory
 ```
 
-### `ImportError: genome[postgres] requires psycopg`
+### `ImportError: genome-memory[postgres] requires psycopg`
 
 You imported `PostgresMemoryStore` without installing the extra.
-**Fix:** `pip install "genome[postgres]"`.
+**Fix:** `pip install "genome-memory[postgres]"`.
 
 ### `ImportError: genome.server requires fastapi`
 
-**Fix:** `pip install "genome[fastapi]"` or `pip install "genome[all]"`.
+**Fix:** `pip install "genome-memory[fastapi]"` or `pip install "genome-memory[all]"`.
 
 ## First-run
 
