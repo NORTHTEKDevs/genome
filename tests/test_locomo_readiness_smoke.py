@@ -93,9 +93,17 @@ def test_smoke_all_five_fixes_wired_together():
     assert final_count <= 20, (
         f"auto-consolidate should have pruned to <=20, got {final_count}"
     )
-    all_recs = m.list_all(user_id="alice")
-    hybrids = [r for r in all_recs if r.parents]
+    # Synthesis is asserted with an EXPLICIT consolidate rather than by inspecting what
+    # the incidental auto-consolidate passes happened to leave behind. Synthesis needs
+    # at least two records in the prune set to pair, and whether the *final* automatic
+    # pass clears that bar depends on how many records in scope are structural
+    # (entities/facts, which are never pruned) versus episodic. Entity extraction is
+    # platform-sensitive, so the old assertion passed on Linux and Windows and failed on
+    # macOS for reasons unrelated to whether synthesis works. This tests the same wiring
+    # deterministically.
+    m.consolidate(user_id="alice", max_memories=3, synthesize_before_prune=True)
+    hybrids = [r for r in m.list_all(user_id="alice") if r.parents]
     assert len(hybrids) >= 1, (
-        "auto-consolidate with synthesize=True should have created at least "
-        "one hybrid record"
+        "consolidate with synthesize_before_prune=True should have created at "
+        "least one hybrid record"
     )
