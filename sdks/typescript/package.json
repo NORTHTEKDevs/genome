@@ -49,7 +49,7 @@
     "node": ">=20"
   },
   "devDependencies": {
-    "@types/node": "^22",
+    "@types/node": "^26",
     "typescript": "^5.5"
   }
 }
