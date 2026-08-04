@@ -1,0 +1,97 @@
+name: release
+
+# Publishes to PyPI via Trusted Publishing (OIDC). There is no API token anywhere in
+# this repository, in GitHub secrets, or on any developer machine -- GitHub proves the
+# workflow's identity to PyPI directly, and PyPI issues a short-lived credential for
+# that single upload. Nothing to leak and nothing to rotate.
+#
+# One-time setup on PyPI is required before this can succeed; see docs in the release
+# checklist section of CONTRIBUTING.md.
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build and verify
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install build tooling
+        run: python -m pip install --upgrade pip build twine
+
+      - name: Verify the tag matches the packaged version
+        # Tagging v1.0.4 while pyproject still says 1.0.3 is a real and easy mistake,
+        # and PyPI version numbers can never be reused once published. Fail here, where
+        # it costs nothing, rather than after an irreversible upload.
+        if: startsWith(github.ref, 'refs/tags/')
+        run: |
+          TAG="${GITHUB_REF_NAME#v}"
+          PKG=$(python -c "import tomllib;print(tomllib.load(open('pyproject.toml','rb'))['project']['version'])")
+          echo "tag=$TAG  pyproject=$PKG"
+          if [ "$TAG" != "$PKG" ]; then
+            echo "::error::Tag v$TAG does not match pyproject version $PKG"
+            exit 1
+          fi
+
+      - name: Build
+        run: python -m build
+
+      - name: Check metadata renders on PyPI
+        run: python -m twine check dist/*
+
+      - name: Refuse to ship anything that should not be in the package
+        # The sdist should contain the library, its tests, and licence files. Datasets,
+        # benchmark artifacts, and notebooks with output have leaked into published
+        # packages before; this makes that a build failure rather than a discovery.
+        run: |
+          python - <<'PY'
+          import tarfile, glob, sys
+          sdist = glob.glob('dist/*.tar.gz')[0]
+          names = [n.split('/', 1)[1] for n in tarfile.open(sdist).getnames() if '/' in n]
+          banned = ('benchmarks/', 'results/', 'notebooks/', 'probes/', 'public/',
+                    'sales/', 'legal/', 'docs/plans', 'dist/', '.env')
+          bad = [n for n in names
+                 if n.startswith(banned) or n.endswith(('.db', '.pem', '.onnx'))]
+          if bad:
+              print('::error::sdist contains files that must not ship:', bad)
+              sys.exit(1)
+          print(f'sdist clean: {len(names)} files')
+          PY
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+  publish:
+    name: Publish to PyPI
+    needs: build
+    runs-on: ubuntu-latest
+    # The environment gate is what makes Trusted Publishing safe: it scopes the OIDC
+    # identity, and it is where you add a manual approval rule if you ever want one.
+    environment:
+      name: pypi
+      url: https://pypi.org/project/genome-memory/
+    permissions:
+      id-token: write # required for OIDC; this is the whole mechanism
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+      - name: Publish
+        uses: pypa/gh-action-pypi-publish@release/v1
+        # No `password:` here, deliberately. Omitting it is what selects Trusted
+        # Publishing over token auth.
