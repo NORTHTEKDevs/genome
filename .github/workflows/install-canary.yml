@@ -1,0 +1,121 @@
+name: install-canary
+
+# Verifies that what users actually receive from PyPI works: fresh install,
+# import, MCP stdio handshake, and a real remember/recall round trip.
+# Exists because mcp 2.0.0 broke every fresh install for weeks before anyone
+# noticed -- the repo's own CI installs from source and could not see it.
+
+on:
+  schedule:
+    - cron: "17 9 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  fresh-install:
+    name: PyPI fresh install (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 25
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    env:
+      GENOME_MCP_DB: canary-memories.db
+    steps:
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      # No checkout on purpose: the job must see exactly what a user gets
+      # from PyPI, independent of the repo state.
+      - name: Fresh install from PyPI
+        run: pip install --no-cache-dir "genome-memory[mcp]"
+
+      - name: Import check
+        run: python -c "import genome; from genome.mcp.server import main; from importlib.metadata import version; print('genome-memory', version('genome-memory'))"
+
+      - name: MCP stdio round trip
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json, subprocess, sys, threading, time
+
+          proc = subprocess.Popen(
+              ["genome-mcp"],
+              stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+              text=True, encoding="utf-8",
+          )
+          out_lines, err_chunks = [], []
+          threading.Thread(
+              target=lambda: [out_lines.append(l) for l in proc.stdout], daemon=True
+          ).start()
+          # stderr must be drained or a chatty model download can deadlock the pipe
+          threading.Thread(
+              target=lambda: [err_chunks.append(l) for l in proc.stderr], daemon=True
+          ).start()
+
+          def send(msg):
+              proc.stdin.write(json.dumps(msg) + "\n")
+              proc.stdin.flush()
+
+          def wait_for(rpc_id, deadline_s):
+              deadline = time.monotonic() + deadline_s
+              while time.monotonic() < deadline:
+                  for line in list(out_lines):
+                      try:
+                          msg = json.loads(line)
+                      except ValueError:
+                          continue
+                      if msg.get("id") == rpc_id:
+                          return msg
+                  if proc.poll() is not None:
+                      break
+                  time.sleep(0.2)
+              return None
+
+          def call_tool(rpc_id, name, arguments, deadline_s):
+              send({"jsonrpc": "2.0", "id": rpc_id, "method": "tools/call",
+                    "params": {"name": name, "arguments": arguments}})
+              resp = wait_for(rpc_id, deadline_s)
+              assert resp and "result" in resp, f"{name} failed: {resp}"
+              assert not resp["result"].get("isError"), f"{name} errored: {resp}"
+              return "".join(
+                  c.get("text", "") for c in resp["result"].get("content", [])
+              )
+
+          try:
+              send({"jsonrpc": "2.0", "id": 1, "method": "initialize",
+                    "params": {"protocolVersion": "2024-11-05", "capabilities": {},
+                               "clientInfo": {"name": "install-canary", "version": "0"}}})
+              resp = wait_for(1, 120)
+              assert resp and "result" in resp, f"no initialize result: {resp}"
+              print("serverInfo:", resp["result"].get("serverInfo"))
+              send({"jsonrpc": "2.0", "method": "notifications/initialized"})
+
+              send({"jsonrpc": "2.0", "id": 2, "method": "tools/list"})
+              resp = wait_for(2, 60)
+              assert resp and "result" in resp, f"no tools/list result: {resp}"
+              tools = sorted(t["name"] for t in resp["result"]["tools"])
+              print("tools:", tools)
+              assert "remember" in tools and "recall" in tools, tools
+
+              # First remember triggers the embedding model download in a fresh env
+              text = call_tool(3, "remember",
+                               {"content": "The canary token is GENOME-CANARY-4417.",
+                                "user_id": "canary"}, 600)
+              print("remember:", text)
+              text = call_tool(4, "recall",
+                               {"query": "what is the canary token?",
+                                "user_id": "canary"}, 120)
+              print("recall:", text)
+              assert "GENOME-CANARY-4417" in text, f"stored fact not recalled: {text!r}"
+              print("CANARY PASS")
+          finally:
+              proc.kill()
+              tail = "".join(err_chunks)[-4000:]
+              if tail:
+                  sys.stderr.write(tail)
+          PY
