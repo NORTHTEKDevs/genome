@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [1.0.4] - 2026-08-16
+
+### Fixed
+
+- **`pip install "genome-memory[mcp]"` crashed on import with mcp 2.0.** The `mcp`
+  extra was unbounded (`mcp>=1.2`); mcp 2.0.0 removed `mcp.server.fastmcp`, so a
+  fresh install resolved 2.0.0 and `genome-mcp` failed at startup with
+  `ModuleNotFoundError: No module named 'mcp.server.fastmcp'`. The `mcp` and `all`
+  extras now pin `mcp>=1.2,<2`.
 ## [1.0.3] - 2026-08-03
 
 ### Fixed
