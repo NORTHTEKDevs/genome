@@ -46,10 +46,10 @@ langchain = ["langchain-core>=0.3"]
 llamaindex = ["llama-index-core>=0.10"]
 postgres = ["psycopg[binary]>=3.1", "pgvector>=0.2"]
 fastapi = ["fastapi>=0.110", "uvicorn[standard]>=0.27", "pydantic>=2.5"]
-mcp = ["mcp>=1.2"]
+mcp = ["mcp>=1.2,<2"]
 viz = ["matplotlib>=3.8,<4.0"]  # benchmark charts only; not needed to use the library
 all = [
-    "mcp>=1.2",
+    "mcp>=1.2,<2",
     "langchain-core>=0.3",
     "llama-index-core>=0.10",
     "psycopg[binary]>=3.1",
