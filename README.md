@@ -1,27 +1,28 @@
 # GENOME
 
-**Open memory for AI agents. Same answer accuracy as Mem0 — but ~1,000× cheaper to store, runs fully offline, and keeps an auditable record.**
+**Open memory for AI agents. Same answer accuracy as Mem0 - but ~1,000× cheaper to store, runs fully offline, and keeps an auditable record.**
 
 [![tests](https://github.com/NORTHTEKDevs/genome/actions/workflows/tests.yml/badge.svg)](https://github.com/NORTHTEKDevs/genome/actions/workflows/tests.yml)
+[![install canary](https://github.com/NORTHTEKDevs/genome/actions/workflows/install-canary.yml/badge.svg)](https://github.com/NORTHTEKDevs/genome/actions/workflows/install-canary.yml)
 [![PyPI](https://img.shields.io/pypi/v/genome-memory)](https://pypi.org/project/genome-memory/)
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](./LICENSE)
 ![Python 3.11-3.14](https://img.shields.io/badge/python-3.11--3.14-blue)
 
 Most agent-memory tools (like Mem0) call an LLM on **every message** to decide what to
-remember. That's the slow, expensive part — and GENOME's bet is that you don't need it.
+remember. That's the slow, expensive part - and GENOME's bet is that you don't need it.
 GENOME just embeds each message locally: no LLM, no API, no network in the write path.
 
 Benchmarked honestly on public datasets (LoCoMo, LongMemEval), GENOME **answers just as
-accurately as Mem0** — while storing memories for a tiny fraction of the cost and running
+accurately as Mem0** - while storing memories for a tiny fraction of the cost and running
 completely offline.
 
-> **Honest up front:** on answer accuracy, GENOME *ties* Mem0 — we do **not** claim to beat
+> **Honest up front:** on answer accuracy, GENOME *ties* Mem0 - we do **not** claim to beat
 > it there (two independent benchmark runs confirm parity). The advantage is cost, speed,
 > offline operation, and a temporal/auditable record Mem0 can't produce.
 
 ## Don't believe it? Prove it yourself
 
-The **cost, speed, and offline** claims need no API key — measure them on *your* machine in 60 seconds:
+The **cost, speed, and offline** claims need no API key - measure them on *your* machine in 60 seconds:
 
 ```bash
 git clone https://github.com/NORTHTEKDevs/genome && cd genome
@@ -29,7 +30,7 @@ pip install -e . && python -m genome.verify
 ```
 
 It writes memories with your **outbound network physically blocked** and prints a live
-pass/fail receipt — 0 network calls, 0 LLM calls, single-digit-ms writes, retrieval that works:
+pass/fail receipt - 0 network calls, 0 LLM calls, single-digit-ms writes, retrieval that works:
 
 ```
   [PASS] Air-gapped write path: wrote 200 memories with every outbound socket blocked -> 0 network attempts, 0 LLM calls
@@ -38,15 +39,15 @@ pass/fail receipt — 0 network calls, 0 LLM calls, single-digit-ms writes, retr
 ```
 
 That receipt covers the cost/speed/offline story only. The **accuracy-parity with Mem0** claim
-is a separate, larger check that needs an LLM key — reproduce it head-to-head on the same
+is a separate, larger check that needs an LLM key - reproduce it head-to-head on the same
 questions with your own key via `python benchmarks/head_to_head.py` (one OpenRouter key works;
 see [`benchmarks/RESULTS.md`](./benchmarks/RESULTS.md) for the n=90 / n=205 runs, the paired
 significance tests, and the published nulls). The full test suite runs in public CI (badge
-above). The pitch isn't "trust me" — it's "run it."
+above). The pitch isn't "trust me" - it's "run it."
 
 ## Add persistent memory to your agent in one line (MCP)
 
-GENOME ships a **fully-local MCP server** — cross-session memory for Claude Desktop, Claude
+GENOME ships a **fully-local MCP server** - cross-session memory for Claude Desktop, Claude
 Code, or Cursor with **no API key and no data leaving your machine**:
 
 ```bash
@@ -70,19 +71,19 @@ Memories persist locally in `~/.genome/memories.db`. [Full MCP details ↓](#use
 | **LLM calls to store one message** | **0** | 1+ |
 | **Write speed** | **~10 ms** | ~2,000 ms |
 | **Runs offline / air-gapped** | **yes** | no (needs an LLM API) |
-| **Ingest cost** (10k-user deployment) | **~$190 / yr** | $159k–$1.6M / yr |
+| **Ingest cost** (10k-user deployment) | **~$190 / yr** | $159k-$1.6M / yr |
 | **"What was true in March?"** (point-in-time) | **yes** | no |
 | **Deterministic, auditable memory** | **yes** | no |
 
-Every number is measured within one harness — same responder, judge, embedder, and top-k;
-only the memory layer changes — with paired significance tests. Full detail and per-number
+Every number is measured within one harness - same responder, judge, embedder, and top-k;
+only the memory layer changes - with paired significance tests. Full detail and per-number
 provenance: [`benchmarks/RESULTS.md`](./benchmarks/RESULTS.md). Formatted report:
 [`benchmarks/GENOME-LoCoMo-Report.pdf`](./benchmarks/GENOME-LoCoMo-Report.pdf).
 
 ## Why it's ~1,000× cheaper: it never calls an LLM to remember
 
 Storing one message costs **one LLM call in Mem0, zero in GENOME** (just a local embedding).
-That's not a benchmark you can argue with — it's arithmetic, and it holds no matter which
+That's not a benchmark you can argue with - it's arithmetic, and it holds no matter which
 LLM you price it against. At 10,000 users × 50 messages/day (15M messages/month):
 
 | Model Mem0 uses to extract | Mem0's yearly ingest bill | GENOME |
@@ -97,10 +98,10 @@ to the LLM as the store fills). Reproduce: `python benchmarks/tco_project.py` (n
 ## It runs air-gapped
 
 GENOME's default embedder is local. We proved the write path is genuinely offline by
-**blocking all network during writes** — they still succeed:
+**blocking all network during writes** - they still succeed:
 
 - **~10 ms/message, 0 network calls, 0 LLM calls** (`python benchmarks/local_writepath.py`)
-- Mem0 can't do this — it needs an LLM API call to ingest.
+- Mem0 can't do this - it needs an LLM API call to ingest.
 
 That makes GENOME usable on-prem, in regulated environments, or fully offline. It's a yes/no
 capability, not a price point.
@@ -111,7 +112,7 @@ capability, not a price point.
 - **Read:** vector search over your memories, with an optional local cross-encoder reranker
   for harder queries.
 - **Optional bi-temporal layer:** track how facts change over time and answer "what was true
-  at time T" — see below.
+  at time T" - see below.
 
 ## Install
 
@@ -119,13 +120,13 @@ capability, not a price point.
 pip install genome-memory
 ```
 
-The default embedder is local (`sentence-transformers/all-MiniLM-L6-v2`) — no API key,
+The default embedder is local (`sentence-transformers/all-MiniLM-L6-v2`) - no API key,
 works offline; the first run downloads the ~90 MB model once. OpenAI embeddings are
 optional for higher-dimensional retrieval.
 
 **Dependency footprint, honestly:** the core install is `numpy`, `sentence-transformers`,
 `scikit-learn`, and `rank-bm25`. Local embeddings run on PyTorch (pulled in by
-sentence-transformers), so it isn't a tiny install — that's the deliberate tradeoff for
+sentence-transformers), so it isn't a tiny install - that's the deliberate tradeoff for
 offline, zero-cost embedding. Plotting/benchmark-chart deps live in an optional `[viz]`
 extra, not the core. Migrating from Mem0? See
 **[docs/migrating_from_mem0.md](docs/migrating_from_mem0.md)**.
@@ -146,7 +147,7 @@ for hit in mem.search("Where did Ada meet Lin?", user_id="u1", limit=5):
     print(f"{hit.score:.3f}  {hit.content}")
 ```
 
-`Memory` mirrors Mem0's API (`add` / `search` / `get` / `delete` / `reset`) — a near
+`Memory` mirrors Mem0's API (`add` / `search` / `get` / `delete` / `reset`) - a near
 drop-in swap. To use OpenAI embeddings instead (set `OPENAI_API_KEY`):
 
 ```python
@@ -157,8 +158,8 @@ mem = Memory(storage="genome.db",
 
 ## Use it as an MCP server (fully-local memory for any agent)
 
-GENOME ships an MCP server, so any MCP client (Claude Desktop, Claude Code, Cursor, …) gets
-persistent cross-session memory that runs **entirely on the local machine** — no LLM calls,
+GENOME ships an MCP server, so any MCP client (Claude Desktop, Claude Code, Cursor, ...) gets
+persistent cross-session memory that runs **entirely on the local machine** - no LLM calls,
 no API keys, no data leaves the box. Most memory MCPs can't say that.
 
 Install with the `mcp` extra, then add it to your client's config:
@@ -190,7 +191,7 @@ Prefer HTTP? GENOME ships a FastAPI server that mirrors the library 1:1 (`add` /
 pip install "genome-memory[fastapi]"
 ```
 
-**Try it locally** (keyless, loopback only — one flag makes the "no auth" intent explicit):
+**Try it locally** (keyless, loopback only - one flag makes the "no auth" intent explicit):
 
 ```bash
 GENOME_ALLOW_NO_AUTH=1 python -m genome.server        # serves on 127.0.0.1:8080
@@ -208,7 +209,7 @@ curl -X POST localhost:8080/v1/search \
 
 **Safe by default.** The server refuses to serve unauthenticated unless you opt in as
 above, and it will not bind a non-loopback interface without a key. To expose it, set an
-API key (sent as `X-API-Key`) — required to bind beyond localhost:
+API key (sent as `X-API-Key`) - required to bind beyond localhost:
 
 ```bash
 GENOME_API_KEY=$(openssl rand -hex 32) GENOME_HOST=0.0.0.0 python -m genome.server
@@ -246,26 +247,26 @@ Same responder + judge + embedder for every system; only the memory layer change
 | What we measured | Result | Verdict |
 |---|---|---|
 | Answer accuracy, in-window (LoCoMo) | GENOME 0.851 vs Mem0 0.855 (p > 0.23) | **Tied** |
-| Answer accuracy, harder bench (LongMemEval, n=90 & n=205) | directionally ahead, not significant (p = 0.14–0.19) | **Tied** |
+| Answer accuracy, harder bench (LongMemEval, n=90 & n=205) | directionally ahead, not significant (p = 0.14-0.19) | **Tied** |
 | Accuracy when history overflows the context window | **+0.409** at 80× less context (p = 8e-10) | **Win** |
-| Cost to store a message | 0 LLM calls vs 1+; **837–8,433× cheaper** | **Win** |
+| Cost to store a message | 0 LLM calls vs 1+; **837-8,433× cheaper** | **Win** |
 | Write path | **~10 ms, air-gapped**, 0 network calls | **Win** |
 | Point-in-time ("what was true at T") | belief-state **0.870** vs Mem0 0.676 (synthetic data) | **Win, with caveat** |
 | Retrieval hit-rate with reranking | improves hit@10 (up to 0.943); local + free | **Win** |
 
 ### What we tested that *didn't* help (so you don't have to)
 
-We publish our nulls — it's how you know the wins are real:
+We publish our nulls - it's how you know the wins are real:
 - **Synthesis / consolidation:** accuracy-neutral at equal token budget (p = 0.86).
 - **Hybrid (BM25 + dense) and graph retrieval:** hybrid underperformed plain dense on LoCoMo;
   graph was not validated here.
 - **Reranking's accuracy gain is embedder-dependent:** it reliably improves *retrieval
-  hit-rate*, but its effect on final *answer accuracy* depends on the embedder — treat it as a
+  hit-rate*, but its effect on final *answer accuracy* depends on the embedder - treat it as a
   retrieval-quality tool, not a guaranteed accuracy win.
 
 ## Bi-temporal memory: "what was true at time T"
 
-GENOME can track how facts change over time and answer point-in-time questions — something
+GENOME can track how facts change over time and answer point-in-time questions - something
 overwrite-based memory structurally can't do (it only keeps the latest value):
 
 ```python
@@ -311,7 +312,7 @@ mem.search("Where did the user go on vacation?", user_id="u1", limit=5)  # reran
 
 ## Reproduce the benchmarks
 
-The LoCoMo and LongMemEval datasets are **not bundled** (they carry their own licenses —
+The LoCoMo and LongMemEval datasets are **not bundled** (they carry their own licenses - 
 LoCoMo is CC BY-NC 4.0). See [`benchmarks/data/README.md`](./benchmarks/data/README.md) to
 download them. The first two lines need no dataset and no API keys:
 
@@ -329,25 +330,25 @@ python benchmarks/tempbelief_run.py --convs 6   # bi-temporal point-in-time vs b
 
 Bugs and questions: [issues](https://github.com/NORTHTEKDevs/genome/issues) and
 [discussions](https://github.com/NORTHTEKDevs/genome/discussions). Community support is
-best-effort — see [SUPPORT.md](./SUPPORT.md).
+best-effort - see [SUPPORT.md](./SUPPORT.md).
 
 **GENOME Enterprise** is a separate commercial product for regulated and on-premise buyers
 who have to answer to an auditor for what an AI system knew and when: a tamper-evident
 hash-chained audit record, point-in-time reconstruction, compliance reports, retention with
-erasure proofs, RBAC and SSO. Self-hosted and licensed per deployment — there is no hosted
+erasure proofs, RBAC and SSO. Self-hosted and licensed per deployment - there is no hosted
 version, deliberately, because the value is that your data never leaves. That tier is what
 funds this one. Evaluating it, or want commercial support on the open core?
 **info@northtek.io**
 
 ## License
 
-**Apache License 2.0** — see [LICENSE](./LICENSE) and [NOTICE](./NOTICE).
+**Apache License 2.0** - see [LICENSE](./LICENSE) and [NOTICE](./NOTICE).
 
 GENOME is free and open source: read it, modify it, self-host it, and embed it in your own
-applications — commercial use included — under the terms of Apache 2.0. There is no
+applications - commercial use included - under the terms of Apache 2.0. There is no
 "open core bait and switch" planned: the core stays Apache-2.0.
 
-The Apache-2.0 grant covers the code, not the name — see
+The Apache-2.0 grant covers the code, not the name - see
 [TRADEMARKS.md](./TRADEMARKS.md), which leads with what you may do without asking.
 Questions: info@northtek.io.
 
