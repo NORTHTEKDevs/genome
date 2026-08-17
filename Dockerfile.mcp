@@ -1,0 +1,19 @@
+# GENOME MCP server container (stdio transport).
+# For the REST API deployment container, see Dockerfile.
+# The embedding model is baked in at build time so the container runs air-gapped.
+FROM python:3.12-slim
+
+ENV PYTHONUNBUFFERED=1
+
+WORKDIR /app
+COPY . .
+
+RUN pip install --no-cache-dir torch --index-url https://download.pytorch.org/whl/cpu \
+    && pip install --no-cache-dir ".[mcp]" \
+    && python -c "import sentence_transformers as s; s.SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2')"
+
+# Memories persist under /data when mounted: -v genome-data:/data
+ENV GENOME_MCP_DB=/data/memories.db
+VOLUME ["/data"]
+
+CMD ["genome-mcp"]
