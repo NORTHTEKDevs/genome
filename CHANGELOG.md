@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [1.0.6] - 2026-08-17
+
+### Fixed
+
+- **The MCP server's first `remember`/`recall` hung forever on Windows.** The
+  embedding model (and its torch/sentence-transformers/sklearn/scipy import
+  graph) loaded lazily inside the first tool call, which FastMCP executes in a
+  worker thread; importing scipy/sklearn in that thread while the event loop
+  runs deadlocks on Windows (import-lock deadlock). The server now loads the
+  model on the main thread at startup, before the event loop starts. Side
+  benefit on every platform: the first tool call answers in milliseconds
+  instead of paying the model load. Found by the new `install-canary` CI
+  workflow on its first run.
+
 ## [1.0.5] - 2026-08-16
 
 ### Added
@@ -46,7 +60,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - Install instructions in five shipped code paths and the troubleshooting guide named the
   wrong package (`genome[postgres]`, `genome[fastapi]`); the correct name is
   `genome-memory[...]`.
-- TypeScript SDK quickstart returned `503` on every call as written — the server is
+- TypeScript SDK quickstart returned `503` on every call as written - the server is
   default-deny and the README marked `apiKey` "optional".
 - `genome-verify` pointed at `pytest` and `benchmarks/*.py`, neither of which exists in a
   pip install. Now labelled as repo-only.
@@ -89,18 +103,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 - **One-command self-verification** (`genome-verify`, `python -m genome.verify`):
-  reproduces the core claims locally with no API key — writes memories with all
+  reproduces the core claims locally with no API key - writes memories with all
   outbound sockets blocked and prints a pass/fail receipt (0 network, 0 LLM,
   single-digit-ms writes, retrieval works).
 - **Head-to-head reproducer** (`benchmarks/head_to_head.py`): runs GENOME and Mem0
   on the same LoCoMo questions through the same responder/judge/embedder/top-k and
-  prints the paired McNemar significance test — reproduce the accuracy-parity claim
+  prints the paired McNemar significance test - reproduce the accuracy-parity claim
   with your own key. Includes an offline `--smoke` plumbing test.
 - **README "Run it as an HTTP API"** and **"Prove it yourself"** sections.
 
 ### Security
 - REST server: the keyless `GENOME_ALLOW_NO_AUTH` opt-in is confined to direct
-  loopback peers — it now refuses any request carrying proxy/forwarding headers
+  loopback peers - it now refuses any request carrying proxy/forwarding headers
   (`X-Forwarded-For`, `X-Real-IP`, `Forwarded`, `Via`, CDN client-IP headers), so a
   same-host reverse proxy can't make a remote client look local.
 - REST server: new `GENOME_REQUIRE_SCOPE=1` requires `user_id`/`agent_id` on every
@@ -108,14 +122,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - `docker-compose.yml`: Postgres published on `127.0.0.1` only; `POSTGRES_PASSWORD`
   and `GENOME_API_KEY` are required (fail-fast), no default weak credentials.
 
-## [1.0.0] - 2026-07-13 — initial public release
+## [1.0.0] - 2026-07-13 - initial public release
 
 First public release at [NORTHTEKDevs/genome](https://github.com/NORTHTEKDevs/genome),
 under the Apache License 2.0.
 
 ### Added
 - **MCP server** (`genome-mcp`, `genome/mcp/server.py`): fully-local persistent agent
-  memory over the Model Context Protocol — `remember` / `recall` / `forget` /
+  memory over the Model Context Protocol - `remember` / `recall` / `forget` /
   `reset_memories`, no API keys, no network. Install extra: `genome-memory[mcp]`.
 - **Cross-encoder reranking** (`genome/memory/rerank.py`, `Memory(reranker=...)`):
   local, free retrieval reranking with RRF fusion against the dense order.
@@ -292,7 +306,7 @@ under the Apache License 2.0.
   `test_record_fact_concurrent_no_double_open_facts` (4 concurrent
   writers must collapse to exactly 1 current fact for the slot).
 
-## [1.0.0] - 2026-04-25 — Initial release
+## [1.0.0] - 2026-04-25 - Initial release
 
 Initial private release of the genome memory system.
 

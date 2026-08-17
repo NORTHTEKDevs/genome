@@ -14,6 +14,7 @@ Run:     `genome-mcp`  (stdio transport)  or  `python -m genome.mcp.server`
 from __future__ import annotations
 
 import os
+import sys
 from pathlib import Path
 
 from mcp.server.fastmcp import FastMCP
@@ -118,6 +119,15 @@ def reset_memories(user_id: str = "default") -> str:
 
 
 def main() -> None:
+    # Load the embedder and its full import graph (torch, sentence-transformers,
+    # sklearn, scipy) on the MAIN thread before the event loop starts. FastMCP
+    # runs sync tools in a worker thread, and importing scipy/sklearn inside
+    # that thread deadlocks on Windows (import-lock deadlock: the first
+    # remember/recall hangs forever). Eager init also means the first tool call
+    # answers in milliseconds instead of paying the model load.
+    print("genome-mcp: loading local embedding model...", file=sys.stderr, flush=True)
+    memory().search("warmup", user_id="__warmup__", limit=1)
+    print("genome-mcp: ready", file=sys.stderr, flush=True)
     mcp.run()  # stdio transport
 
 
