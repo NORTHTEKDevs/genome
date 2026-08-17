@@ -17,13 +17,14 @@ jobs:
   fresh-install:
     name: PyPI fresh install (${{ matrix.os }})
     runs-on: ${{ matrix.os }}
-    timeout-minutes: 25
+    timeout-minutes: 40
     strategy:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest]
     env:
       GENOME_MCP_DB: canary-memories.db
+      HF_HUB_DISABLE_PROGRESS_BARS: "1"
     steps:
       - uses: actions/setup-python@v5
         with:
@@ -37,7 +38,15 @@ jobs:
       - name: Import check
         run: python -c "import genome; from genome.mcp.server import main; from importlib.metadata import version; print('genome-memory', version('genome-memory'))"
 
+      # Separate step so a slow model download fails distinctly from a broken
+      # package (the cold torch import + download exceeded 10 min on a
+      # 2-core Windows runner when folded into the round trip).
+      - name: Pre-warm embedding model
+        timeout-minutes: 20
+        run: python -c "from sentence_transformers import SentenceTransformer; SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2')"
+
       - name: MCP stdio round trip
+        timeout-minutes: 10
         shell: bash
         run: |
           python - <<'PY'
