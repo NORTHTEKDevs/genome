@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [1.0.5] - 2026-08-16
+
+### Added
+
+- `server.json` and the `mcp-name` README marker so the MCP server is listed on the
+  official MCP Registry (registry.modelcontextprotocol.io).
 ## [1.0.4] - 2026-08-16
 
 ### Fixed

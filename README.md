@@ -352,3 +352,4 @@ The Apache-2.0 grant covers the code, not the name — see
 Questions: info@northtek.io.
 
 Copyright 2026 Northtek (FrostByte Digital LLC).
+mcp-name: io.github.NORTHTEKDevs/genome

@@ -1,0 +1,20 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.NORTHTEKDevs/genome",
+  "description": "Fully local memory for AI agents: zero-LLM ingest, semantic recall, air-gapped, auditable.",
+  "repository": {
+    "url": "https://github.com/NORTHTEKDevs/genome",
+    "source": "github"
+  },
+  "version": "1.0.5",
+  "packages": [
+    {
+      "registryType": "pypi",
+      "identifier": "genome-memory",
+      "version": "1.0.5",
+      "transport": {
+        "type": "stdio"
+      }
+    }
+  ]
+}
