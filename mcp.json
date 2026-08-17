@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "genome": {
+      "command": "genome-mcp",
+      "args": [],
+      "env": {}
+    }
+  }
+}
