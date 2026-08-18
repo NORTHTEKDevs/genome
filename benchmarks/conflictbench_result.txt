@@ -1,0 +1,35 @@
+ConflictBench result (2026-08-18, anthropic/claude-haiku-4.5 via OpenRouter,
+local all-MiniLM embedder, 16 slots: 8 correction-only + 8 correction+negation,
+two independent full runs; presence metrics re-audited from dumped stores with
+the positive-assertion audit, v3)
+
+metric                          naive-insert   resolve-conflicts
+current value present                    8/8                 7/8
+stale value positively asserted        16/16                1/16
+negated fact positively asserted         8/8                 1/8
+top-1 retrieval correct                  4/8                 7/8
+total records in store                   101                  34
+ingest seconds (run2)                   72.4               211.5
+
+Findings
+- Naive insertion: full pile-up (every superseded and negated fact remains
+  positively asserted) and real retrieval poisoning: half of top-1 lookups
+  return a stale value.
+- resolve_conflicts=True: removes or converts to explicit retractions 15/16
+  superseded facts and honors 7/8 negations; fixes top-1 retrieval to 7/8;
+  store is 3x smaller; costs 2.9x ingest time (one resolution call per fact).
+- Defects (reproducible from results/conflictbench/store_*.jsonl dumps):
+  (1) one lost current value: a correction was stored ONLY as "user previously
+      believed X was a teacher" without asserting the corrected occupation;
+  (2) one stale and one negated fact survive as positive assertions;
+  (3) extraction noise: 13/34 records are near-empty "user has a relationship
+      with <name>" facts; one hallucinated fact ("user has a sister named
+      Maya") appears in the store.
+- Methodological: audit design dominates apparent failure rates. A naive
+  value-substring audit counted correction sentences and stored negations as
+  "stale fact remains", overstating negation failures 5x (5/8 vs the true
+  1/8). The audit must count only POSITIVE assertions (value present,
+  competing value absent, no negation/retraction markers).
+
+Reproduce: benchmarks/conflictbench_or.py (OPENROUTER_API_KEY);
+re-audit dumps free with --reaudit.

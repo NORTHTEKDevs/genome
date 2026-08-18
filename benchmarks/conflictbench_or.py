@@ -118,8 +118,8 @@ def turns_for(s):
 
 
 _NEG_MARKERS = ("n't", " not ", "no longer", "anymore", "quit", "gone off",
-                "used to", "My mistake", "misspoke", "had that wrong",
-                "got that wrong", "Correction")
+                "used to", "previously", "My mistake", "misspoke",
+                "had that wrong", "got that wrong", "Correction", "dislikes")
 
 
 def _asserts(text, value, other):
@@ -187,10 +187,37 @@ def run_arm(name, slots, resolve):
     return res
 
 
+def reaudit(slots):
+    """Recompute the presence metrics from dumped stores (free, no API).
+    The top-1 retrieval metric needs a live store and is not recomputed here."""
+    import json
+    for name in ("naive-insert", "resolve-conflicts"):
+        path = f"results/conflictbench/store_{name}.jsonl"
+        if not os.path.exists(path):
+            print(f"{name}: no dump at {path}"); continue
+        texts = [json.loads(l)["content"] for l in open(path, encoding="utf-8")]
+        res = {"current_present": 0, "stale_present": 0, "negated_present": 0}
+        for s in slots:
+            ent = [t for t in texts if s["entity"] in t]
+            a1 = any(_asserts(t, s["v1"], s["v2"]) for t in ent)
+            a2 = any(_asserts(t, s["v2"], s["v1"]) for t in ent)
+            if s["negate"]:
+                res["negated_present"] += a2
+                res["stale_present"] += a1
+            else:
+                res["current_present"] += a2
+                res["stale_present"] += a1
+        print(f"{name:20} records={len(texts):4} {res}")
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--slots", type=int, default=16)
+    ap.add_argument("--reaudit", action="store_true",
+                    help="recompute presence metrics from dumped stores, no API")
     args = ap.parse_args()
+    if args.reaudit:
+        reaudit(build_slots(args.slots)); return 0
     if not os.environ.get("OPENROUTER_API_KEY"):
         print("need OPENROUTER_API_KEY"); return 1
     print(f"[cfg] model={MODEL} via OpenRouter  embedder=local all-MiniLM  slots={args.slots}", flush=True)
