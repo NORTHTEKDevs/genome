@@ -3,12 +3,24 @@ message: "If you use GENOME or its benchmark results, please cite it as below."
 title: "GENOME: a zero-LLM-call, bi-temporal memory layer for AI agents"
 type: software
 authors:
-  - name: "Northtek (FrostByte Digital LLC)"
+  - family-names: Baer
+    given-names: Kristian
+    affiliation: "Northtek Labs (FrostByte Digital LLC)"
     email: info@northtek.io
 repository-code: "https://github.com/NORTHTEKDevs/genome"
 license: Apache-2.0
-version: 1.0.3
-date-released: 2026-08-02
+version: 1.0.6
+date-released: 2026-08-17
+preferred-citation:
+  type: article
+  title: "Do Agents Need an LLM to Remember? An Evaluation of LLM-Free Memory Ingestion"
+  authors:
+    - family-names: Baer
+      given-names: Kristian
+      affiliation: "Northtek Labs (FrostByte Digital LLC)"
+  year: 2026
+  doi: 10.5281/zenodo.21987934
+  url: "https://doi.org/10.5281/zenodo.21987934"
 keywords:
   - agent memory
   - retrieval
