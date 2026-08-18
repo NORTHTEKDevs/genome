@@ -9,7 +9,7 @@
 ![Python 3.11-3.14](https://img.shields.io/badge/python-3.11--3.14-blue)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.21987934.svg)](https://doi.org/10.5281/zenodo.21987934)
 
-**Paper:** [Do Agents Need an LLM to Remember? An Evaluation of LLM-Free Memory Ingestion](https://doi.org/10.5281/zenodo.21987934) (preprint, 2026) - the full evaluation behind the numbers below, negative results included. PDF also in [`papers/`](./papers/).
+**Papers:** [Do Agents Need an LLM to Remember?](https://doi.org/10.5281/zenodo.21987934) (the core evaluation, 2026) and [What Does Each Memory Feature Buy?](https://doi.org/10.5281/zenodo.22002654) (a measured audit of all five optional features, wins and failures alike, 2026). PDFs in [`papers/`](./papers/); result tables in [`benchmarks/AUDIT-RESULTS.md`](./benchmarks/AUDIT-RESULTS.md).
 
 Most agent-memory tools (like Mem0) call an LLM on **every message** to decide what to
 remember. That's the slow, expensive part - and GENOME's bet is that you don't need it.
