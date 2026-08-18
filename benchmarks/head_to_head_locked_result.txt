@@ -1,0 +1,33 @@
+Locked head-to-head rerun result (2026-08-18)
+
+The "don't trust our benchmark, run it" artifact, run end to end by the same
+command a reviewer would use:
+
+  python benchmarks/head_to_head.py --provider openrouter --n 10 --q 30 --workers 2
+
+Single OpenRouter key path: LLM roles through OpenRouter, LOCAL all-MiniLM
+embedder for BOTH systems, same responder / judge / embedder / top-k, only the
+memory layer swapped. 10 LoCoMo conversations, 30 questions each.
+
+  GENOME (genome-parent-filtered):  0.753   (n=300 headline questions)
+  Mem0:                             0.780   (n=300)
+
+  paired: GENOME-only-correct 28, Mem0-only-correct 36, McNemar p=0.382
+
+  VERDICT: PARITY. The 0.027 gap is NOT statistically significant.
+
+Note the direction honestly: Mem0's point estimate is nominally HIGHER here,
+as it was in the published in-window LoCoMo table (0.855 vs 0.851). The claim
+was, and remains, a tie on answer accuracy. GENOME's advantages are elsewhere:
+0 LLM calls per message at ingest, air-gapped operation, and a deterministic
+auditable record.
+
+This is the fifth-plus independent configuration in which GENOME-vs-Mem0
+answer accuracy comes back at parity (LoCoMo n=1540 p=0.747; LongMemEval n=90
+p=0.19; LongMemEval n=205 p=0.14; bge-small n=90 p=0.83; bge-large n=90 p=0.82;
+this locked rerun n=300 p=0.382). No configuration has produced a significant
+difference in either direction.
+
+Cost of this run: roughly $20 of metered OpenRouter spend, about 4 CPU-hours,
+dominated by Mem0's LLM ingestion (727-1546 s per conversation) versus GENOME's
+local embedding write path.
