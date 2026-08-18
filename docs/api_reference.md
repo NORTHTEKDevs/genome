@@ -50,7 +50,7 @@ Memory(
 - `llm_call`: optional sync callable `(prompt: str) -> str` for auto fact-extraction. If provided, wraps into `LLMExtractor`.
 - `extractor`: explicit `FactExtractor` overriding both the default and `llm_call`.
 
-> The default extractor is `IdentityExtractor` — it stores text as-is. Supplying
+> The default extractor is `IdentityExtractor` - it stores text as-is. Supplying
 > `llm_call` or `extractor` is what makes `add()` call an LLM. **Everything below marked
 > "opt-in" is off by default precisely because it costs LLM calls**, which is the cost
 > GENOME exists to avoid. Turn them on deliberately.
@@ -60,19 +60,27 @@ Memory(
 - `cache_size`: response-cache LRU capacity.
 - `enable_cache`: if `False`, no cache at all.
 
-**Conflict resolution** (opt-in — costs LLM calls)
+**Conflict resolution** (opt-in - costs LLM calls)
 
 - `resolve_conflicts`: when `True`, each extracted fact is compared against existing memories in the same scope and an LLM decides ADD / UPDATE / DELETE / NONE.
 - `conflict_llm`: the callable used for that decision. Falls back to `llm_call`.
 - `conflict_topk`: how many existing memories are offered to the LLM as candidates.
 - `conflict_skip_unrelated`: skip the LLM call when no candidate is semantically close, trading a little recall for fewer calls.
 
-**Entity and temporal facts** (opt-in — costs LLM calls)
+**Entity and temporal facts** (opt-in - costs LLM calls)
 
 - `auto_extract_entities`: extract entities and record temporal facts on every `add()`.
 - `auto_fact_confidence_threshold`: minimum confidence `[0, 1]` before a detected fact is recorded.
 
 **Auto-consolidation** (opt-in)
+
+> **Warning (measured):** auto-consolidation is a lossy compression knob, not a
+> free win. In a controlled test at an aggressive cap (threshold 300, default
+> target 150, evidence-dense conversation), answer accuracy collapsed roughly
+> five-fold (0.454 to 0.09, p < 0.0001) and the synthesis operator did not
+> repair the loss. Size the threshold well above the working set your workload's
+> questions actually need, and measure before enabling. Full result:
+> [`../benchmarks/consolidation_scale_result.txt`](../benchmarks/consolidation_scale_result.txt).
 
 - `auto_consolidate_threshold`: when a scope exceeds this many memories, consolidate it automatically. `None` disables it.
 - `auto_consolidate_target`: the number of **episodic** memories to keep. Entities, temporal facts, RAPTOR summaries, and agent core-memory blocks are structural and are never pruned.
