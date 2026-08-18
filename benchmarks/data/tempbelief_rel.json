@@ -1,0 +1,3800 @@
+[
+ {
+  "conversation_id": "tb-00",
+  "turns": [
+   {
+    "speaker": "friend",
+    "text": "We caught up over coffee for a couple hours.",
+    "turn_id": "tb-00:t23",
+    "dia_id": "D1:23",
+    "session": 1,
+    "session_datetime": "March 2023"
+   },
+   {
+    "speaker": "friend",
+    "text": "Work has been busy but good.",
+    "turn_id": "tb-00:t31",
+    "dia_id": "D1:31",
+    "session": 1,
+    "session_datetime": "March 2023"
+   },
+   {
+    "speaker": "friend",
+    "text": "Nothing too exciting on my end this week.",
+    "turn_id": "tb-00:t39",
+    "dia_id": "D1:39",
+    "session": 1,
+    "session_datetime": "March 2023"
+   },
+   {
+    "speaker": "user",
+    "text": "Sana has been talking about maybe switching gym to Planet Fitness at some point, but nothing's decided.",
+    "turn_id": "tb-00:t12",
+    "dia_id": "D2:12",
+    "session": 2,
+    "session_datetime": "June 2023"
+   },
+   {
+    "speaker": "friend",
+    "text": "I've been meaning to call more often, honestly.",
+    "turn_id": "tb-00:t24",
+    "dia_id": "D2:24",
+    "session": 2,
+    "session_datetime": "June 2023"
+   },
+   {
+    "speaker": "friend",
+    "text": "We laughed about old times for a while.",
+    "turn_id": "tb-00:t32",
+    "dia_id": "D2:32",
+    "session": 2,
+    "session_datetime": "June 2023"
+   },
+   {
+    "speaker": "friend",
+    "text": "The weather has been all over the place lately.",
+    "turn_id": "tb-00:t40",
+    "dia_id": "D2:40",
+    "session": 2,
+    "session_datetime": "June 2023"
+   },
+   {
+    "speaker": "friend",
+    "text": "Work has been busy but good.",
+    "turn_id": "tb-00:t25",
+    "dia_id": "D3:25",
+    "session": 3,
+    "session_datetime": "September 2023"
+   },
+   {
+    "speaker": "friend",
+    "text": "Nothing too exciting on my end this week.",
+    "turn_id": "tb-00:t33",
+    "dia_id": "D3:33",
+    "session": 3,
+    "session_datetime": "September 2023"
+   },
+   {
+    "speaker": "friend",
+    "text": "We caught up over coffee for a couple hours.",
+    "turn_id": "tb-00:t41",
+    "dia_id": "D3:41",
+    "session": 3,
+    "session_datetime": "September 2023"
+   },
+   {
+    "speaker": "user",
+    "text": "Diego started at a nonprofit just now.",
+    "turn_id": "tb-00:t1",
+    "dia_id": "D4:1",
+    "session": 4,
+    "session_datetime": "December 2023"
+   },
+   {
+    "speaker": "user",
+    "text": "Diego has been talking about maybe switching employer to Google at some point, but nothing's decided.",
+    "turn_id": "tb-00:t2",
+    "dia_id": "D4:2",
+    "session": 4,
+    "session_datetime": "December 2023"
+   },
+   {
+    "speaker": "user",
+    "text": "Diego got a minivan just now.",
+    "turn_id": "tb-00:t5",
+    "dia_id": "D4:5",
+    "session": 4,
+    "session_datetime": "December 2023"
+   },
+   {
+    "speaker": "user",
+    "text": "Sana became dating someone just now.",
+    "turn_id": "tb-00:t9",
+    "dia_id": "D4:9",
+    "session": 4,
+    "session_datetime": "December 2023"
+   },
+   {
+    "speaker": "friend",
+    "text": "We laughed about old times for a while.",
+    "turn_id": "tb-00:t26",
+    "dia_id": "D4:26",
+    "session": 4,
+    "session_datetime": "December 2023"
+   },
+   {
+    "speaker": "friend",
+    "text": "The weather has been all over the place lately.",
+    "turn_id": "tb-00:t34",
+    "dia_id": "D4:34",
+    "session": 4,
+    "session_datetime": "December 2023"
+   },
+   {
+    "speaker": "friend",
+    "text": "I've been meaning to call more often, honestly.",
+    "turn_id": "tb-00:t42",
+    "dia_id": "D4:42",
+    "session": 4,
+    "session_datetime": "December 2023"
+   },
+   {
+    "speaker": "user",
+    "text": "Sana joined CrossFit just now.",
+    "turn_id": "tb-00:t13",
+    "dia_id": "D5:13",
+    "session": 5,
+    "session_datetime": "March 2024"
+   },
+   {
+    "speaker": "user",
+    "text": "Ivan got into sushi just now.",
+    "turn_id": "tb-00:t16",
+    "dia_id": "D5:16",
+    "session": 5,
+    "session_datetime": "March 2024"
+   },
+   {
+    "speaker": "user",
+    "text": "Ivan has been talking about maybe switching favorite food to tacos at some point, but nothing's decided.",
+    "turn_id": "tb-00:t17",
+    "dia_id": "D5:17",
+    "session": 5,
+    "session_datetime": "March 2024"
+   },
+   {
+    "speaker": "user",
+    "text": "Ivan started at a bank just now.",
+    "turn_id": "tb-00:t20",
+    "dia_id": "D5:20",
+    "session": 5,
+    "session_datetime": "March 2024"
+   },
+   {
+    "speaker": "friend",
+    "text": "Nothing too exciting on my end this week.",
+    "turn_id": "tb-00:t27",
+    "dia_id": "D5:27",
+    "session": 5,
+    "session_datetime": "March 2024"
+   },
+   {
+    "speaker": "friend",
+    "text": "We caught up over coffee for a couple hours.",
+    "turn_id": "tb-00:t35",
+    "dia_id": "D5:35",
+    "session": 5,
+    "session_datetime": "March 2024"
+   },
+   {
+    "speaker": "friend",
+    "text": "Work has been busy but good.",
+    "turn_id": "tb-00:t43",
+    "dia_id": "D5:43",
+    "session": 5,
+    "session_datetime": "March 2024"
+   },
+   {
+    "speaker": "friend",
+    "text": "The weather has been all over the place lately.",
+    "turn_id": "tb-00:t28",
+    "dia_id": "D6:28",
+    "session": 6,
+    "session_datetime": "June 2024"
+   },
+   {
+    "speaker": "friend",
+    "text": "I've been meaning to call more often, honestly.",
+    "turn_id": "tb-00:t36",
+    "dia_id": "D6:36",
+    "session": 6,
+    "session_datetime": "June 2024"
+   },
+   {
+    "speaker": "friend",
+    "text": "We laughed about old times for a while.",
+    "turn_id": "tb-00:t44",
+    "dia_id": "D6:44",
+    "session": 6,
+    "session_datetime": "June 2024"
+   },
+   {
+    "speaker": "friend",
+    "text": "We caught up over coffee for a couple hours.",
+    "turn_id": "tb-00:t29",
+    "dia_id": "D7:29",
+    "session": 7,
+    "session_datetime": "September 2024"
+   },
+   {
+    "speaker": "friend",
+    "text": "Work has been busy but good.",
+    "turn_id": "tb-00:t37",
+    "dia_id": "D7:37",
+    "session": 7,
+    "session_datetime": "September 2024"
+   },
+   {
+    "speaker": "friend",
+    "text": "Nothing too exciting on my end this week.",
+    "turn_id": "tb-00:t45",
+    "dia_id": "D7:45",
+    "session": 7,
+    "session_datetime": "September 2024"
+   },
+   {
+    "speaker": "user",
+    "text": "Diego started at a startup 19 months ago.",
+    "turn_id": "tb-00:t0",
+    "dia_id": "D8:0",
+    "session": 8,
+    "session_datetime": "December 2024"
+   },
+   {
+    "speaker": "user",
+    "text": "Diego started at Google just now.",
+    "turn_id": "tb-00:t3",
+    "dia_id": "D8:3",
+    "session": 8,
+    "session_datetime": "December 2024"
+   },
+   {
+    "speaker": "user",
+    "text": "Diego got a pickup truck 19 months ago.",
+    "turn_id": "tb-00:t4",
+    "dia_id": "D8:4",
+    "session": 8,
+    "session_datetime": "December 2024"
+   },
+   {
+    "speaker": "user",
+    "text": "Diego got a Jeep just now.",
+    "turn_id": "tb-00:t6",
+    "dia_id": "D8:6",
+    "session": 8,
+    "session_datetime": "December 2024"
+   },
+   {
+    "speaker": "user",
+    "text": "Diego has been talking about maybe switching car to a Civic at some point, but nothing's decided.",
+    "turn_id": "tb-00:t7",
+    "dia_id": "D8:7",
+    "session": 8,
+    "session_datetime": "December 2024"
+   },
+   {
+    "speaker": "user",
+    "text": "Sana became married 19 months ago.",
+    "turn_id": "tb-00:t8",
+    "dia_id": "D8:8",
+    "session": 8,
+    "session_datetime": "December 2024"
+   },
+   {
+    "speaker": "user",
+    "text": "Sana became divorced just now.",
+    "turn_id": "tb-00:t10",
+    "dia_id": "D8:10",
+    "session": 8,
+    "session_datetime": "December 2024"
+   },
+   {
+    "speaker": "user",
+    "text": "Sana joined Equinox 17 months ago.",
+    "turn_id": "tb-00:t11",
+    "dia_id": "D8:11",
+    "session": 8,
+    "session_datetime": "December 2024"
+   },
+   {
+    "speaker": "user",
+    "text": "Sana joined the YMCA just now.",
+    "turn_id": "tb-00:t14",
+    "dia_id": "D8:14",
+    "session": 8,
+    "session_datetime": "December 2024"
+   },
+   {
+    "speaker": "user",
+    "text": "Ivan got into curry 18 months ago.",
+    "turn_id": "tb-00:t15",
+    "dia_id": "D8:15",
+    "session": 8,
+    "session_datetime": "December 2024"
+   },
+   {
+    "speaker": "user",
+    "text": "Ivan got into pizza just now.",
+    "turn_id": "tb-00:t18",
+    "dia_id": "D8:18",
+    "session": 8,
+    "session_datetime": "December 2024"
+   },
+   {
+    "speaker": "user",
+    "text": "Ivan started at IBM 18 months ago.",
+    "turn_id": "tb-00:t19",
+    "dia_id": "D8:19",
+    "session": 8,
+    "session_datetime": "December 2024"
+   },
+   {
+    "speaker": "user",
+    "text": "Ivan started at a startup just now.",
+    "turn_id": "tb-00:t21",
+    "dia_id": "D8:21",
+    "session": 8,
+    "session_datetime": "December 2024"
+   },
+   {
+    "speaker": "user",
+    "text": "Ivan has been talking about maybe switching employer to Google at some point, but nothing's decided.",
+    "turn_id": "tb-00:t22",
+    "dia_id": "D8:22",
+    "session": 8,
+    "session_datetime": "December 2024"
+   },
+   {
+    "speaker": "friend",
+    "text": "I've been meaning to call more often, honestly.",
+    "turn_id": "tb-00:t30",
+    "dia_id": "D8:30",
+    "session": 8,
+    "session_datetime": "December 2024"
+   },
+   {
+    "speaker": "friend",
+    "text": "We laughed about old times for a while.",
+    "turn_id": "tb-00:t38",
+    "dia_id": "D8:38",
+    "session": 8,
+    "session_datetime": "December 2024"
+   }
+  ],
+  "questions": [
+   {
+    "question": "What is Diego's current employer?",
+    "answer": "Google",
+    "category": "current-value",
+    "question_id": "tb-00:q0",
+    "entity": "Diego",
+    "attribute": "employer"
+   },
+   {
+    "question": "What was Diego's employer in September 2023?",
+    "answer": "a startup",
+    "category": "as-of",
+    "question_id": "tb-00:q1",
+    "entity": "Diego",
+    "attribute": "employer"
+   },
+   {
+    "question": "What was Diego's employer in July 2024?",
+    "answer": "a nonprofit",
+    "category": "as-of",
+    "question_id": "tb-00:q2",
+    "entity": "Diego",
+    "attribute": "employer"
+   },
+   {
+    "question": "What was Diego's employer in March 2025?",
+    "answer": "Google",
+    "category": "as-of",
+    "question_id": "tb-00:q3",
+    "entity": "Diego",
+    "attribute": "employer"
+   },
+   {
+    "question": "List every employer Diego has had over time, in order.",
+    "answer": "a startup (from May 2023); a nonprofit (from February 2024); Google (from December 2024)",
+    "category": "history",
+    "question_id": "tb-00:q4",
+    "entity": "Diego",
+    "attribute": "employer"
+   },
+   {
+    "question": "What is Diego's current car?",
+    "answer": "a Jeep",
+    "category": "current-value",
+    "question_id": "tb-00:q5",
+    "entity": "Diego",
+    "attribute": "car"
+   },
+   {
+    "question": "What was Diego's car in September 2023?",
+    "answer": "a pickup truck",
+    "category": "as-of",
+    "question_id": "tb-00:q6",
+    "entity": "Diego",
+    "attribute": "car"
+   },
+   {
+    "question": "What was Diego's car in July 2024?",
+    "answer": "a minivan",
+    "category": "as-of",
+    "question_id": "tb-00:q7",
+    "entity": "Diego",
+    "attribute": "car"
+   },
+   {
+    "question": "What was Diego's car in March 2025?",
+    "answer": "a Jeep",
+    "category": "as-of",
+    "question_id": "tb-00:q8",
+    "entity": "Diego",
+    "attribute": "car"
+   },
+   {
+    "question": "List every car Diego has had over time, in order.",
+    "answer": "a pickup truck (from May 2023); a minivan (from February 2024); a Jeep (from December 2024)",
+    "category": "history",
+    "question_id": "tb-00:q9",
+    "entity": "Diego",
+    "attribute": "car"
+   },
+   {
+    "question": "What is Sana's current relationship status?",
+    "answer": "divorced",
+    "category": "current-value",
+    "question_id": "tb-00:q10",
+    "entity": "Sana",
+    "attribute": "relationship_status"
+   },
+   {
+    "question": "What was Sana's relationship status in September 2023?",
+    "answer": "married",
+    "category": "as-of",
+    "question_id": "tb-00:q11",
+    "entity": "Sana",
+    "attribute": "relationship_status"
+   },
+   {
+    "question": "What was Sana's relationship status in July 2024?",
+    "answer": "dating someone",
+    "category": "as-of",
+    "question_id": "tb-00:q12",
+    "entity": "Sana",
+    "attribute": "relationship_status"
+   },
+   {
+    "question": "What was Sana's relationship status in March 2025?",
+    "answer": "divorced",
+    "category": "as-of",
+    "question_id": "tb-00:q13",
+    "entity": "Sana",
+    "attribute": "relationship_status"
+   },
+   {
+    "question": "List every relationship status Sana has had over time, in order.",
+    "answer": "married (from May 2023); dating someone (from February 2024); divorced (from December 2024)",
+    "category": "history",
+    "question_id": "tb-00:q14",
+    "entity": "Sana",
+    "attribute": "relationship_status"
+   },
+   {
+    "question": "What is Sana's current gym?",
+    "answer": "the YMCA",
+    "category": "current-value",
+    "question_id": "tb-00:q15",
+    "entity": "Sana",
+    "attribute": "gym"
+   },
+   {
+    "question": "What was Sana's gym in November 2023?",
+    "answer": "Equinox",
+    "category": "as-of",
+    "question_id": "tb-00:q16",
+    "entity": "Sana",
+    "attribute": "gym"
+   },
+   {
+    "question": "What was Sana's gym in September 2024?",
+    "answer": "CrossFit",
+    "category": "as-of",
+    "question_id": "tb-00:q17",
+    "entity": "Sana",
+    "attribute": "gym"
+   },
+   {
+    "question": "What was Sana's gym in May 2025?",
+    "answer": "the YMCA",
+    "category": "as-of",
+    "question_id": "tb-00:q18",
+    "entity": "Sana",
+    "attribute": "gym"
+   },
+   {
+    "question": "List every gym Sana has had over time, in order.",
+    "answer": "Equinox (from July 2023); CrossFit (from April 2024); the YMCA (from February 2025)",
+    "category": "history",
+    "question_id": "tb-00:q19",
+    "entity": "Sana",
+    "attribute": "gym"
+   },
+   {
+    "question": "What was Sana's gym in January 2023?",
+    "answer": "no information available",
+    "category": "as-of-abstention",
+    "question_id": "tb-00:q20",
+    "entity": "Sana",
+    "attribute": "gym"
+   },
+   {
+    "question": "What is Ivan's current favorite food?",
+    "answer": "pizza",
+    "category": "current-value",
+    "question_id": "tb-00:q21",
+    "entity": "Ivan",
+    "attribute": "favorite_food"
+   },
+   {
+    "question": "What was Ivan's favorite food in October 2023?",
+    "answer": "curry",
+    "category": "as-of",
+    "question_id": "tb-00:q22",
+    "entity": "Ivan",
+    "attribute": "favorite_food"
+   },
+   {
+    "question": "What was Ivan's favorite food in August 2024?",
+    "answer": "sushi",
+    "category": "as-of",
+    "question_id": "tb-00:q23",
+    "entity": "Ivan",
+    "attribute": "favorite_food"
+   },
+   {
+    "question": "What was Ivan's favorite food in April 2025?",
+    "answer": "pizza",
+    "category": "as-of",
+    "question_id": "tb-00:q24",
+    "entity": "Ivan",
+    "attribute": "favorite_food"
+   },
+   {
+    "question": "List every favorite food Ivan has had over time, in order.",
+    "answer": "curry (from June 2023); sushi (from March 2024); pizza (from January 2025)",
+    "category": "history",
+    "question_id": "tb-00:q25",
+    "entity": "Ivan",
+    "attribute": "favorite_food"
+   },
+   {
+    "question": "What is Ivan's current employer?",
+    "answer": "a startup",
+    "category": "current-value",
+    "question_id": "tb-00:q26",
+    "entity": "Ivan",
+    "attribute": "employer"
+   },
+   {
+    "question": "What was Ivan's employer in October 2023?",
+    "answer": "IBM",
+    "category": "as-of",
+    "question_id": "tb-00:q27",
+    "entity": "Ivan",
+    "attribute": "employer"
+   },
+   {
+    "question": "What was Ivan's employer in August 2024?",
+    "answer": "a bank",
+    "category": "as-of",
+    "question_id": "tb-00:q28",
+    "entity": "Ivan",
+    "attribute": "employer"
+   },
+   {
+    "question": "What was Ivan's employer in April 2025?",
+    "answer": "a startup",
+    "category": "as-of",
+    "question_id": "tb-00:q29",
+    "entity": "Ivan",
+    "attribute": "employer"
+   },
+   {
+    "question": "List every employer Ivan has had over time, in order.",
+    "answer": "IBM (from June 2023); a bank (from March 2024); a startup (from January 2025)",
+    "category": "history",
+    "question_id": "tb-00:q30",
+    "entity": "Ivan",
+    "attribute": "employer"
+   }
+  ],
+  "speaker_a": "user",
+  "speaker_b": "friend",
+  "speakers": [
+   "user",
+   "friend"
+  ]
+ },
+ {
+  "conversation_id": "tb-01",
+  "turns": [
+   {
+    "speaker": "friend",
+    "text": "I've been meaning to call more often, honestly.",
+    "turn_id": "tb-01:t23",
+    "dia_id": "D1:23",
+    "session": 1,
+    "session_datetime": "March 2023"
+   },
+   {
+    "speaker": "friend",
+    "text": "We laughed about old times for a while.",
+    "turn_id": "tb-01:t31",
+    "dia_id": "D1:31",
+    "session": 1,
+    "session_datetime": "March 2023"
+   },
+   {
+    "speaker": "friend",
+    "text": "The weather has been all over the place lately.",
+    "turn_id": "tb-01:t39",
+    "dia_id": "D1:39",
+    "session": 1,
+    "session_datetime": "March 2023"
+   },
+   {
+    "speaker": "user",
+    "text": "Ravi has been talking about maybe switching city to Boston at some point, but nothing's decided.",
+    "turn_id": "tb-01:t12",
+    "dia_id": "D2:12",
+    "session": 2,
+    "session_datetime": "June 2023"
+   },
+   {
+    "speaker": "friend",
+    "text": "Work has been busy but good.",
+    "turn_id": "tb-01:t24",
+    "dia_id": "D2:24",
+    "session": 2,
+    "session_datetime": "June 2023"
+   },
+   {
+    "speaker": "friend",
+    "text": "Nothing too exciting on my end this week.",
+    "turn_id": "tb-01:t32",
+    "dia_id": "D2:32",
+    "session": 2,
+    "session_datetime": "June 2023"
+   },
+   {
+    "speaker": "friend",
+    "text": "We caught up over coffee for a couple hours.",
+    "turn_id": "tb-01:t40",
+    "dia_id": "D2:40",
+    "session": 2,
+    "session_datetime": "June 2023"
+   },
+   {
+    "speaker": "friend",
+    "text": "We laughed about old times for a while.",
+    "turn_id": "tb-01:t25",
+    "dia_id": "D3:25",
+    "session": 3,
+    "session_datetime": "September 2023"
+   },
+   {
+    "speaker": "friend",
+    "text": "The weather has been all over the place lately.",
+    "turn_id": "tb-01:t33",
+    "dia_id": "D3:33",
+    "session": 3,
+    "session_datetime": "September 2023"
+   },
+   {
+    "speaker": "friend",
+    "text": "I've been meaning to call more often, honestly.",
+    "turn_id": "tb-01:t41",
+    "dia_id": "D3:41",
+    "session": 3,
+    "session_datetime": "September 2023"
+   },
+   {
+    "speaker": "user",
+    "text": "Nina became a lawyer just now.",
+    "turn_id": "tb-01:t1",
+    "dia_id": "D4:1",
+    "session": 4,
+    "session_datetime": "December 2023"
+   },
+   {
+    "speaker": "user",
+    "text": "Nina has been talking about maybe switching job to nurse at some point, but nothing's decided.",
+    "turn_id": "tb-01:t2",
+    "dia_id": "D4:2",
+    "session": 4,
+    "session_datetime": "December 2023"
+   },
+   {
+    "speaker": "user",
+    "text": "Ravi got a Tesla just now.",
+    "turn_id": "tb-01:t9",
+    "dia_id": "D4:9",
+    "session": 4,
+    "session_datetime": "December 2023"
+   },
+   {
+    "speaker": "friend",
+    "text": "Nothing too exciting on my end this week.",
+    "turn_id": "tb-01:t26",
+    "dia_id": "D4:26",
+    "session": 4,
+    "session_datetime": "December 2023"
+   },
+   {
+    "speaker": "friend",
+    "text": "We caught up over coffee for a couple hours.",
+    "turn_id": "tb-01:t34",
+    "dia_id": "D4:34",
+    "session": 4,
+    "session_datetime": "December 2023"
+   },
+   {
+    "speaker": "friend",
+    "text": "Work has been busy but good.",
+    "turn_id": "tb-01:t42",
+    "dia_id": "D4:42",
+    "session": 4,
+    "session_datetime": "December 2023"
+   },
+   {
+    "speaker": "user",
+    "text": "Nina got into barbecue just now.",
+    "turn_id": "tb-01:t5",
+    "dia_id": "D5:5",
+    "session": 5,
+    "session_datetime": "March 2024"
+   },
+   {
+    "speaker": "user",
+    "text": "Ravi moved to Atlanta just now.",
+    "turn_id": "tb-01:t13",
+    "dia_id": "D5:13",
+    "session": 5,
+    "session_datetime": "March 2024"
+   },
+   {
+    "speaker": "user",
+    "text": "Jordan joined Equinox just now.",
+    "turn_id": "tb-01:t16",
+    "dia_id": "D5:16",
+    "session": 5,
+    "session_datetime": "March 2024"
+   },
+   {
+    "speaker": "user",
+    "text": "Jordan has been talking about maybe switching gym to Planet Fitness at some point, but nothing's decided.",
+    "turn_id": "tb-01:t17",
+    "dia_id": "D5:17",
+    "session": 5,
+    "session_datetime": "March 2024"
+   },
+   {
+    "speaker": "user",
+    "text": "Jordan became a nurse just now.",
+    "turn_id": "tb-01:t20",
+    "dia_id": "D5:20",
+    "session": 5,
+    "session_datetime": "March 2024"
+   },
+   {
+    "speaker": "friend",
+    "text": "The weather has been all over the place lately.",
+    "turn_id": "tb-01:t27",
+    "dia_id": "D5:27",
+    "session": 5,
+    "session_datetime": "March 2024"
+   },
+   {
+    "speaker": "friend",
+    "text": "I've been meaning to call more often, honestly.",
+    "turn_id": "tb-01:t35",
+    "dia_id": "D5:35",
+    "session": 5,
+    "session_datetime": "March 2024"
+   },
+   {
+    "speaker": "friend",
+    "text": "We laughed about old times for a while.",
+    "turn_id": "tb-01:t43",
+    "dia_id": "D5:43",
+    "session": 5,
+    "session_datetime": "March 2024"
+   },
+   {
+    "speaker": "friend",
+    "text": "We caught up over coffee for a couple hours.",
+    "turn_id": "tb-01:t28",
+    "dia_id": "D6:28",
+    "session": 6,
+    "session_datetime": "June 2024"
+   },
+   {
+    "speaker": "friend",
+    "text": "Work has been busy but good.",
+    "turn_id": "tb-01:t36",
+    "dia_id": "D6:36",
+    "session": 6,
+    "session_datetime": "June 2024"
+   },
+   {
+    "speaker": "friend",
+    "text": "Nothing too exciting on my end this week.",
+    "turn_id": "tb-01:t44",
+    "dia_id": "D6:44",
+    "session": 6,
+    "session_datetime": "June 2024"
+   },
+   {
+    "speaker": "friend",
+    "text": "I've been meaning to call more often, honestly.",
+    "turn_id": "tb-01:t29",
+    "dia_id": "D7:29",
+    "session": 7,
+    "session_datetime": "September 2024"
+   },
+   {
+    "speaker": "friend",
+    "text": "We laughed about old times for a while.",
+    "turn_id": "tb-01:t37",
+    "dia_id": "D7:37",
+    "session": 7,
+    "session_datetime": "September 2024"
+   },
+   {
+    "speaker": "friend",
+    "text": "The weather has been all over the place lately.",
+    "turn_id": "tb-01:t45",
+    "dia_id": "D7:45",
+    "session": 7,
+    "session_datetime": "September 2024"
+   },
+   {
+    "speaker": "user",
+    "text": "Nina became a analyst 19 months ago.",
+    "turn_id": "tb-01:t0",
+    "dia_id": "D8:0",
+    "session": 8,
+    "session_datetime": "December 2024"
+   },
+   {
+    "speaker": "user",
+    "text": "Nina became a teacher just now.",
+    "turn_id": "tb-01:t3",
+    "dia_id": "D8:3",
+    "session": 8,
+    "session_datetime": "December 2024"
+   },
+   {
+    "speaker": "user",
+    "text": "Nina got into pizza 18 months ago.",
+    "turn_id": "tb-01:t4",
+    "dia_id": "D8:4",
+    "session": 8,
+    "session_datetime": "December 2024"
+   },
+   {
+    "speaker": "user",
+    "text": "Nina got into pho just now.",
+    "turn_id": "tb-01:t6",
+    "dia_id": "D8:6",
+    "session": 8,
+    "session_datetime": "December 2024"
+   },
+   {
+    "speaker": "user",
+    "text": "Nina has been talking about maybe switching favorite food to sushi at some point, but nothing's decided.",
+    "turn_id": "tb-01:t7",
+    "dia_id": "D8:7",
+    "session": 8,
+    "session_datetime": "December 2024"
+   },
+   {
+    "speaker": "user",
+    "text": "Ravi got a Jeep 19 months ago.",
+    "turn_id": "tb-01:t8",
+    "dia_id": "D8:8",
+    "session": 8,
+    "session_datetime": "December 2024"
+   },
+   {
+    "speaker": "user",
+    "text": "Ravi got a Civic just now.",
+    "turn_id": "tb-01:t10",
+    "dia_id": "D8:10",
+    "session": 8,
+    "session_datetime": "December 2024"
+   },
+   {
+    "speaker": "user",
+    "text": "Ravi moved to Chicago 18 months ago.",
+    "turn_id": "tb-01:t11",
+    "dia_id": "D8:11",
+    "session": 8,
+    "session_datetime": "December 2024"
+   },
+   {
+    "speaker": "user",
+    "text": "Ravi moved to Austin just now.",
+    "turn_id": "tb-01:t14",
+    "dia_id": "D8:14",
+    "session": 8,
+    "session_datetime": "December 2024"
+   },
+   {
+    "speaker": "user",
+    "text": "Jordan joined Planet Fitness 17 months ago.",
+    "turn_id": "tb-01:t15",
+    "dia_id": "D8:15",
+    "session": 8,
+    "session_datetime": "December 2024"
+   },
+   {
+    "speaker": "user",
+    "text": "Jordan joined CrossFit just now.",
+    "turn_id": "tb-01:t18",
+    "dia_id": "D8:18",
+    "session": 8,
+    "session_datetime": "December 2024"
+   },
+   {
+    "speaker": "user",
+    "text": "Jordan became a pilot 18 months ago.",
+    "turn_id": "tb-01:t19",
+    "dia_id": "D8:19",
+    "session": 8,
+    "session_datetime": "December 2024"
+   },
+   {
+    "speaker": "user",
+    "text": "Jordan became a analyst just now.",
+    "turn_id": "tb-01:t21",
+    "dia_id": "D8:21",
+    "session": 8,
+    "session_datetime": "December 2024"
+   },
+   {
+    "speaker": "user",
+    "text": "Jordan has been talking about maybe switching job to nurse at some point, but nothing's decided.",
+    "turn_id": "tb-01:t22",
+    "dia_id": "D8:22",
+    "session": 8,
+    "session_datetime": "December 2024"
+   },
+   {
+    "speaker": "friend",
+    "text": "Work has been busy but good.",
+    "turn_id": "tb-01:t30",
+    "dia_id": "D8:30",
+    "session": 8,
+    "session_datetime": "December 2024"
+   },
+   {
+    "speaker": "friend",
+    "text": "Nothing too exciting on my end this week.",
+    "turn_id": "tb-01:t38",
+    "dia_id": "D8:38",
+    "session": 8,
+    "session_datetime": "December 2024"
+   }
+  ],
+  "questions": [
+   {
+    "question": "What is Nina's current job?",
+    "answer": "teacher",
+    "category": "current-value",
+    "question_id": "tb-01:q0",
+    "entity": "Nina",
+    "attribute": "occupation"
+   },
+   {
+    "question": "What was Nina's job in September 2023?",
+    "answer": "analyst",
+    "category": "as-of",
+    "question_id": "tb-01:q1",
+    "entity": "Nina",
+    "attribute": "occupation"
+   },
+   {
+    "question": "What was Nina's job in July 2024?",
+    "answer": "lawyer",
+    "category": "as-of",
+    "question_id": "tb-01:q2",
+    "entity": "Nina",
+    "attribute": "occupation"
+   },
+   {
+    "question": "What was Nina's job in March 2025?",
+    "answer": "teacher",
+    "category": "as-of",
+    "question_id": "tb-01:q3",
+    "entity": "Nina",
+    "attribute": "occupation"
+   },
+   {
+    "question": "List every job Nina has had over time, in order.",
+    "answer": "analyst (from May 2023); lawyer (from February 2024); teacher (from December 2024)",
+    "category": "history",
+    "question_id": "tb-01:q4",
+    "entity": "Nina",
+    "attribute": "occupation"
+   },
+   {
+    "question": "What is Nina's current favorite food?",
+    "answer": "pho",
+    "category": "current-value",
+    "question_id": "tb-01:q5",
+    "entity": "Nina",
+    "attribute": "favorite_food"
+   },
+   {
+    "question": "What was Nina's favorite food in October 2023?",
+    "answer": "pizza",
+    "category": "as-of",
+    "question_id": "tb-01:q6",
+    "entity": "Nina",
+    "attribute": "favorite_food"
+   },
+   {
+    "question": "What was Nina's favorite food in August 2024?",
+    "answer": "barbecue",
+    "category": "as-of",
+    "question_id": "tb-01:q7",
+    "entity": "Nina",
+    "attribute": "favorite_food"
+   },
+   {
+    "question": "What was Nina's favorite food in April 2025?",
+    "answer": "pho",
+    "category": "as-of",
+    "question_id": "tb-01:q8",
+    "entity": "Nina",
+    "attribute": "favorite_food"
+   },
+   {
+    "question": "List every favorite food Nina has had over time, in order.",
+    "answer": "pizza (from June 2023); barbecue (from March 2024); pho (from January 2025)",
+    "category": "history",
+    "question_id": "tb-01:q9",
+    "entity": "Nina",
+    "attribute": "favorite_food"
+   },
+   {
+    "question": "What is Ravi's current car?",
+    "answer": "a Civic",
+    "category": "current-value",
+    "question_id": "tb-01:q10",
+    "entity": "Ravi",
+    "attribute": "car"
+   },
+   {
+    "question": "What was Ravi's car in September 2023?",
+    "answer": "a Jeep",
+    "category": "as-of",
+    "question_id": "tb-01:q11",
+    "entity": "Ravi",
+    "attribute": "car"
+   },
+   {
+    "question": "What was Ravi's car in July 2024?",
+    "answer": "a Tesla",
+    "category": "as-of",
+    "question_id": "tb-01:q12",
+    "entity": "Ravi",
+    "attribute": "car"
+   },
+   {
+    "question": "What was Ravi's car in March 2025?",
+    "answer": "a Civic",
+    "category": "as-of",
+    "question_id": "tb-01:q13",
+    "entity": "Ravi",
+    "attribute": "car"
+   },
+   {
+    "question": "List every car Ravi has had over time, in order.",
+    "answer": "a Jeep (from May 2023); a Tesla (from February 2024); a Civic (from December 2024)",
+    "category": "history",
+    "question_id": "tb-01:q14",
+    "entity": "Ravi",
+    "attribute": "car"
+   },
+   {
+    "question": "What is Ravi's current city?",
+    "answer": "Austin",
+    "category": "current-value",
+    "question_id": "tb-01:q15",
+    "entity": "Ravi",
+    "attribute": "location"
+   },
+   {
+    "question": "What was Ravi's city in October 2023?",
+    "answer": "Chicago",
+    "category": "as-of",
+    "question_id": "tb-01:q16",
+    "entity": "Ravi",
+    "attribute": "location"
+   },
+   {
+    "question": "What was Ravi's city in August 2024?",
+    "answer": "Atlanta",
+    "category": "as-of",
+    "question_id": "tb-01:q17",
+    "entity": "Ravi",
+    "attribute": "location"
+   },
+   {
+    "question": "What was Ravi's city in April 2025?",
+    "answer": "Austin",
+    "category": "as-of",
+    "question_id": "tb-01:q18",
+    "entity": "Ravi",
+    "attribute": "location"
+   },
+   {
+    "question": "List every city Ravi has had over time, in order.",
+    "answer": "Chicago (from June 2023); Atlanta (from March 2024); Austin (from January 2025)",
+    "category": "history",
+    "question_id": "tb-01:q19",
+    "entity": "Ravi",
+    "attribute": "location"
+   },
+   {
+    "question": "What is Jordan's current gym?",
+    "answer": "CrossFit",
+    "category": "current-value",
+    "question_id": "tb-01:q20",
+    "entity": "Jordan",
+    "attribute": "gym"
+   },
+   {
+    "question": "What was Jordan's gym in November 2023?",
+    "answer": "Planet Fitness",
+    "category": "as-of",
+    "question_id": "tb-01:q21",
+    "entity": "Jordan",
+    "attribute": "gym"
+   },
+   {
+    "question": "What was Jordan's gym in September 2024?",
+    "answer": "Equinox",
+    "category": "as-of",
+    "question_id": "tb-01:q22",
+    "entity": "Jordan",
+    "attribute": "gym"
+   },
+   {
+    "question": "What was Jordan's gym in May 2025?",
+    "answer": "CrossFit",
+    "category": "as-of",
+    "question_id": "tb-01:q23",
+    "entity": "Jordan",
+    "attribute": "gym"
+   },
+   {
+    "question": "List every gym Jordan has had over time, in order.",
+    "answer": "Planet Fitness (from July 2023); Equinox (from April 2024); CrossFit (from February 2025)",
+    "category": "history",
+    "question_id": "tb-01:q24",
+    "entity": "Jordan",
+    "attribute": "gym"
+   },
+   {
+    "question": "What was Jordan's gym in January 2023?",
+    "answer": "no information available",
+    "category": "as-of-abstention",
+    "question_id": "tb-01:q25",
+    "entity": "Jordan",
+    "attribute": "gym"
+   },
+   {
+    "question": "What is Jordan's current job?",
+    "answer": "analyst",
+    "category": "current-value",
+    "question_id": "tb-01:q26",
+    "entity": "Jordan",
+    "attribute": "occupation"
+   },
+   {
+    "question": "What was Jordan's job in October 2023?",
+    "answer": "pilot",
+    "category": "as-of",
+    "question_id": "tb-01:q27",
+    "entity": "Jordan",
+    "attribute": "occupation"
+   },
+   {
+    "question": "What was Jordan's job in August 2024?",
+    "answer": "nurse",
+    "category": "as-of",
+    "question_id": "tb-01:q28",
+    "entity": "Jordan",
+    "attribute": "occupation"
+   },
+   {
+    "question": "What was Jordan's job in April 2025?",
+    "answer": "analyst",
+    "category": "as-of",
+    "question_id": "tb-01:q29",
+    "entity": "Jordan",
+    "attribute": "occupation"
+   },
+   {
+    "question": "List every job Jordan has had over time, in order.",
+    "answer": "pilot (from June 2023); nurse (from March 2024); analyst (from January 2025)",
+    "category": "history",
+    "question_id": "tb-01:q30",
+    "entity": "Jordan",
+    "attribute": "occupation"
+   }
+  ],
+  "speaker_a": "user",
+  "speaker_b": "friend",
+  "speakers": [
+   "user",
+   "friend"
+  ]
+ },
+ {
+  "conversation_id": "tb-02",
+  "turns": [
+   {
+    "speaker": "friend",
+    "text": "Work has been busy but good.",
+    "turn_id": "tb-02:t24",
+    "dia_id": "D1:24",
+    "session": 1,
+    "session_datetime": "March 2023"
+   },
+   {
+    "speaker": "friend",
+    "text": "Nothing too exciting on my end this week.",
+    "turn_id": "tb-02:t32",
+    "dia_id": "D1:32",
+    "session": 1,
+    "session_datetime": "March 2023"
+   },
+   {
+    "speaker": "friend",
+    "text": "We caught up over coffee for a couple hours.",
+    "turn_id": "tb-02:t40",
+    "dia_id": "D1:40",
+    "session": 1,
+    "session_datetime": "March 2023"
+   },
+   {
+    "speaker": "user",
+    "text": "Rosa has been talking about maybe switching employer to Google at some point, but nothing's decided.",
+    "turn_id": "tb-02:t12",
+    "dia_id": "D2:12",
+    "session": 2,
+    "session_datetime": "June 2023"
+   },
+   {
+    "speaker": "user",
+    "text": "Diego flew to Denver for a work conference last week, just a short trip.",
+    "turn_id": "tb-02:t16",
+    "dia_id": "D2:16",
+    "session": 2,
+    "session_datetime": "June 2023"
+   },
+   {
+    "speaker": "friend",
+    "text": "We laughed about old times for a while.",
+    "turn_id": "tb-02:t25",
+    "dia_id": "D2:25",
+    "session": 2,
+    "session_datetime": "June 2023"
+   },
+   {
+    "speaker": "friend",
+    "text": "The weather has been all over the place lately.",
+    "turn_id": "tb-02:t33",
+    "dia_id": "D2:33",
+    "session": 2,
+    "session_datetime": "June 2023"
+   },
+   {
+    "speaker": "friend",
+    "text": "I've been meaning to call more often, honestly.",
+    "turn_id": "tb-02:t41",
+    "dia_id": "D2:41",
+    "session": 2,
+    "session_datetime": "June 2023"
+   },
+   {
+    "speaker": "friend",
+    "text": "Nothing too exciting on my end this week.",
+    "turn_id": "tb-02:t26",
+    "dia_id": "D3:26",
+    "session": 3,
+    "session_datetime": "September 2023"
+   },
+   {
+    "speaker": "friend",
+    "text": "We caught up over coffee for a couple hours.",
+    "turn_id": "tb-02:t34",
+    "dia_id": "D3:34",
+    "session": 3,
+    "session_datetime": "September 2023"
+   },
+   {
+    "speaker": "friend",
+    "text": "Work has been busy but good.",
+    "turn_id": "tb-02:t42",
+    "dia_id": "D3:42",
+    "session": 3,
+    "session_datetime": "September 2023"
+   },
+   {
+    "speaker": "user",
+    "text": "Marcus became engaged just now.",
+    "turn_id": "tb-02:t1",
+    "dia_id": "D4:1",
+    "session": 4,
+    "session_datetime": "December 2023"
+   },
+   {
+    "speaker": "user",
+    "text": "Marcus has been talking about maybe switching relationship status to single at some point, but nothing's decided.",
+    "turn_id": "tb-02:t2",
+    "dia_id": "D4:2",
+    "session": 4,
+    "session_datetime": "December 2023"
+   },
+   {
+    "speaker": "user",
+    "text": "Marcus joined a yoga studio just now.",
+    "turn_id": "tb-02:t5",
+    "dia_id": "D4:5",
+    "session": 4,
+    "session_datetime": "December 2023"
+   },
+   {
+    "speaker": "friend",
+    "text": "The weather has been all over the place lately.",
+    "turn_id": "tb-02:t27",
+    "dia_id": "D4:27",
+    "session": 4,
+    "session_datetime": "December 2023"
+   },
+   {
+    "speaker": "friend",
+    "text": "I've been meaning to call more often, honestly.",
+    "turn_id": "tb-02:t35",
+    "dia_id": "D4:35",
+    "session": 4,
+    "session_datetime": "December 2023"
+   },
+   {
+    "speaker": "friend",
+    "text": "We laughed about old times for a while.",
+    "turn_id": "tb-02:t43",
+    "dia_id": "D4:43",
+    "session": 4,
+    "session_datetime": "December 2023"
+   },
+   {
+    "speaker": "user",
+    "text": "Rosa got into tacos just now.",
+    "turn_id": "tb-02:t9",
+    "dia_id": "D5:9",
+    "session": 5,
+    "session_datetime": "March 2024"
+   },
+   {
+    "speaker": "user",
+    "text": "Rosa started at Google just now.",
+    "turn_id": "tb-02:t13",
+    "dia_id": "D5:13",
+    "session": 5,
+    "session_datetime": "March 2024"
+   },
+   {
+    "speaker": "user",
+    "text": "Diego moved to Seattle just now.",
+    "turn_id": "tb-02:t17",
+    "dia_id": "D5:17",
+    "session": 5,
+    "session_datetime": "March 2024"
+   },
+   {
+    "speaker": "user",
+    "text": "Diego has been talking about maybe switching city to Boston at some point, but nothing's decided.",
+    "turn_id": "tb-02:t18",
+    "dia_id": "D5:18",
+    "session": 5,
+    "session_datetime": "March 2024"
+   },
+   {
+    "speaker": "user",
+    "text": "Diego became divorced just now.",
+    "turn_id": "tb-02:t21",
+    "dia_id": "D5:21",
+    "session": 5,
+    "session_datetime": "March 2024"
+   },
+   {
+    "speaker": "friend",
+    "text": "We caught up over coffee for a couple hours.",
+    "turn_id": "tb-02:t28",
+    "dia_id": "D5:28",
+    "session": 5,
+    "session_datetime": "March 2024"
+   },
+   {
+    "speaker": "friend",
+    "text": "Work has been busy but good.",
+    "turn_id": "tb-02:t36",
+    "dia_id": "D5:36",
+    "session": 5,
+    "session_datetime": "March 2024"
+   },
+   {
+    "speaker": "friend",
+    "text": "Nothing too exciting on my end this week.",
+    "turn_id": "tb-02:t44",
+    "dia_id": "D5:44",
+    "session": 5,
+    "session_datetime": "March 2024"
+   },
+   {
+    "speaker": "friend",
+    "text": "I've been meaning to call more often, honestly.",
+    "turn_id": "tb-02:t29",
+    "dia_id": "D6:29",
+    "session": 6,
+    "session_datetime": "June 2024"
+   },
+   {
+    "speaker": "friend",
+    "text": "We laughed about old times for a while.",
+    "turn_id": "tb-02:t37",
+    "dia_id": "D6:37",
+    "session": 6,
+    "session_datetime": "June 2024"
+   },
+   {
+    "speaker": "friend",
+    "text": "The weather has been all over the place lately.",
+    "turn_id": "tb-02:t45",
+    "dia_id": "D6:45",
+    "session": 6,
+    "session_datetime": "June 2024"
+   },
+   {
+    "speaker": "user",
+    "text": "Marcus joined Planet Fitness just now.",
+    "turn_id": "tb-02:t6",
+    "dia_id": "D7:6",
+    "session": 7,
+    "session_datetime": "September 2024"
+   },
+   {
+    "speaker": "user",
+    "text": "Marcus has been talking about maybe switching gym to CrossFit at some point, but nothing's decided.",
+    "turn_id": "tb-02:t7",
+    "dia_id": "D7:7",
+    "session": 7,
+    "session_datetime": "September 2024"
+   },
+   {
+    "speaker": "friend",
+    "text": "Work has been busy but good.",
+    "turn_id": "tb-02:t30",
+    "dia_id": "D7:30",
+    "session": 7,
+    "session_datetime": "September 2024"
+   },
+   {
+    "speaker": "friend",
+    "text": "Nothing too exciting on my end this week.",
+    "turn_id": "tb-02:t38",
+    "dia_id": "D7:38",
+    "session": 7,
+    "session_datetime": "September 2024"
+   },
+   {
+    "speaker": "friend",
+    "text": "We caught up over coffee for a couple hours.",
+    "turn_id": "tb-02:t46",
+    "dia_id": "D7:46",
+    "session": 7,
+    "session_datetime": "September 2024"
+   },
+   {
+    "speaker": "user",
+    "text": "Marcus became divorced 19 months ago.",
+    "turn_id": "tb-02:t0",
+    "dia_id": "D8:0",
+    "session": 8,
+    "session_datetime": "December 2024"
+   },
+   {
+    "speaker": "user",
+    "text": "Marcus became single just now.",
+    "turn_id": "tb-02:t3",
+    "dia_id": "D8:3",
+    "session": 8,
+    "session_datetime": "December 2024"
+   },
+   {
+    "speaker": "user",
+    "text": "Marcus joined the YMCA 20 months ago.",
+    "turn_id": "tb-02:t4",
+    "dia_id": "D8:4",
+    "session": 8,
+    "session_datetime": "December 2024"
+   },
+   {
+    "speaker": "user",
+    "text": "Rosa got into ramen 18 months ago.",
+    "turn_id": "tb-02:t8",
+    "dia_id": "D8:8",
+    "session": 8,
+    "session_datetime": "December 2024"
+   },
+   {
+    "speaker": "user",
+    "text": "Rosa got into curry just now.",
+    "turn_id": "tb-02:t10",
+    "dia_id": "D8:10",
+    "session": 8,
+    "session_datetime": "December 2024"
+   },
+   {
+    "speaker": "user",
+    "text": "Rosa started at a nonprofit 18 months ago.",
+    "turn_id": "tb-02:t11",
+    "dia_id": "D8:11",
+    "session": 8,
+    "session_datetime": "December 2024"
+   },
+   {
+    "speaker": "user",
+    "text": "Rosa started at Amazon just now.",
+    "turn_id": "tb-02:t14",
+    "dia_id": "D8:14",
+    "session": 8,
+    "session_datetime": "December 2024"
+   },
+   {
+    "speaker": "user",
+    "text": "Diego moved to Miami 18 months ago.",
+    "turn_id": "tb-02:t15",
+    "dia_id": "D8:15",
+    "session": 8,
+    "session_datetime": "December 2024"
+   },
+   {
+    "speaker": "user",
+    "text": "Diego moved to Chicago just now.",
+    "turn_id": "tb-02:t19",
+    "dia_id": "D8:19",
+    "session": 8,
+    "session_datetime": "December 2024"
+   },
+   {
+    "speaker": "user",
+    "text": "Diego became dating someone 18 months ago.",
+    "turn_id": "tb-02:t20",
+    "dia_id": "D8:20",
+    "session": 8,
+    "session_datetime": "December 2024"
+   },
+   {
+    "speaker": "user",
+    "text": "Diego became engaged just now.",
+    "turn_id": "tb-02:t22",
+    "dia_id": "D8:22",
+    "session": 8,
+    "session_datetime": "December 2024"
+   },
+   {
+    "speaker": "user",
+    "text": "Diego has been talking about maybe switching relationship status to single at some point, but nothing's decided.",
+    "turn_id": "tb-02:t23",
+    "dia_id": "D8:23",
+    "session": 8,
+    "session_datetime": "December 2024"
+   },
+   {
+    "speaker": "friend",
+    "text": "We laughed about old times for a while.",
+    "turn_id": "tb-02:t31",
+    "dia_id": "D8:31",
+    "session": 8,
+    "session_datetime": "December 2024"
+   },
+   {
+    "speaker": "friend",
+    "text": "The weather has been all over the place lately.",
+    "turn_id": "tb-02:t39",
+    "dia_id": "D8:39",
+    "session": 8,
+    "session_datetime": "December 2024"
+   },
+   {
+    "speaker": "friend",
+    "text": "I've been meaning to call more often, honestly.",
+    "turn_id": "tb-02:t47",
+    "dia_id": "D8:47",
+    "session": 8,
+    "session_datetime": "December 2024"
+   }
+  ],
+  "questions": [
+   {
+    "question": "What is Marcus's current relationship status?",
+    "answer": "single",
+    "category": "current-value",
+    "question_id": "tb-02:q0",
+    "entity": "Marcus",
+    "attribute": "relationship_status"
+   },
+   {
+    "question": "What was Marcus's relationship status in September 2023?",
+    "answer": "divorced",
+    "category": "as-of",
+    "question_id": "tb-02:q1",
+    "entity": "Marcus",
+    "attribute": "relationship_status"
+   },
+   {
+    "question": "What was Marcus's relationship status in July 2024?",
+    "answer": "engaged",
+    "category": "as-of",
+    "question_id": "tb-02:q2",
+    "entity": "Marcus",
+    "attribute": "relationship_status"
+   },
+   {
+    "question": "What was Marcus's relationship status in March 2025?",
+    "answer": "single",
+    "category": "as-of",
+    "question_id": "tb-02:q3",
+    "entity": "Marcus",
+    "attribute": "relationship_status"
+   },
+   {
+    "question": "List every relationship status Marcus has had over time, in order.",
+    "answer": "divorced (from May 2023); engaged (from February 2024); single (from December 2024)",
+    "category": "history",
+    "question_id": "tb-02:q4",
+    "entity": "Marcus",
+    "attribute": "relationship_status"
+   },
+   {
+    "question": "What is Marcus's current gym?",
+    "answer": "Planet Fitness",
+    "category": "current-value",
+    "question_id": "tb-02:q5",
+    "entity": "Marcus",
+    "attribute": "gym"
+   },
+   {
+    "question": "What was Marcus's gym in August 2023?",
+    "answer": "the YMCA",
+    "category": "as-of",
+    "question_id": "tb-02:q6",
+    "entity": "Marcus",
+    "attribute": "gym"
+   },
+   {
+    "question": "What was Marcus's gym in June 2024?",
+    "answer": "a yoga studio",
+    "category": "as-of",
+    "question_id": "tb-02:q7",
+    "entity": "Marcus",
+    "attribute": "gym"
+   },
+   {
+    "question": "What was Marcus's gym in February 2025?",
+    "answer": "Planet Fitness",
+    "category": "as-of",
+    "question_id": "tb-02:q8",
+    "entity": "Marcus",
+    "attribute": "gym"
+   },
+   {
+    "question": "List every gym Marcus has had over time, in order.",
+    "answer": "the YMCA (from April 2023); a yoga studio (from January 2024); Planet Fitness (from November 2024)",
+    "category": "history",
+    "question_id": "tb-02:q9",
+    "entity": "Marcus",
+    "attribute": "gym"
+   },
+   {
+    "question": "What is Rosa's current favorite food?",
+    "answer": "curry",
+    "category": "current-value",
+    "question_id": "tb-02:q10",
+    "entity": "Rosa",
+    "attribute": "favorite_food"
+   },
+   {
+    "question": "What was Rosa's favorite food in October 2023?",
+    "answer": "ramen",
+    "category": "as-of",
+    "question_id": "tb-02:q11",
+    "entity": "Rosa",
+    "attribute": "favorite_food"
+   },
+   {
+    "question": "What was Rosa's favorite food in August 2024?",
+    "answer": "tacos",
+    "category": "as-of",
+    "question_id": "tb-02:q12",
+    "entity": "Rosa",
+    "attribute": "favorite_food"
+   },
+   {
+    "question": "What was Rosa's favorite food in April 2025?",
+    "answer": "curry",
+    "category": "as-of",
+    "question_id": "tb-02:q13",
+    "entity": "Rosa",
+    "attribute": "favorite_food"
+   },
+   {
+    "question": "List every favorite food Rosa has had over time, in order.",
+    "answer": "ramen (from June 2023); tacos (from March 2024); curry (from January 2025)",
+    "category": "history",
+    "question_id": "tb-02:q14",
+    "entity": "Rosa",
+    "attribute": "favorite_food"
+   },
+   {
+    "question": "What is Rosa's current employer?",
+    "answer": "Amazon",
+    "category": "current-value",
+    "question_id": "tb-02:q15",
+    "entity": "Rosa",
+    "attribute": "employer"
+   },
+   {
+    "question": "What was Rosa's employer in October 2023?",
+    "answer": "a nonprofit",
+    "category": "as-of",
+    "question_id": "tb-02:q16",
+    "entity": "Rosa",
+    "attribute": "employer"
+   },
+   {
+    "question": "What was Rosa's employer in August 2024?",
+    "answer": "Google",
+    "category": "as-of",
+    "question_id": "tb-02:q17",
+    "entity": "Rosa",
+    "attribute": "employer"
+   },
+   {
+    "question": "What was Rosa's employer in April 2025?",
+    "answer": "Amazon",
+    "category": "as-of",
+    "question_id": "tb-02:q18",
+    "entity": "Rosa",
+    "attribute": "employer"
+   },
+   {
+    "question": "List every employer Rosa has had over time, in order.",
+    "answer": "a nonprofit (from June 2023); Google (from March 2024); Amazon (from January 2025)",
+    "category": "history",
+    "question_id": "tb-02:q19",
+    "entity": "Rosa",
+    "attribute": "employer"
+   },
+   {
+    "question": "What is Diego's current city?",
+    "answer": "Chicago",
+    "category": "current-value",
+    "question_id": "tb-02:q20",
+    "entity": "Diego",
+    "attribute": "location"
+   },
+   {
+    "question": "What was Diego's city in October 2023?",
+    "answer": "Miami",
+    "category": "as-of",
+    "question_id": "tb-02:q21",
+    "entity": "Diego",
+    "attribute": "location"
+   },
+   {
+    "question": "What was Diego's city in August 2024?",
+    "answer": "Seattle",
+    "category": "as-of",
+    "question_id": "tb-02:q22",
+    "entity": "Diego",
+    "attribute": "location"
+   },
+   {
+    "question": "What was Diego's city in April 2025?",
+    "answer": "Chicago",
+    "category": "as-of",
+    "question_id": "tb-02:q23",
+    "entity": "Diego",
+    "attribute": "location"
+   },
+   {
+    "question": "List every city Diego has had over time, in order.",
+    "answer": "Miami (from June 2023); Seattle (from March 2024); Chicago (from January 2025)",
+    "category": "history",
+    "question_id": "tb-02:q24",
+    "entity": "Diego",
+    "attribute": "location"
+   },
+   {
+    "question": "What is Diego's current relationship status?",
+    "answer": "engaged",
+    "category": "current-value",
+    "question_id": "tb-02:q25",
+    "entity": "Diego",
+    "attribute": "relationship_status"
+   },
+   {
+    "question": "What was Diego's relationship status in October 2023?",
+    "answer": "dating someone",
+    "category": "as-of",
+    "question_id": "tb-02:q26",
+    "entity": "Diego",
+    "attribute": "relationship_status"
+   },
+   {
+    "question": "What was Diego's relationship status in August 2024?",
+    "answer": "divorced",
+    "category": "as-of",
+    "question_id": "tb-02:q27",
+    "entity": "Diego",
+    "attribute": "relationship_status"
+   },
+   {
+    "question": "What was Diego's relationship status in April 2025?",
+    "answer": "engaged",
+    "category": "as-of",
+    "question_id": "tb-02:q28",
+    "entity": "Diego",
+    "attribute": "relationship_status"
+   },
+   {
+    "question": "List every relationship status Diego has had over time, in order.",
+    "answer": "dating someone (from June 2023); divorced (from March 2024); engaged (from January 2025)",
+    "category": "history",
+    "question_id": "tb-02:q29",
+    "entity": "Diego",
+    "attribute": "relationship_status"
+   }
+  ],
+  "speaker_a": "user",
+  "speaker_b": "friend",
+  "speakers": [
+   "user",
+   "friend"
+  ]
+ },
+ {
+  "conversation_id": "tb-03",
+  "turns": [
+   {
+    "speaker": "friend",
+    "text": "We laughed about old times for a while.",
+    "turn_id": "tb-03:t23",
+    "dia_id": "D1:23",
+    "session": 1,
+    "session_datetime": "March 2023"
+   },
+   {
+    "speaker": "friend",
+    "text": "The weather has been all over the place lately.",
+    "turn_id": "tb-03:t31",
+    "dia_id": "D1:31",
+    "session": 1,
+    "session_datetime": "March 2023"
+   },
+   {
+    "speaker": "friend",
+    "text": "I've been meaning to call more often, honestly.",
+    "turn_id": "tb-03:t39",
+    "dia_id": "D1:39",
+    "session": 1,
+    "session_datetime": "March 2023"
+   },
+   {
+    "speaker": "user",
+    "text": "Maya has been talking about maybe switching job to nurse at some point, but nothing's decided.",
+    "turn_id": "tb-03:t12",
+    "dia_id": "D2:12",
+    "session": 2,
+    "session_datetime": "June 2023"
+   },
+   {
+    "speaker": "friend",
+    "text": "Nothing too exciting on my end this week.",
+    "turn_id": "tb-03:t24",
+    "dia_id": "D2:24",
+    "session": 2,
+    "session_datetime": "June 2023"
+   },
+   {
+    "speaker": "friend",
+    "text": "We caught up over coffee for a couple hours.",
+    "turn_id": "tb-03:t32",
+    "dia_id": "D2:32",
+    "session": 2,
+    "session_datetime": "June 2023"
+   },
+   {
+    "speaker": "friend",
+    "text": "Work has been busy but good.",
+    "turn_id": "tb-03:t40",
+    "dia_id": "D2:40",
+    "session": 2,
+    "session_datetime": "June 2023"
+   },
+   {
+    "speaker": "friend",
+    "text": "The weather has been all over the place lately.",
+    "turn_id": "tb-03:t25",
+    "dia_id": "D3:25",
+    "session": 3,
+    "session_datetime": "September 2023"
+   },
+   {
+    "speaker": "friend",
+    "text": "I've been meaning to call more often, honestly.",
+    "turn_id": "tb-03:t33",
+    "dia_id": "D3:33",
+    "session": 3,
+    "session_datetime": "September 2023"
+   },
+   {
+    "speaker": "friend",
+    "text": "We laughed about old times for a while.",
+    "turn_id": "tb-03:t41",
+    "dia_id": "D3:41",
+    "session": 3,
+    "session_datetime": "September 2023"
+   },
+   {
+    "speaker": "user",
+    "text": "Clara got a pickup truck just now.",
+    "turn_id": "tb-03:t1",
+    "dia_id": "D4:1",
+    "session": 4,
+    "session_datetime": "December 2023"
+   },
+   {
+    "speaker": "user",
+    "text": "Clara has been talking about maybe switching car to a Civic at some point, but nothing's decided.",
+    "turn_id": "tb-03:t2",
+    "dia_id": "D4:2",
+    "session": 4,
+    "session_datetime": "December 2023"
+   },
+   {
+    "speaker": "friend",
+    "text": "We caught up over coffee for a couple hours.",
+    "turn_id": "tb-03:t26",
+    "dia_id": "D4:26",
+    "session": 4,
+    "session_datetime": "December 2023"
+   },
+   {
+    "speaker": "friend",
+    "text": "Work has been busy but good.",
+    "turn_id": "tb-03:t34",
+    "dia_id": "D4:34",
+    "session": 4,
+    "session_datetime": "December 2023"
+   },
+   {
+    "speaker": "friend",
+    "text": "Nothing too exciting on my end this week.",
+    "turn_id": "tb-03:t42",
+    "dia_id": "D4:42",
+    "session": 4,
+    "session_datetime": "December 2023"
+   },
+   {
+    "speaker": "user",
+    "text": "Clara moved to Boston just now.",
+    "turn_id": "tb-03:t5",
+    "dia_id": "D5:5",
+    "session": 5,
+    "session_datetime": "March 2024"
+   },
+   {
+    "speaker": "user",
+    "text": "Maya joined the YMCA just now.",
+    "turn_id": "tb-03:t9",
+    "dia_id": "D5:9",
+    "session": 5,
+    "session_datetime": "March 2024"
+   },
+   {
+    "speaker": "user",
+    "text": "Maya became a teacher just now.",
+    "turn_id": "tb-03:t13",
+    "dia_id": "D5:13",
+    "session": 5,
+    "session_datetime": "March 2024"
+   },
+   {
+    "speaker": "user",
+    "text": "Nina started at a startup just now.",
+    "turn_id": "tb-03:t16",
+    "dia_id": "D5:16",
+    "session": 5,
+    "session_datetime": "March 2024"
+   },
+   {
+    "speaker": "user",
+    "text": "Nina has been talking about maybe switching employer to Google at some point, but nothing's decided.",
+    "turn_id": "tb-03:t17",
+    "dia_id": "D5:17",
+    "session": 5,
+    "session_datetime": "March 2024"
+   },
+   {
+    "speaker": "user",
+    "text": "Nina got a Jeep just now.",
+    "turn_id": "tb-03:t20",
+    "dia_id": "D5:20",
+    "session": 5,
+    "session_datetime": "March 2024"
+   },
+   {
+    "speaker": "friend",
+    "text": "I've been meaning to call more often, honestly.",
+    "turn_id": "tb-03:t27",
+    "dia_id": "D5:27",
+    "session": 5,
+    "session_datetime": "March 2024"
+   },
+   {
+    "speaker": "friend",
+    "text": "We laughed about old times for a while.",
+    "turn_id": "tb-03:t35",
+    "dia_id": "D5:35",
+    "session": 5,
+    "session_datetime": "March 2024"
+   },
+   {
+    "speaker": "friend",
+    "text": "The weather has been all over the place lately.",
+    "turn_id": "tb-03:t43",
+    "dia_id": "D5:43",
+    "session": 5,
+    "session_datetime": "March 2024"
+   },
+   {
+    "speaker": "friend",
+    "text": "Work has been busy but good.",
+    "turn_id": "tb-03:t28",
+    "dia_id": "D6:28",
+    "session": 6,
+    "session_datetime": "June 2024"
+   },
+   {
+    "speaker": "friend",
+    "text": "Nothing too exciting on my end this week.",
+    "turn_id": "tb-03:t36",
+    "dia_id": "D6:36",
+    "session": 6,
+    "session_datetime": "June 2024"
+   },
+   {
+    "speaker": "friend",
+    "text": "We caught up over coffee for a couple hours.",
+    "turn_id": "tb-03:t44",
+    "dia_id": "D6:44",
+    "session": 6,
+    "session_datetime": "June 2024"
+   },
+   {
+    "speaker": "friend",
+    "text": "We laughed about old times for a while.",
+    "turn_id": "tb-03:t29",
+    "dia_id": "D7:29",
+    "session": 7,
+    "session_datetime": "September 2024"
+   },
+   {
+    "speaker": "friend",
+    "text": "The weather has been all over the place lately.",
+    "turn_id": "tb-03:t37",
+    "dia_id": "D7:37",
+    "session": 7,
+    "session_datetime": "September 2024"
+   },
+   {
+    "speaker": "friend",
+    "text": "I've been meaning to call more often, honestly.",
+    "turn_id": "tb-03:t45",
+    "dia_id": "D7:45",
+    "session": 7,
+    "session_datetime": "September 2024"
+   },
+   {
+    "speaker": "user",
+    "text": "Clara got a minivan 19 months ago.",
+    "turn_id": "tb-03:t0",
+    "dia_id": "D8:0",
+    "session": 8,
+    "session_datetime": "December 2024"
+   },
+   {
+    "speaker": "user",
+    "text": "Clara got a Tesla just now.",
+    "turn_id": "tb-03:t3",
+    "dia_id": "D8:3",
+    "session": 8,
+    "session_datetime": "December 2024"
+   },
+   {
+    "speaker": "user",
+    "text": "Clara moved to Portland 18 months ago.",
+    "turn_id": "tb-03:t4",
+    "dia_id": "D8:4",
+    "session": 8,
+    "session_datetime": "December 2024"
+   },
+   {
+    "speaker": "user",
+    "text": "Clara moved to Denver just now.",
+    "turn_id": "tb-03:t6",
+    "dia_id": "D8:6",
+    "session": 8,
+    "session_datetime": "December 2024"
+   },
+   {
+    "speaker": "user",
+    "text": "Clara has been talking about maybe switching city to Boston at some point, but nothing's decided.",
+    "turn_id": "tb-03:t7",
+    "dia_id": "D8:7",
+    "session": 8,
+    "session_datetime": "December 2024"
+   },
+   {
+    "speaker": "user",
+    "text": "Maya joined CrossFit 17 months ago.",
+    "turn_id": "tb-03:t8",
+    "dia_id": "D8:8",
+    "session": 8,
+    "session_datetime": "December 2024"
+   },
+   {
+    "speaker": "user",
+    "text": "Maya joined a yoga studio just now.",
+    "turn_id": "tb-03:t10",
+    "dia_id": "D8:10",
+    "session": 8,
+    "session_datetime": "December 2024"
+   },
+   {
+    "speaker": "user",
+    "text": "Maya became a lawyer 18 months ago.",
+    "turn_id": "tb-03:t11",
+    "dia_id": "D8:11",
+    "session": 8,
+    "session_datetime": "December 2024"
+   },
+   {
+    "speaker": "user",
+    "text": "Maya became a chef just now.",
+    "turn_id": "tb-03:t14",
+    "dia_id": "D8:14",
+    "session": 8,
+    "session_datetime": "December 2024"
+   },
+   {
+    "speaker": "user",
+    "text": "Nina started at a bank 18 months ago.",
+    "turn_id": "tb-03:t15",
+    "dia_id": "D8:15",
+    "session": 8,
+    "session_datetime": "December 2024"
+   },
+   {
+    "speaker": "user",
+    "text": "Nina started at a nonprofit just now.",
+    "turn_id": "tb-03:t18",
+    "dia_id": "D8:18",
+    "session": 8,
+    "session_datetime": "December 2024"
+   },
+   {
+    "speaker": "user",
+    "text": "Nina got a Tesla 18 months ago.",
+    "turn_id": "tb-03:t19",
+    "dia_id": "D8:19",
+    "session": 8,
+    "session_datetime": "December 2024"
+   },
+   {
+    "speaker": "user",
+    "text": "Nina got a Prius just now.",
+    "turn_id": "tb-03:t21",
+    "dia_id": "D8:21",
+    "session": 8,
+    "session_datetime": "December 2024"
+   },
+   {
+    "speaker": "user",
+    "text": "Nina has been talking about maybe switching car to a Civic at some point, but nothing's decided.",
+    "turn_id": "tb-03:t22",
+    "dia_id": "D8:22",
+    "session": 8,
+    "session_datetime": "December 2024"
+   },
+   {
+    "speaker": "friend",
+    "text": "Nothing too exciting on my end this week.",
+    "turn_id": "tb-03:t30",
+    "dia_id": "D8:30",
+    "session": 8,
+    "session_datetime": "December 2024"
+   },
+   {
+    "speaker": "friend",
+    "text": "We caught up over coffee for a couple hours.",
+    "turn_id": "tb-03:t38",
+    "dia_id": "D8:38",
+    "session": 8,
+    "session_datetime": "December 2024"
+   }
+  ],
+  "questions": [
+   {
+    "question": "What is Clara's current car?",
+    "answer": "a Tesla",
+    "category": "current-value",
+    "question_id": "tb-03:q0",
+    "entity": "Clara",
+    "attribute": "car"
+   },
+   {
+    "question": "What was Clara's car in September 2023?",
+    "answer": "a minivan",
+    "category": "as-of",
+    "question_id": "tb-03:q1",
+    "entity": "Clara",
+    "attribute": "car"
+   },
+   {
+    "question": "What was Clara's car in July 2024?",
+    "answer": "a pickup truck",
+    "category": "as-of",
+    "question_id": "tb-03:q2",
+    "entity": "Clara",
+    "attribute": "car"
+   },
+   {
+    "question": "What was Clara's car in March 2025?",
+    "answer": "a Tesla",
+    "category": "as-of",
+    "question_id": "tb-03:q3",
+    "entity": "Clara",
+    "attribute": "car"
+   },
+   {
+    "question": "List every car Clara has had over time, in order.",
+    "answer": "a minivan (from May 2023); a pickup truck (from February 2024); a Tesla (from December 2024)",
+    "category": "history",
+    "question_id": "tb-03:q4",
+    "entity": "Clara",
+    "attribute": "car"
+   },
+   {
+    "question": "What is Clara's current city?",
+    "answer": "Denver",
+    "category": "current-value",
+    "question_id": "tb-03:q5",
+    "entity": "Clara",
+    "attribute": "location"
+   },
+   {
+    "question": "What was Clara's city in October 2023?",
+    "answer": "Portland",
+    "category": "as-of",
+    "question_id": "tb-03:q6",
+    "entity": "Clara",
+    "attribute": "location"
+   },
+   {
+    "question": "What was Clara's city in August 2024?",
+    "answer": "Boston",
+    "category": "as-of",
+    "question_id": "tb-03:q7",
+    "entity": "Clara",
+    "attribute": "location"
+   },
+   {
+    "question": "What was Clara's city in April 2025?",
+    "answer": "Denver",
+    "category": "as-of",
+    "question_id": "tb-03:q8",
+    "entity": "Clara",
+    "attribute": "location"
+   },
+   {
+    "question": "List every city Clara has had over time, in order.",
+    "answer": "Portland (from June 2023); Boston (from March 2024); Denver (from January 2025)",
+    "category": "history",
+    "question_id": "tb-03:q9",
+    "entity": "Clara",
+    "attribute": "location"
+   },
+   {
+    "question": "What is Maya's current gym?",
+    "answer": "a yoga studio",
+    "category": "current-value",
+    "question_id": "tb-03:q10",
+    "entity": "Maya",
+    "attribute": "gym"
+   },
+   {
+    "question": "What was Maya's gym in November 2023?",
+    "answer": "CrossFit",
+    "category": "as-of",
+    "question_id": "tb-03:q11",
+    "entity": "Maya",
+    "attribute": "gym"
+   },
+   {
+    "question": "What was Maya's gym in September 2024?",
+    "answer": "the YMCA",
+    "category": "as-of",
+    "question_id": "tb-03:q12",
+    "entity": "Maya",
+    "attribute": "gym"
+   },
+   {
+    "question": "What was Maya's gym in May 2025?",
+    "answer": "a yoga studio",
+    "category": "as-of",
+    "question_id": "tb-03:q13",
+    "entity": "Maya",
+    "attribute": "gym"
+   },
+   {
+    "question": "List every gym Maya has had over time, in order.",
+    "answer": "CrossFit (from July 2023); the YMCA (from April 2024); a yoga studio (from February 2025)",
+    "category": "history",
+    "question_id": "tb-03:q14",
+    "entity": "Maya",
+    "attribute": "gym"
+   },
+   {
+    "question": "What was Maya's gym in January 2023?",
+    "answer": "no information available",
+    "category": "as-of-abstention",
+    "question_id": "tb-03:q15",
+    "entity": "Maya",
+    "attribute": "gym"
+   },
+   {
+    "question": "What is Maya's current job?",
+    "answer": "chef",
+    "category": "current-value",
+    "question_id": "tb-03:q16",
+    "entity": "Maya",
+    "attribute": "occupation"
+   },
+   {
+    "question": "What was Maya's job in October 2023?",
+    "answer": "lawyer",
+    "category": "as-of",
+    "question_id": "tb-03:q17",
+    "entity": "Maya",
+    "attribute": "occupation"
+   },
+   {
+    "question": "What was Maya's job in August 2024?",
+    "answer": "teacher",
+    "category": "as-of",
+    "question_id": "tb-03:q18",
+    "entity": "Maya",
+    "attribute": "occupation"
+   },
+   {
+    "question": "What was Maya's job in April 2025?",
+    "answer": "chef",
+    "category": "as-of",
+    "question_id": "tb-03:q19",
+    "entity": "Maya",
+    "attribute": "occupation"
+   },
+   {
+    "question": "List every job Maya has had over time, in order.",
+    "answer": "lawyer (from June 2023); teacher (from March 2024); chef (from January 2025)",
+    "category": "history",
+    "question_id": "tb-03:q20",
+    "entity": "Maya",
+    "attribute": "occupation"
+   },
+   {
+    "question": "What is Nina's current employer?",
+    "answer": "a nonprofit",
+    "category": "current-value",
+    "question_id": "tb-03:q21",
+    "entity": "Nina",
+    "attribute": "employer"
+   },
+   {
+    "question": "What was Nina's employer in October 2023?",
+    "answer": "a bank",
+    "category": "as-of",
+    "question_id": "tb-03:q22",
+    "entity": "Nina",
+    "attribute": "employer"
+   },
+   {
+    "question": "What was Nina's employer in August 2024?",
+    "answer": "a startup",
+    "category": "as-of",
+    "question_id": "tb-03:q23",
+    "entity": "Nina",
+    "attribute": "employer"
+   },
+   {
+    "question": "What was Nina's employer in April 2025?",
+    "answer": "a nonprofit",
+    "category": "as-of",
+    "question_id": "tb-03:q24",
+    "entity": "Nina",
+    "attribute": "employer"
+   },
+   {
+    "question": "List every employer Nina has had over time, in order.",
+    "answer": "a bank (from June 2023); a startup (from March 2024); a nonprofit (from January 2025)",
+    "category": "history",
+    "question_id": "tb-03:q25",
+    "entity": "Nina",
+    "attribute": "employer"
+   },
+   {
+    "question": "What is Nina's current car?",
+    "answer": "a Prius",
+    "category": "current-value",
+    "question_id": "tb-03:q26",
+    "entity": "Nina",
+    "attribute": "car"
+   },
+   {
+    "question": "What was Nina's car in October 2023?",
+    "answer": "a Tesla",
+    "category": "as-of",
+    "question_id": "tb-03:q27",
+    "entity": "Nina",
+    "attribute": "car"
+   },
+   {
+    "question": "What was Nina's car in August 2024?",
+    "answer": "a Jeep",
+    "category": "as-of",
+    "question_id": "tb-03:q28",
+    "entity": "Nina",
+    "attribute": "car"
+   },
+   {
+    "question": "What was Nina's car in April 2025?",
+    "answer": "a Prius",
+    "category": "as-of",
+    "question_id": "tb-03:q29",
+    "entity": "Nina",
+    "attribute": "car"
+   },
+   {
+    "question": "List every car Nina has had over time, in order.",
+    "answer": "a Tesla (from June 2023); a Jeep (from March 2024); a Prius (from January 2025)",
+    "category": "history",
+    "question_id": "tb-03:q30",
+    "entity": "Nina",
+    "attribute": "car"
+   }
+  ],
+  "speaker_a": "user",
+  "speaker_b": "friend",
+  "speakers": [
+   "user",
+   "friend"
+  ]
+ },
+ {
+  "conversation_id": "tb-04",
+  "turns": [
+   {
+    "speaker": "friend",
+    "text": "Nothing too exciting on my end this week.",
+    "turn_id": "tb-04:t24",
+    "dia_id": "D1:24",
+    "session": 1,
+    "session_datetime": "March 2023"
+   },
+   {
+    "speaker": "friend",
+    "text": "We caught up over coffee for a couple hours.",
+    "turn_id": "tb-04:t32",
+    "dia_id": "D1:32",
+    "session": 1,
+    "session_datetime": "March 2023"
+   },
+   {
+    "speaker": "friend",
+    "text": "Work has been busy but good.",
+    "turn_id": "tb-04:t40",
+    "dia_id": "D1:40",
+    "session": 1,
+    "session_datetime": "March 2023"
+   },
+   {
+    "speaker": "user",
+    "text": "Lena has been talking about maybe switching relationship status to single at some point, but nothing's decided.",
+    "turn_id": "tb-04:t13",
+    "dia_id": "D2:13",
+    "session": 2,
+    "session_datetime": "June 2023"
+   },
+   {
+    "speaker": "friend",
+    "text": "The weather has been all over the place lately.",
+    "turn_id": "tb-04:t25",
+    "dia_id": "D2:25",
+    "session": 2,
+    "session_datetime": "June 2023"
+   },
+   {
+    "speaker": "friend",
+    "text": "I've been meaning to call more often, honestly.",
+    "turn_id": "tb-04:t33",
+    "dia_id": "D2:33",
+    "session": 2,
+    "session_datetime": "June 2023"
+   },
+   {
+    "speaker": "friend",
+    "text": "We laughed about old times for a while.",
+    "turn_id": "tb-04:t41",
+    "dia_id": "D2:41",
+    "session": 2,
+    "session_datetime": "June 2023"
+   },
+   {
+    "speaker": "friend",
+    "text": "We caught up over coffee for a couple hours.",
+    "turn_id": "tb-04:t26",
+    "dia_id": "D3:26",
+    "session": 3,
+    "session_datetime": "September 2023"
+   },
+   {
+    "speaker": "friend",
+    "text": "Work has been busy but good.",
+    "turn_id": "tb-04:t34",
+    "dia_id": "D3:34",
+    "session": 3,
+    "session_datetime": "September 2023"
+   },
+   {
+    "speaker": "friend",
+    "text": "Nothing too exciting on my end this week.",
+    "turn_id": "tb-04:t42",
+    "dia_id": "D3:42",
+    "session": 3,
+    "session_datetime": "September 2023"
+   },
+   {
+    "speaker": "friend",
+    "text": "I've been meaning to call more often, honestly.",
+    "turn_id": "tb-04:t27",
+    "dia_id": "D4:27",
+    "session": 4,
+    "session_datetime": "December 2023"
+   },
+   {
+    "speaker": "friend",
+    "text": "We laughed about old times for a while.",
+    "turn_id": "tb-04:t35",
+    "dia_id": "D4:35",
+    "session": 4,
+    "session_datetime": "December 2023"
+   },
+   {
+    "speaker": "friend",
+    "text": "The weather has been all over the place lately.",
+    "turn_id": "tb-04:t43",
+    "dia_id": "D4:43",
+    "session": 4,
+    "session_datetime": "December 2023"
+   },
+   {
+    "speaker": "user",
+    "text": "Kofi got into pho just now.",
+    "turn_id": "tb-04:t1",
+    "dia_id": "D5:1",
+    "session": 5,
+    "session_datetime": "March 2024"
+   },
+   {
+    "speaker": "user",
+    "text": "Kofi has been talking about maybe switching favorite food to sushi at some point, but nothing's decided.",
+    "turn_id": "tb-04:t2",
+    "dia_id": "D5:2",
+    "session": 5,
+    "session_datetime": "March 2024"
+   },
+   {
+    "speaker": "user",
+    "text": "Kofi started at Stripe just now.",
+    "turn_id": "tb-04:t5",
+    "dia_id": "D5:5",
+    "session": 5,
+    "session_datetime": "March 2024"
+   },
+   {
+    "speaker": "user",
+    "text": "Lena moved to Austin just now.",
+    "turn_id": "tb-04:t9",
+    "dia_id": "D5:9",
+    "session": 5,
+    "session_datetime": "March 2024"
+   },
+   {
+    "speaker": "user",
+    "text": "Lena flew to Denver for a work conference last week, just a short trip.",
+    "turn_id": "tb-04:t10",
+    "dia_id": "D5:10",
+    "session": 5,
+    "session_datetime": "March 2024"
+   },
+   {
+    "speaker": "user",
+    "text": "Lena became single just now.",
+    "turn_id": "tb-04:t14",
+    "dia_id": "D5:14",
+    "session": 5,
+    "session_datetime": "March 2024"
+   },
+   {
+    "speaker": "user",
+    "text": "Marcus became a analyst just now.",
+    "turn_id": "tb-04:t17",
+    "dia_id": "D5:17",
+    "session": 5,
+    "session_datetime": "March 2024"
+   },
+   {
+    "speaker": "user",
+    "text": "Marcus has been talking about maybe switching job to nurse at some point, but nothing's decided.",
+    "turn_id": "tb-04:t18",
+    "dia_id": "D5:18",
+    "session": 5,
+    "session_datetime": "March 2024"
+   },
+   {
+    "speaker": "user",
+    "text": "Marcus got into curry just now.",
+    "turn_id": "tb-04:t21",
+    "dia_id": "D5:21",
+    "session": 5,
+    "session_datetime": "March 2024"
+   },
+   {
+    "speaker": "friend",
+    "text": "Work has been busy but good.",
+    "turn_id": "tb-04:t28",
+    "dia_id": "D5:28",
+    "session": 5,
+    "session_datetime": "March 2024"
+   },
+   {
+    "speaker": "friend",
+    "text": "Nothing too exciting on my end this week.",
+    "turn_id": "tb-04:t36",
+    "dia_id": "D5:36",
+    "session": 5,
+    "session_datetime": "March 2024"
+   },
+   {
+    "speaker": "friend",
+    "text": "We caught up over coffee for a couple hours.",
+    "turn_id": "tb-04:t44",
+    "dia_id": "D5:44",
+    "session": 5,
+    "session_datetime": "March 2024"
+   },
+   {
+    "speaker": "friend",
+    "text": "We laughed about old times for a while.",
+    "turn_id": "tb-04:t29",
+    "dia_id": "D6:29",
+    "session": 6,
+    "session_datetime": "June 2024"
+   },
+   {
+    "speaker": "friend",
+    "text": "The weather has been all over the place lately.",
+    "turn_id": "tb-04:t37",
+    "dia_id": "D6:37",
+    "session": 6,
+    "session_datetime": "June 2024"
+   },
+   {
+    "speaker": "friend",
+    "text": "I've been meaning to call more often, honestly.",
+    "turn_id": "tb-04:t45",
+    "dia_id": "D6:45",
+    "session": 6,
+    "session_datetime": "June 2024"
+   },
+   {
+    "speaker": "friend",
+    "text": "Nothing too exciting on my end this week.",
+    "turn_id": "tb-04:t30",
+    "dia_id": "D7:30",
+    "session": 7,
+    "session_datetime": "September 2024"
+   },
+   {
+    "speaker": "friend",
+    "text": "We caught up over coffee for a couple hours.",
+    "turn_id": "tb-04:t38",
+    "dia_id": "D7:38",
+    "session": 7,
+    "session_datetime": "September 2024"
+   },
+   {
+    "speaker": "friend",
+    "text": "Work has been busy but good.",
+    "turn_id": "tb-04:t46",
+    "dia_id": "D7:46",
+    "session": 7,
+    "session_datetime": "September 2024"
+   },
+   {
+    "speaker": "user",
+    "text": "Kofi got into barbecue 18 months ago.",
+    "turn_id": "tb-04:t0",
+    "dia_id": "D8:0",
+    "session": 8,
+    "session_datetime": "December 2024"
+   },
+   {
+    "speaker": "user",
+    "text": "Kofi got into ramen just now.",
+    "turn_id": "tb-04:t3",
+    "dia_id": "D8:3",
+    "session": 8,
+    "session_datetime": "December 2024"
+   },
+   {
+    "speaker": "user",
+    "text": "Kofi started at Netflix 18 months ago.",
+    "turn_id": "tb-04:t4",
+    "dia_id": "D8:4",
+    "session": 8,
+    "session_datetime": "December 2024"
+   },
+   {
+    "speaker": "user",
+    "text": "Kofi started at IBM just now.",
+    "turn_id": "tb-04:t6",
+    "dia_id": "D8:6",
+    "session": 8,
+    "session_datetime": "December 2024"
+   },
+   {
+    "speaker": "user",
+    "text": "Kofi has been talking about maybe switching employer to Google at some point, but nothing's decided.",
+    "turn_id": "tb-04:t7",
+    "dia_id": "D8:7",
+    "session": 8,
+    "session_datetime": "December 2024"
+   },
+   {
+    "speaker": "user",
+    "text": "Lena moved to Atlanta 18 months ago.",
+    "turn_id": "tb-04:t8",
+    "dia_id": "D8:8",
+    "session": 8,
+    "session_datetime": "December 2024"
+   },
+   {
+    "speaker": "user",
+    "text": "Lena moved to Portland just now.",
+    "turn_id": "tb-04:t11",
+    "dia_id": "D8:11",
+    "session": 8,
+    "session_datetime": "December 2024"
+   },
+   {
+    "speaker": "user",
+    "text": "Lena became engaged 18 months ago.",
+    "turn_id": "tb-04:t12",
+    "dia_id": "D8:12",
+    "session": 8,
+    "session_datetime": "December 2024"
+   },
+   {
+    "speaker": "user",
+    "text": "Lena became married just now.",
+    "turn_id": "tb-04:t15",
+    "dia_id": "D8:15",
+    "session": 8,
+    "session_datetime": "December 2024"
+   },
+   {
+    "speaker": "user",
+    "text": "Marcus became a nurse 18 months ago.",
+    "turn_id": "tb-04:t16",
+    "dia_id": "D8:16",
+    "session": 8,
+    "session_datetime": "December 2024"
+   },
+   {
+    "speaker": "user",
+    "text": "Marcus became a lawyer just now.",
+    "turn_id": "tb-04:t19",
+    "dia_id": "D8:19",
+    "session": 8,
+    "session_datetime": "December 2024"
+   },
+   {
+    "speaker": "user",
+    "text": "Marcus got into tacos 17 months ago.",
+    "turn_id": "tb-04:t20",
+    "dia_id": "D8:20",
+    "session": 8,
+    "session_datetime": "December 2024"
+   },
+   {
+    "speaker": "user",
+    "text": "Marcus got into sushi just now.",
+    "turn_id": "tb-04:t22",
+    "dia_id": "D8:22",
+    "session": 8,
+    "session_datetime": "December 2024"
+   },
+   {
+    "speaker": "user",
+    "text": "Marcus has been talking about maybe switching favorite food to tacos at some point, but nothing's decided.",
+    "turn_id": "tb-04:t23",
+    "dia_id": "D8:23",
+    "session": 8,
+    "session_datetime": "December 2024"
+   },
+   {
+    "speaker": "friend",
+    "text": "The weather has been all over the place lately.",
+    "turn_id": "tb-04:t31",
+    "dia_id": "D8:31",
+    "session": 8,
+    "session_datetime": "December 2024"
+   },
+   {
+    "speaker": "friend",
+    "text": "I've been meaning to call more often, honestly.",
+    "turn_id": "tb-04:t39",
+    "dia_id": "D8:39",
+    "session": 8,
+    "session_datetime": "December 2024"
+   },
+   {
+    "speaker": "friend",
+    "text": "We laughed about old times for a while.",
+    "turn_id": "tb-04:t47",
+    "dia_id": "D8:47",
+    "session": 8,
+    "session_datetime": "December 2024"
+   }
+  ],
+  "questions": [
+   {
+    "question": "What is Kofi's current favorite food?",
+    "answer": "ramen",
+    "category": "current-value",
+    "question_id": "tb-04:q0",
+    "entity": "Kofi",
+    "attribute": "favorite_food"
+   },
+   {
+    "question": "What was Kofi's favorite food in October 2023?",
+    "answer": "barbecue",
+    "category": "as-of",
+    "question_id": "tb-04:q1",
+    "entity": "Kofi",
+    "attribute": "favorite_food"
+   },
+   {
+    "question": "What was Kofi's favorite food in August 2024?",
+    "answer": "pho",
+    "category": "as-of",
+    "question_id": "tb-04:q2",
+    "entity": "Kofi",
+    "attribute": "favorite_food"
+   },
+   {
+    "question": "What was Kofi's favorite food in April 2025?",
+    "answer": "ramen",
+    "category": "as-of",
+    "question_id": "tb-04:q3",
+    "entity": "Kofi",
+    "attribute": "favorite_food"
+   },
+   {
+    "question": "List every favorite food Kofi has had over time, in order.",
+    "answer": "barbecue (from June 2023); pho (from March 2024); ramen (from January 2025)",
+    "category": "history",
+    "question_id": "tb-04:q4",
+    "entity": "Kofi",
+    "attribute": "favorite_food"
+   },
+   {
+    "question": "What is Kofi's current employer?",
+    "answer": "IBM",
+    "category": "current-value",
+    "question_id": "tb-04:q5",
+    "entity": "Kofi",
+    "attribute": "employer"
+   },
+   {
+    "question": "What was Kofi's employer in October 2023?",
+    "answer": "Netflix",
+    "category": "as-of",
+    "question_id": "tb-04:q6",
+    "entity": "Kofi",
+    "attribute": "employer"
+   },
+   {
+    "question": "What was Kofi's employer in August 2024?",
+    "answer": "Stripe",
+    "category": "as-of",
+    "question_id": "tb-04:q7",
+    "entity": "Kofi",
+    "attribute": "employer"
+   },
+   {
+    "question": "What was Kofi's employer in April 2025?",
+    "answer": "IBM",
+    "category": "as-of",
+    "question_id": "tb-04:q8",
+    "entity": "Kofi",
+    "attribute": "employer"
+   },
+   {
+    "question": "List every employer Kofi has had over time, in order.",
+    "answer": "Netflix (from June 2023); Stripe (from March 2024); IBM (from January 2025)",
+    "category": "history",
+    "question_id": "tb-04:q9",
+    "entity": "Kofi",
+    "attribute": "employer"
+   },
+   {
+    "question": "What is Lena's current city?",
+    "answer": "Portland",
+    "category": "current-value",
+    "question_id": "tb-04:q10",
+    "entity": "Lena",
+    "attribute": "location"
+   },
+   {
+    "question": "What was Lena's city in October 2023?",
+    "answer": "Atlanta",
+    "category": "as-of",
+    "question_id": "tb-04:q11",
+    "entity": "Lena",
+    "attribute": "location"
+   },
+   {
+    "question": "What was Lena's city in August 2024?",
+    "answer": "Austin",
+    "category": "as-of",
+    "question_id": "tb-04:q12",
+    "entity": "Lena",
+    "attribute": "location"
+   },
+   {
+    "question": "What was Lena's city in April 2025?",
+    "answer": "Portland",
+    "category": "as-of",
+    "question_id": "tb-04:q13",
+    "entity": "Lena",
+    "attribute": "location"
+   },
+   {
+    "question": "List every city Lena has had over time, in order.",
+    "answer": "Atlanta (from June 2023); Austin (from March 2024); Portland (from January 2025)",
+    "category": "history",
+    "question_id": "tb-04:q14",
+    "entity": "Lena",
+    "attribute": "location"
+   },
+   {
+    "question": "What is Lena's current relationship status?",
+    "answer": "married",
+    "category": "current-value",
+    "question_id": "tb-04:q15",
+    "entity": "Lena",
+    "attribute": "relationship_status"
+   },
+   {
+    "question": "What was Lena's relationship status in October 2023?",
+    "answer": "engaged",
+    "category": "as-of",
+    "question_id": "tb-04:q16",
+    "entity": "Lena",
+    "attribute": "relationship_status"
+   },
+   {
+    "question": "What was Lena's relationship status in August 2024?",
+    "answer": "single",
+    "category": "as-of",
+    "question_id": "tb-04:q17",
+    "entity": "Lena",
+    "attribute": "relationship_status"
+   },
+   {
+    "question": "What was Lena's relationship status in April 2025?",
+    "answer": "married",
+    "category": "as-of",
+    "question_id": "tb-04:q18",
+    "entity": "Lena",
+    "attribute": "relationship_status"
+   },
+   {
+    "question": "List every relationship status Lena has had over time, in order.",
+    "answer": "engaged (from June 2023); single (from March 2024); married (from January 2025)",
+    "category": "history",
+    "question_id": "tb-04:q19",
+    "entity": "Lena",
+    "attribute": "relationship_status"
+   },
+   {
+    "question": "What is Marcus's current job?",
+    "answer": "lawyer",
+    "category": "current-value",
+    "question_id": "tb-04:q20",
+    "entity": "Marcus",
+    "attribute": "occupation"
+   },
+   {
+    "question": "What was Marcus's job in October 2023?",
+    "answer": "nurse",
+    "category": "as-of",
+    "question_id": "tb-04:q21",
+    "entity": "Marcus",
+    "attribute": "occupation"
+   },
+   {
+    "question": "What was Marcus's job in August 2024?",
+    "answer": "analyst",
+    "category": "as-of",
+    "question_id": "tb-04:q22",
+    "entity": "Marcus",
+    "attribute": "occupation"
+   },
+   {
+    "question": "What was Marcus's job in April 2025?",
+    "answer": "lawyer",
+    "category": "as-of",
+    "question_id": "tb-04:q23",
+    "entity": "Marcus",
+    "attribute": "occupation"
+   },
+   {
+    "question": "List every job Marcus has had over time, in order.",
+    "answer": "nurse (from June 2023); analyst (from March 2024); lawyer (from January 2025)",
+    "category": "history",
+    "question_id": "tb-04:q24",
+    "entity": "Marcus",
+    "attribute": "occupation"
+   },
+   {
+    "question": "What is Marcus's current favorite food?",
+    "answer": "sushi",
+    "category": "current-value",
+    "question_id": "tb-04:q25",
+    "entity": "Marcus",
+    "attribute": "favorite_food"
+   },
+   {
+    "question": "What was Marcus's favorite food in November 2023?",
+    "answer": "tacos",
+    "category": "as-of",
+    "question_id": "tb-04:q26",
+    "entity": "Marcus",
+    "attribute": "favorite_food"
+   },
+   {
+    "question": "What was Marcus's favorite food in September 2024?",
+    "answer": "curry",
+    "category": "as-of",
+    "question_id": "tb-04:q27",
+    "entity": "Marcus",
+    "attribute": "favorite_food"
+   },
+   {
+    "question": "What was Marcus's favorite food in May 2025?",
+    "answer": "sushi",
+    "category": "as-of",
+    "question_id": "tb-04:q28",
+    "entity": "Marcus",
+    "attribute": "favorite_food"
+   },
+   {
+    "question": "List every favorite food Marcus has had over time, in order.",
+    "answer": "tacos (from July 2023); curry (from April 2024); sushi (from February 2025)",
+    "category": "history",
+    "question_id": "tb-04:q29",
+    "entity": "Marcus",
+    "attribute": "favorite_food"
+   },
+   {
+    "question": "What was Marcus's favorite food in January 2023?",
+    "answer": "no information available",
+    "category": "as-of-abstention",
+    "question_id": "tb-04:q30",
+    "entity": "Marcus",
+    "attribute": "favorite_food"
+   }
+  ],
+  "speaker_a": "user",
+  "speaker_b": "friend",
+  "speakers": [
+   "user",
+   "friend"
+  ]
+ },
+ {
+  "conversation_id": "tb-05",
+  "turns": [
+   {
+    "speaker": "friend",
+    "text": "The weather has been all over the place lately.",
+    "turn_id": "tb-05:t23",
+    "dia_id": "D1:23",
+    "session": 1,
+    "session_datetime": "March 2023"
+   },
+   {
+    "speaker": "friend",
+    "text": "I've been meaning to call more often, honestly.",
+    "turn_id": "tb-05:t31",
+    "dia_id": "D1:31",
+    "session": 1,
+    "session_datetime": "March 2023"
+   },
+   {
+    "speaker": "friend",
+    "text": "We laughed about old times for a while.",
+    "turn_id": "tb-05:t39",
+    "dia_id": "D1:39",
+    "session": 1,
+    "session_datetime": "March 2023"
+   },
+   {
+    "speaker": "user",
+    "text": "Theo has been talking about maybe switching car to a Civic at some point, but nothing's decided.",
+    "turn_id": "tb-05:t12",
+    "dia_id": "D2:12",
+    "session": 2,
+    "session_datetime": "June 2023"
+   },
+   {
+    "speaker": "friend",
+    "text": "We caught up over coffee for a couple hours.",
+    "turn_id": "tb-05:t24",
+    "dia_id": "D2:24",
+    "session": 2,
+    "session_datetime": "June 2023"
+   },
+   {
+    "speaker": "friend",
+    "text": "Work has been busy but good.",
+    "turn_id": "tb-05:t32",
+    "dia_id": "D2:32",
+    "session": 2,
+    "session_datetime": "June 2023"
+   },
+   {
+    "speaker": "friend",
+    "text": "Nothing too exciting on my end this week.",
+    "turn_id": "tb-05:t40",
+    "dia_id": "D2:40",
+    "session": 2,
+    "session_datetime": "June 2023"
+   },
+   {
+    "speaker": "friend",
+    "text": "I've been meaning to call more often, honestly.",
+    "turn_id": "tb-05:t25",
+    "dia_id": "D3:25",
+    "session": 3,
+    "session_datetime": "September 2023"
+   },
+   {
+    "speaker": "friend",
+    "text": "We laughed about old times for a while.",
+    "turn_id": "tb-05:t33",
+    "dia_id": "D3:33",
+    "session": 3,
+    "session_datetime": "September 2023"
+   },
+   {
+    "speaker": "friend",
+    "text": "The weather has been all over the place lately.",
+    "turn_id": "tb-05:t41",
+    "dia_id": "D3:41",
+    "session": 3,
+    "session_datetime": "September 2023"
+   },
+   {
+    "speaker": "user",
+    "text": "Priya joined Planet Fitness just now.",
+    "turn_id": "tb-05:t1",
+    "dia_id": "D4:1",
+    "session": 4,
+    "session_datetime": "December 2023"
+   },
+   {
+    "speaker": "user",
+    "text": "Priya has been talking about maybe switching gym to CrossFit at some point, but nothing's decided.",
+    "turn_id": "tb-05:t2",
+    "dia_id": "D4:2",
+    "session": 4,
+    "session_datetime": "December 2023"
+   },
+   {
+    "speaker": "friend",
+    "text": "Work has been busy but good.",
+    "turn_id": "tb-05:t26",
+    "dia_id": "D4:26",
+    "session": 4,
+    "session_datetime": "December 2023"
+   },
+   {
+    "speaker": "friend",
+    "text": "Nothing too exciting on my end this week.",
+    "turn_id": "tb-05:t34",
+    "dia_id": "D4:34",
+    "session": 4,
+    "session_datetime": "December 2023"
+   },
+   {
+    "speaker": "friend",
+    "text": "We caught up over coffee for a couple hours.",
+    "turn_id": "tb-05:t42",
+    "dia_id": "D4:42",
+    "session": 4,
+    "session_datetime": "December 2023"
+   },
+   {
+    "speaker": "user",
+    "text": "Priya became a designer just now.",
+    "turn_id": "tb-05:t5",
+    "dia_id": "D5:5",
+    "session": 5,
+    "session_datetime": "March 2024"
+   },
+   {
+    "speaker": "user",
+    "text": "Theo started at Amazon just now.",
+    "turn_id": "tb-05:t9",
+    "dia_id": "D5:9",
+    "session": 5,
+    "session_datetime": "March 2024"
+   },
+   {
+    "speaker": "user",
+    "text": "Theo got a minivan just now.",
+    "turn_id": "tb-05:t13",
+    "dia_id": "D5:13",
+    "session": 5,
+    "session_datetime": "March 2024"
+   },
+   {
+    "speaker": "user",
+    "text": "Clara became engaged just now.",
+    "turn_id": "tb-05:t16",
+    "dia_id": "D5:16",
+    "session": 5,
+    "session_datetime": "March 2024"
+   },
+   {
+    "speaker": "user",
+    "text": "Clara has been talking about maybe switching relationship status to single at some point, but nothing's decided.",
+    "turn_id": "tb-05:t17",
+    "dia_id": "D5:17",
+    "session": 5,
+    "session_datetime": "March 2024"
+   },
+   {
+    "speaker": "user",
+    "text": "Clara joined a yoga studio just now.",
+    "turn_id": "tb-05:t20",
+    "dia_id": "D5:20",
+    "session": 5,
+    "session_datetime": "March 2024"
+   },
+   {
+    "speaker": "friend",
+    "text": "We laughed about old times for a while.",
+    "turn_id": "tb-05:t27",
+    "dia_id": "D5:27",
+    "session": 5,
+    "session_datetime": "March 2024"
+   },
+   {
+    "speaker": "friend",
+    "text": "The weather has been all over the place lately.",
+    "turn_id": "tb-05:t35",
+    "dia_id": "D5:35",
+    "session": 5,
+    "session_datetime": "March 2024"
+   },
+   {
+    "speaker": "friend",
+    "text": "I've been meaning to call more often, honestly.",
+    "turn_id": "tb-05:t43",
+    "dia_id": "D5:43",
+    "session": 5,
+    "session_datetime": "March 2024"
+   },
+   {
+    "speaker": "friend",
+    "text": "Nothing too exciting on my end this week.",
+    "turn_id": "tb-05:t28",
+    "dia_id": "D6:28",
+    "session": 6,
+    "session_datetime": "June 2024"
+   },
+   {
+    "speaker": "friend",
+    "text": "We caught up over coffee for a couple hours.",
+    "turn_id": "tb-05:t36",
+    "dia_id": "D6:36",
+    "session": 6,
+    "session_datetime": "June 2024"
+   },
+   {
+    "speaker": "friend",
+    "text": "Work has been busy but good.",
+    "turn_id": "tb-05:t44",
+    "dia_id": "D6:44",
+    "session": 6,
+    "session_datetime": "June 2024"
+   },
+   {
+    "speaker": "user",
+    "text": "Priya joined Equinox just now.",
+    "turn_id": "tb-05:t3",
+    "dia_id": "D7:3",
+    "session": 7,
+    "session_datetime": "September 2024"
+   },
+   {
+    "speaker": "friend",
+    "text": "The weather has been all over the place lately.",
+    "turn_id": "tb-05:t29",
+    "dia_id": "D7:29",
+    "session": 7,
+    "session_datetime": "September 2024"
+   },
+   {
+    "speaker": "friend",
+    "text": "I've been meaning to call more often, honestly.",
+    "turn_id": "tb-05:t37",
+    "dia_id": "D7:37",
+    "session": 7,
+    "session_datetime": "September 2024"
+   },
+   {
+    "speaker": "friend",
+    "text": "We laughed about old times for a while.",
+    "turn_id": "tb-05:t45",
+    "dia_id": "D7:45",
+    "session": 7,
+    "session_datetime": "September 2024"
+   },
+   {
+    "speaker": "user",
+    "text": "Priya joined a yoga studio 20 months ago.",
+    "turn_id": "tb-05:t0",
+    "dia_id": "D8:0",
+    "session": 8,
+    "session_datetime": "December 2024"
+   },
+   {
+    "speaker": "user",
+    "text": "Priya became a barista 18 months ago.",
+    "turn_id": "tb-05:t4",
+    "dia_id": "D8:4",
+    "session": 8,
+    "session_datetime": "December 2024"
+   },
+   {
+    "speaker": "user",
+    "text": "Priya became a pilot just now.",
+    "turn_id": "tb-05:t6",
+    "dia_id": "D8:6",
+    "session": 8,
+    "session_datetime": "December 2024"
+   },
+   {
+    "speaker": "user",
+    "text": "Priya has been talking about maybe switching job to nurse at some point, but nothing's decided.",
+    "turn_id": "tb-05:t7",
+    "dia_id": "D8:7",
+    "session": 8,
+    "session_datetime": "December 2024"
+   },
+   {
+    "speaker": "user",
+    "text": "Theo started at Google 18 months ago.",
+    "turn_id": "tb-05:t8",
+    "dia_id": "D8:8",
+    "session": 8,
+    "session_datetime": "December 2024"
+   },
+   {
+    "speaker": "user",
+    "text": "Theo started at Netflix just now.",
+    "turn_id": "tb-05:t10",
+    "dia_id": "D8:10",
+    "session": 8,
+    "session_datetime": "December 2024"
+   },
+   {
+    "speaker": "user",
+    "text": "Theo got a pickup truck 18 months ago.",
+    "turn_id": "tb-05:t11",
+    "dia_id": "D8:11",
+    "session": 8,
+    "session_datetime": "December 2024"
+   },
+   {
+    "speaker": "user",
+    "text": "Theo got a Jeep just now.",
+    "turn_id": "tb-05:t14",
+    "dia_id": "D8:14",
+    "session": 8,
+    "session_datetime": "December 2024"
+   },
+   {
+    "speaker": "user",
+    "text": "Clara became divorced 18 months ago.",
+    "turn_id": "tb-05:t15",
+    "dia_id": "D8:15",
+    "session": 8,
+    "session_datetime": "December 2024"
+   },
+   {
+    "speaker": "user",
+    "text": "Clara became single just now.",
+    "turn_id": "tb-05:t18",
+    "dia_id": "D8:18",
+    "session": 8,
+    "session_datetime": "December 2024"
+   },
+   {
+    "speaker": "user",
+    "text": "Clara joined the YMCA 16 months ago.",
+    "turn_id": "tb-05:t19",
+    "dia_id": "D8:19",
+    "session": 8,
+    "session_datetime": "December 2024"
+   },
+   {
+    "speaker": "user",
+    "text": "Clara joined Planet Fitness just now.",
+    "turn_id": "tb-05:t21",
+    "dia_id": "D8:21",
+    "session": 8,
+    "session_datetime": "December 2024"
+   },
+   {
+    "speaker": "user",
+    "text": "Clara has been talking about maybe switching gym to CrossFit at some point, but nothing's decided.",
+    "turn_id": "tb-05:t22",
+    "dia_id": "D8:22",
+    "session": 8,
+    "session_datetime": "December 2024"
+   },
+   {
+    "speaker": "friend",
+    "text": "We caught up over coffee for a couple hours.",
+    "turn_id": "tb-05:t30",
+    "dia_id": "D8:30",
+    "session": 8,
+    "session_datetime": "December 2024"
+   },
+   {
+    "speaker": "friend",
+    "text": "Work has been busy but good.",
+    "turn_id": "tb-05:t38",
+    "dia_id": "D8:38",
+    "session": 8,
+    "session_datetime": "December 2024"
+   }
+  ],
+  "questions": [
+   {
+    "question": "What is Priya's current gym?",
+    "answer": "Equinox",
+    "category": "current-value",
+    "question_id": "tb-05:q0",
+    "entity": "Priya",
+    "attribute": "gym"
+   },
+   {
+    "question": "What was Priya's gym in August 2023?",
+    "answer": "a yoga studio",
+    "category": "as-of",
+    "question_id": "tb-05:q1",
+    "entity": "Priya",
+    "attribute": "gym"
+   },
+   {
+    "question": "What was Priya's gym in June 2024?",
+    "answer": "Planet Fitness",
+    "category": "as-of",
+    "question_id": "tb-05:q2",
+    "entity": "Priya",
+    "attribute": "gym"
+   },
+   {
+    "question": "What was Priya's gym in February 2025?",
+    "answer": "Equinox",
+    "category": "as-of",
+    "question_id": "tb-05:q3",
+    "entity": "Priya",
+    "attribute": "gym"
+   },
+   {
+    "question": "List every gym Priya has had over time, in order.",
+    "answer": "a yoga studio (from April 2023); Planet Fitness (from January 2024); Equinox (from November 2024)",
+    "category": "history",
+    "question_id": "tb-05:q4",
+    "entity": "Priya",
+    "attribute": "gym"
+   },
+   {
+    "question": "What is Priya's current job?",
+    "answer": "pilot",
+    "category": "current-value",
+    "question_id": "tb-05:q5",
+    "entity": "Priya",
+    "attribute": "occupation"
+   },
+   {
+    "question": "What was Priya's job in October 2023?",
+    "answer": "barista",
+    "category": "as-of",
+    "question_id": "tb-05:q6",
+    "entity": "Priya",
+    "attribute": "occupation"
+   },
+   {
+    "question": "What was Priya's job in August 2024?",
+    "answer": "designer",
+    "category": "as-of",
+    "question_id": "tb-05:q7",
+    "entity": "Priya",
+    "attribute": "occupation"
+   },
+   {
+    "question": "What was Priya's job in April 2025?",
+    "answer": "pilot",
+    "category": "as-of",
+    "question_id": "tb-05:q8",
+    "entity": "Priya",
+    "attribute": "occupation"
+   },
+   {
+    "question": "List every job Priya has had over time, in order.",
+    "answer": "barista (from June 2023); designer (from March 2024); pilot (from January 2025)",
+    "category": "history",
+    "question_id": "tb-05:q9",
+    "entity": "Priya",
+    "attribute": "occupation"
+   },
+   {
+    "question": "What is Theo's current employer?",
+    "answer": "Netflix",
+    "category": "current-value",
+    "question_id": "tb-05:q10",
+    "entity": "Theo",
+    "attribute": "employer"
+   },
+   {
+    "question": "What was Theo's employer in October 2023?",
+    "answer": "Google",
+    "category": "as-of",
+    "question_id": "tb-05:q11",
+    "entity": "Theo",
+    "attribute": "employer"
+   },
+   {
+    "question": "What was Theo's employer in August 2024?",
+    "answer": "Amazon",
+    "category": "as-of",
+    "question_id": "tb-05:q12",
+    "entity": "Theo",
+    "attribute": "employer"
+   },
+   {
+    "question": "What was Theo's employer in April 2025?",
+    "answer": "Netflix",
+    "category": "as-of",
+    "question_id": "tb-05:q13",
+    "entity": "Theo",
+    "attribute": "employer"
+   },
+   {
+    "question": "List every employer Theo has had over time, in order.",
+    "answer": "Google (from June 2023); Amazon (from March 2024); Netflix (from January 2025)",
+    "category": "history",
+    "question_id": "tb-05:q14",
+    "entity": "Theo",
+    "attribute": "employer"
+   },
+   {
+    "question": "What is Theo's current car?",
+    "answer": "a Jeep",
+    "category": "current-value",
+    "question_id": "tb-05:q15",
+    "entity": "Theo",
+    "attribute": "car"
+   },
+   {
+    "question": "What was Theo's car in October 2023?",
+    "answer": "a pickup truck",
+    "category": "as-of",
+    "question_id": "tb-05:q16",
+    "entity": "Theo",
+    "attribute": "car"
+   },
+   {
+    "question": "What was Theo's car in August 2024?",
+    "answer": "a minivan",
+    "category": "as-of",
+    "question_id": "tb-05:q17",
+    "entity": "Theo",
+    "attribute": "car"
+   },
+   {
+    "question": "What was Theo's car in April 2025?",
+    "answer": "a Jeep",
+    "category": "as-of",
+    "question_id": "tb-05:q18",
+    "entity": "Theo",
+    "attribute": "car"
+   },
+   {
+    "question": "List every car Theo has had over time, in order.",
+    "answer": "a pickup truck (from June 2023); a minivan (from March 2024); a Jeep (from January 2025)",
+    "category": "history",
+    "question_id": "tb-05:q19",
+    "entity": "Theo",
+    "attribute": "car"
+   },
+   {
+    "question": "What is Clara's current relationship status?",
+    "answer": "single",
+    "category": "current-value",
+    "question_id": "tb-05:q20",
+    "entity": "Clara",
+    "attribute": "relationship_status"
+   },
+   {
+    "question": "What was Clara's relationship status in October 2023?",
+    "answer": "divorced",
+    "category": "as-of",
+    "question_id": "tb-05:q21",
+    "entity": "Clara",
+    "attribute": "relationship_status"
+   },
+   {
+    "question": "What was Clara's relationship status in August 2024?",
+    "answer": "engaged",
+    "category": "as-of",
+    "question_id": "tb-05:q22",
+    "entity": "Clara",
+    "attribute": "relationship_status"
+   },
+   {
+    "question": "What was Clara's relationship status in April 2025?",
+    "answer": "single",
+    "category": "as-of",
+    "question_id": "tb-05:q23",
+    "entity": "Clara",
+    "attribute": "relationship_status"
+   },
+   {
+    "question": "List every relationship status Clara has had over time, in order.",
+    "answer": "divorced (from June 2023); engaged (from March 2024); single (from January 2025)",
+    "category": "history",
+    "question_id": "tb-05:q24",
+    "entity": "Clara",
+    "attribute": "relationship_status"
+   },
+   {
+    "question": "What is Clara's current gym?",
+    "answer": "Planet Fitness",
+    "category": "current-value",
+    "question_id": "tb-05:q25",
+    "entity": "Clara",
+    "attribute": "gym"
+   },
+   {
+    "question": "What was Clara's gym in December 2023?",
+    "answer": "the YMCA",
+    "category": "as-of",
+    "question_id": "tb-05:q26",
+    "entity": "Clara",
+    "attribute": "gym"
+   },
+   {
+    "question": "What was Clara's gym in October 2024?",
+    "answer": "a yoga studio",
+    "category": "as-of",
+    "question_id": "tb-05:q27",
+    "entity": "Clara",
+    "attribute": "gym"
+   },
+   {
+    "question": "What was Clara's gym in June 2025?",
+    "answer": "Planet Fitness",
+    "category": "as-of",
+    "question_id": "tb-05:q28",
+    "entity": "Clara",
+    "attribute": "gym"
+   },
+   {
+    "question": "List every gym Clara has had over time, in order.",
+    "answer": "the YMCA (from August 2023); a yoga studio (from May 2024); Planet Fitness (from March 2025)",
+    "category": "history",
+    "question_id": "tb-05:q29",
+    "entity": "Clara",
+    "attribute": "gym"
+   },
+   {
+    "question": "What was Clara's gym in February 2023?",
+    "answer": "no information available",
+    "category": "as-of-abstention",
+    "question_id": "tb-05:q30",
+    "entity": "Clara",
+    "attribute": "gym"
+   }
+  ],
+  "speaker_a": "user",
+  "speaker_b": "friend",
+  "speakers": [
+   "user",
+   "friend"
+  ]
+ }
+]
