@@ -117,31 +117,57 @@ def turns_for(s):
     return out
 
 
-def audit(mem, slots):
+_NEG_MARKERS = ("n't", " not ", "no longer", "anymore", "quit", "gone off",
+                "used to", "My mistake", "misspoke", "had that wrong",
+                "got that wrong", "Correction")
+
+
+def _asserts(text, value, other):
+    """True iff `text` positively asserts `value`: the value appears, the
+    competing value does not (correction turns mention both), and no negation
+    marker is present (a stored negation is not an assertion). Conservative
+    and mechanical; markers cover this benchmark's templates plus common
+    extractor phrasings."""
+    if value not in text or other in text:
+        return False
+    low = text.lower()
+    return not any(m.lower() in low for m in _NEG_MARKERS)
+
+
+def audit(mem, slots, dump_path=None):
     recs = mem.list_all(user_id="cb")
     texts = [r.content for r in recs]
+    if dump_path:
+        import json
+        from pathlib import Path
+        Path(dump_path).parent.mkdir(parents=True, exist_ok=True)
+        with open(dump_path, "w", encoding="utf-8") as f:
+            for r in recs:
+                f.write(json.dumps({"id": r.id, "content": r.content}) + "\n")
     res = {"current_present": 0, "stale_present": 0, "negated_present": 0,
            "top1_correct": 0, "top1_total": 0, "records": len(recs)}
     for s in slots:
         ent_texts = [t for t in texts if s["entity"] in t]
-        has_v1 = any(s["v1"] in t for t in ent_texts)
-        has_v2 = any(s["v2"] in t for t in ent_texts)
+        asserts_v1 = any(_asserts(t, s["v1"], s["v2"]) for t in ent_texts)
+        asserts_v2 = any(_asserts(t, s["v2"], s["v1"]) for t in ent_texts)
         if s["negate"]:
-            # final truth: v2 was negated with no replacement -> neither value should remain
-            if has_v2:
+            # final truth: v2 was negated with no replacement -> no positive
+            # assertion of either value should survive
+            if asserts_v2:
                 res["negated_present"] += 1
-            if has_v1:
+            if asserts_v1:
                 res["stale_present"] += 1
         else:
-            if has_v2:
+            if asserts_v2:
                 res["current_present"] += 1
-            if has_v1:
+            if asserts_v1:
                 res["stale_present"] += 1
-            # retrieval poisoning check: is the top hit about the CURRENT value?
+            # retrieval poisoning check: does the top hit positively assert
+            # the CURRENT value?
             noun = _QUESTION_NOUN[s["attr"]]
             hits = mem.search(f"What is {s['entity']}'s {noun}?", user_id="cb", limit=3)
             res["top1_total"] += 1
-            if hits and s["v2"] in hits[0].content and s["v1"] not in hits[0].content:
+            if hits and _asserts(hits[0].content, s["v2"], s["v1"]):
                 res["top1_correct"] += 1
     return res
 
@@ -155,7 +181,7 @@ def run_arm(name, slots, resolve):
         for turn in turns_for(s):
             mem.add(turn, user_id="cb")
     dt = time.time() - t0
-    res = audit(mem, slots)
+    res = audit(mem, slots, dump_path=f"results/conflictbench/store_{name}.jsonl")
     mem.close()
     res["ingest_s"] = round(dt, 1)
     return res
