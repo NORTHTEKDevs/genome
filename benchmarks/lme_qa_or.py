@@ -88,14 +88,24 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--n", type=int, default=210)
     ap.add_argument("--distractors", type=int, default=4)
+    ap.add_argument("--embedder", default="sentence-transformers/all-MiniLM-L6-v2",
+                    help="local sentence-transformers model for BOTH systems "
+                         "(e.g. BAAI/bge-small-en-v1.5, BAAI/bge-large-en-v1.5)")
     args = ap.parse_args()
+    _DIMS = {"sentence-transformers/all-MiniLM-L6-v2": 384,
+             "BAAI/bge-small-en-v1.5": 384, "BAAI/bge-large-en-v1.5": 1024}
+    dims = _DIMS.get(args.embedder, 384)
+    tag = args.embedder.rsplit("/", 1)[-1]
+    global OUT
+    OUT = f"results/lme_qa/answers_or_{tag}.jsonl" \
+        if tag != "all-MiniLM-L6-v2" else OUT
     if not os.environ.get("OPENROUTER_API_KEY"):
         print("need OPENROUTER_API_KEY"); return 1
     # Route Mem0's OpenAI-provider LLM through OpenRouter via env (config-level base_url
     # is ignored by mem0's openai provider). Our own responder/judge client is explicit.
     os.environ["OPENAI_API_KEY"] = os.environ["OPENROUTER_API_KEY"]
     os.environ["OPENAI_BASE_URL"] = OR_BASE
-    print(f"[cfg] responder={RESP}  judge={JUDGE}  embedder=local all-MiniLM (384d)", flush=True)
+    print(f"[cfg] responder={RESP}  judge={JUDGE}  embedder=local {args.embedder} ({dims}d)", flush=True)
 
     data = json.load(open("benchmarks/data/lme/longmemeval_s", encoding="utf-8"))
     order = ["temporal-reasoning", "knowledge-update", "multi-session",
@@ -115,16 +125,17 @@ def main():
             except Exception:
                 pass
 
-    embed = EmbeddingProvider()   # LOCAL default (all-MiniLM), no API
+    embed = EmbeddingProvider(model_name=args.embedder)   # LOCAL, no API
     rr = CrossEncoderReranker()
     from mem0 import Memory as Mem0
-    shutil.rmtree("/tmp/qdrant_or", ignore_errors=True)
+    qpath = f"/tmp/qdrant_or_{tag}"
+    shutil.rmtree(qpath, ignore_errors=True)
     m0 = Mem0.from_config({
         "llm": {"provider": "openai", "config": {"model": JUDGE, "temperature": 0.0}},
         "embedder": {"provider": "huggingface", "config": {
-            "model": "sentence-transformers/all-MiniLM-L6-v2"}},
+            "model": args.embedder}},
         "vector_store": {"provider": "qdrant", "config": {
-            "embedding_model_dims": 384, "path": "/tmp/qdrant_or"}}})
+            "embedding_model_dims": dims, "path": qpath}}})
 
     fh = open(OUT, "a")
     for qi, q in enumerate(sample):
