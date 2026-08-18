@@ -1,0 +1,33 @@
+LongMemEval embedder sweep result (2026-08-18)
+
+Harness: benchmarks/lme_qa_or.py --embedder ..., 90 questions, gold+4
+distractor sessions, Sonnet-4 responder + Haiku-4.5 judge via OpenRouter,
+SAME local embedder for GENOME and Mem0 per leg. Prior runs included for the
+full picture (different n / backend where noted).
+
+embedder                      dense acc  rerank acc  dense h@10  rerank h@10  vs Mem0
+bge-small-en-v1.5   (n=90)        0.533       0.556       0.834        0.907  parity (p=0.83/0.48)
+bge-large-en-v1.5   (n=90)        0.533       0.556       0.896        0.916  parity (p=0.82/0.83), mem0 0.533
+all-MiniLM-L6-v2    (n=205)       0.595       0.546       0.827        0.895  parity (p=0.14)   [prior run]
+openai te3-small    (n=90)        0.689       0.700       0.917        0.943  parity (p=0.19)   [published run]
+
+Findings:
+1. RERANKING: the cross-encoder reliably improves RETRIEVAL on every embedder
+   tested (hit@10 +0.02 to +0.07). Its ANSWER-level effect is small and
+   inconsistent (-0.049 to +0.023 across four configurations) and never
+   statistically significant. Honest summary: rerank is a retrieval feature
+   whose end-to-end answer benefit should not be assumed.
+2. PARITY REPLICATES: GENOME vs Mem0 answer-accuracy parity now holds in FOUR
+   independent configurations (two backends, three local embedders plus the
+   hosted one). The parity claim of the 2026-08 paper is the most-replicated
+   result in this program.
+3. RETRIEVAL IS NOT THE BOTTLENECK at these levels: bge-large beats bge-small
+   by +0.062 dense hit@10 with IDENTICAL answer accuracy (0.533/0.556) - the
+   answer step, not retrieval, limits accuracy once hit@10 is above ~0.83.
+
+Caveats: n=90 per new leg (answer-accuracy deltas of ~0.02 are far from
+significance at this n); single run per leg; one Mem0 extraction-parse error
+observed in the bge-small leg (tolerated by the harness's try/except).
+
+Reproduce: OPENROUTER_API_KEY=... python benchmarks/lme_qa_or.py --n 90 \
+    --embedder BAAI/bge-small-en-v1.5   (and BAAI/bge-large-en-v1.5)

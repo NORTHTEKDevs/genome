@@ -136,6 +136,12 @@ class Memory:
         # GENOME's recombination operators actually fire on a vanilla
         # add()+search() benchmark protocol -- without it, synthesize() and
         # consolidate() require explicit user calls.
+        # WARNING (measured, benchmarks/consolidation_scale_result.txt): this
+        # is a LOSSY compression knob, not a free win. At an aggressive cap
+        # (threshold=300, default target=150, evidence-dense conversation)
+        # answer accuracy collapsed ~5x (0.454 -> 0.09, p<1e-4) and synthesis
+        # did not rescue it. Size the threshold well above the working set the
+        # workload's questions actually need, and measure before enabling.
         if auto_consolidate_threshold is not None and auto_consolidate_threshold <= 0:
             raise ValueError(
                 f"auto_consolidate_threshold must be positive or None, "
