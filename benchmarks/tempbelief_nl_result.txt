@@ -1,0 +1,46 @@
+TempBelief NATURAL-LANGUAGE register result (2026-08-18)
+
+Harness: benchmarks/tempbelief_run_or.py on benchmarks/data/tempbelief_nl.json
+(colloquial register: conversational framing, resolvable anchors). All LLM roles
+anthropic/claude-haiku-4.5 via OpenRouter; LOCAL all-MiniLM embedder for every
+system (GENOME's shipped default; Mem0 on the same local embedder). 6
+conversations, 194 questions, 4 systems, checkpointed in results/tempbelief_or/.
+
+split               belief  full-context   dense    mem0
+current-value        0.833         0.833   0.889   0.500
+as-of                0.861         0.213   0.194   0.593
+history              0.972         0.778   0.861   0.778
+as-of-abstention     1.000         1.000   1.000   1.000
+macro-J              0.889         0.608   0.648   0.623
+
+McNemar (paired, headline splits):
+  as-of:   belief vs mem0  35 vs 6   p<0.0001  WIN
+           belief vs full-context 71 vs 1, belief vs dense 73 vs 1, both p~0  WIN
+  history: belief vs mem0  8 vs 1   p=0.0455  WIN; vs full-context p=0.0233 WIN;
+           vs dense 5 vs 1 p=0.22 (lead only)
+  current-value: belief vs mem0 13 vs 1 p=0.0033 WIN; ties full-context/dense.
+
+Extraction sanity (kill-criterion): belief KG captured 104/108 gold fact events
+from colloquial text (96.3%), matching the published explicit-register recall
+(0.963). Ingest ~78 s/conv for belief.
+
+READ: the bi-temporal edge SURVIVES natural colloquial language. Belief's as-of
+barely moves vs the published explicit-dated register (0.870 -> 0.861) while
+every baseline stays far behind. This was the biggest open caveat in the
+2026-08 paper (relative-date pipeline p=0.137 at n=54); at n=108 as-of
+questions in the colloquial register the win is decisive.
+
+Caveats, stated plainly:
+- Backend differs from the published explicit-register run (OpenRouter + local
+  embedder here vs direct Anthropic + OpenAI embedder there): within-harness
+  comparisons are valid; cross-run absolute numbers are indicative only.
+- Mem0's current-value dropped to 0.500 here vs 0.861 in the explicit-register
+  run. Whether that is the register or the local-embedder backend is
+  UNRESOLVED; do not cite Mem0's absolute numbers without this caveat.
+- Single run, single seed, template-authored dataset (self-built; generator and
+  canonical JSON are committed - regeneration needs PYTHONHASHSEED=0).
+
+Reproduce:
+  PYTHONHASHSEED=0 python -m genome.evals.tempbelief 6 --colloquial
+  python benchmarks/tempbelief_run_or.py --convs 6 \
+      --data benchmarks/data/tempbelief_nl.json --tag nl
