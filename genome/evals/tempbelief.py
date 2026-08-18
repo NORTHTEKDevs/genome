@@ -20,6 +20,16 @@ Turns are LocomoTurn-compatible (speaker/text/turn_id/dia_id/session/session_dat
 so the existing FullContextBaseline / Mem0Baseline / dense retrieval run unmodified.
 
 Splits: current-value, as-of (in-range), history; plus an as-of-abstention diagnostic.
+
+Registers (same FactEvent log and question schema, different NL rendering):
+  - explicit  (default): dated assertions ("In March 2023, ...")
+  - relative  (--relative): resolvable relative phrasing ("8 months ago")
+  - colloquial (--colloquial): conversational framing with resolvable anchors
+    ("Oh, did I tell you? ... back in March")
+
+REGENERATION NOTE: one value-offset uses Python's salted str hash, so bit-exact
+regeneration of the committed datasets requires PYTHONHASHSEED=0. The committed
+JSON files in benchmarks/data/ are the canonical datasets either way.
 """
 from __future__ import annotations
 
@@ -140,6 +150,53 @@ def _rel_assert_text(ev: FactEvent, narr_idx: int) -> str:
     return f"{e} {verb} {phrase}."
 
 
+def _colloq_anchor(fact_idx: int, narr_idx: int) -> str:
+    """Colloquial but arithmetically RESOLVABLE date anchor, relative to the
+    narration month (the harness prefixes each turn with its session date).
+    Same design rule as the relative register: the eval measures whether a
+    system resolves natural phrasing, not whether it guesses vague phrasing."""
+    d = max(0, narr_idx - fact_idx)
+    fy, fm = _grid_date(fact_idx)
+    ny, _nm = _grid_date(narr_idx)
+    if d == 0:
+        return "just this month"
+    if d == 1:
+        return "last month"
+    if fy == ny:
+        return f"back in {_MONTHNAMES[fm - 1]}"
+    if fy == ny - 1:
+        return f"in {_MONTHNAMES[fm - 1]} last year"
+    return f"way back in {_MONTHNAMES[fm - 1]} {fy}"
+
+
+_COLLOQ_FRAMES = [
+    "Oh, did I tell you? {core} {anchor}.",
+    "By the way, {core} {anchor}. Wild, right?",
+    "I keep forgetting to mention it, but {core} {anchor}.",
+    "So apparently {core} {anchor}. I only just heard about it.",
+    "Oh yeah, {core} {anchor}. I thought I'd told you already.",
+]
+
+
+def _colloq_core(ev: FactEvent) -> str:
+    e, v = ev.entity, ev.value
+    return {
+        "location": f"{e} ended up moving to {v}",
+        "employer": f"{e} took a job at {v}",
+        "occupation": f"{e} went and became a {v}",
+        "relationship_status": f"{e}'s relationship status changed to {v}",
+        "car": f"{e} swapped cars and got {v}",
+        "favorite_food": f"{e} got really into {v}",
+        "gym": f"{e} started going to {v}",
+    }[ev.attribute]
+
+
+def _colloq_assert_text(ev: FactEvent, narr_idx: int, k: int) -> str:
+    frame = _COLLOQ_FRAMES[k % len(_COLLOQ_FRAMES)]
+    return frame.format(core=_colloq_core(ev),
+                        anchor=_colloq_anchor(ev.from_idx, narr_idx))
+
+
 def _assert_text(ev: FactEvent, forward: bool) -> str:
     noun, _ = _ATTRS[ev.attribute]
     when = _month_year(ev.from_idx)
@@ -186,7 +243,8 @@ _FILLER = [
 # ---------------------------------------------------------------------------
 # Generator
 # ---------------------------------------------------------------------------
-def _build_conversation(cid: str, seed: int, relative: bool = False) -> TBConversation:
+def _build_conversation(cid: str, seed: int, relative: bool = False,
+                        register: str | None = None) -> TBConversation:
     # deterministic pseudo-choices from seed (no RNG module -> fully reproducible)
     def pick(lst, k):
         return lst[(seed * 7 + k * 13) % len(lst)]
@@ -248,7 +306,9 @@ def _build_conversation(cid: str, seed: int, relative: bool = False) -> TBConver
         fwd_session = min(n_sessions - 1, max(0, (ev.from_idx - 2) // 3))
         out_of_order = (ei % 3 == 0) and fwd_session < n_sessions - 1
         sess = (n_sessions - 1) if out_of_order else fwd_session
-        if relative:
+        if register == "colloquial":
+            add(sess, _colloq_assert_text(ev, 2 + sess * 3, ei))
+        elif relative:
             add(sess, _rel_assert_text(ev, 2 + sess * 3))   # relative phrasing
         else:
             add(sess, _assert_text(ev, forward=not out_of_order))
@@ -317,8 +377,10 @@ def _build_conversation(cid: str, seed: int, relative: bool = False) -> TBConver
     return TBConversation(conversation_id=cid, turns=turns, questions=questions)
 
 
-def generate(n_conversations: int = 12, relative: bool = False) -> list[TBConversation]:
-    return [_build_conversation(f"tb-{i:02d}", seed=i + 1, relative=relative)
+def generate(n_conversations: int = 12, relative: bool = False,
+             register: str | None = None) -> list[TBConversation]:
+    return [_build_conversation(f"tb-{i:02d}", seed=i + 1, relative=relative,
+                                register=register)
             for i in range(n_conversations)]
 
 
@@ -343,8 +405,14 @@ if __name__ == "__main__":
     import sys
     n = int(sys.argv[1]) if len(sys.argv) > 1 else 12
     rel = "--relative" in sys.argv
-    convs = generate(n, relative=rel)
-    outp = Path("benchmarks/data/tempbelief_rel.json" if rel else "benchmarks/data/tempbelief.json")
+    colloq = "--colloquial" in sys.argv
+    convs = generate(n, relative=rel, register="colloquial" if colloq else None)
+    if colloq:
+        outp = Path("benchmarks/data/tempbelief_nl.json")
+    elif rel:
+        outp = Path("benchmarks/data/tempbelief_rel.json")
+    else:
+        outp = Path("benchmarks/data/tempbelief.json")
     outp.parent.mkdir(parents=True, exist_ok=True)
     outp.write_text(json.dumps(to_json(convs), indent=1), encoding="utf-8")
     nt = sum(len(c.turns) for c in convs)
