@@ -1,0 +1,39 @@
+Consolidation-at-scale result (2026-08-18)
+
+Harness: benchmarks/consolidation_scale_or.py, LoCoMo conv-26 (419 turns, 152
+non-adversarial questions), anthropic/claude-haiku-4.5 via OpenRouter for
+extraction/synthesis/responder/judge, LOCAL all-MiniLM embedder, LLM fact
+extraction on ingest for ALL arms (llm_call present). Auto-consolidation:
+threshold=300, target=150 (150 is the constructor default target),
+frequency_crossover synthesis vs prune-only.
+
+arm       accuracy  final store  ingest s
+off          0.454         1468     594.7
+synth        0.092          243     589.5
+prune        0.086          243     592.6
+
+McNemar vs control: synth 4 vs 59, p<0.0001; prune 2 vs 58, p<0.0001.
+
+Store trajectory: without consolidation the store grows to 1,468 records
+(419 turns x ~3.5 extracted facts). With the trigger on, consolidation fires
+repeatedly from ~turn 100 and pins the store at ~250 records (~17% retention).
+
+READ (strong negative result): at this cap ratio (~6x compression), the
+SHIPPED auto-consolidation trigger destroys answer accuracy (5x collapse,
+decisively significant), and the synthesis operator does not rescue it
+(0.092 vs 0.086 - consistent with the equal-budget wash in the published
+finding 05, now reproduced under the feature's own trigger). Auto-consolidation
+at aggressive caps is NOT a safe cost lever; treat it as a lossy compression
+knob whose accuracy cost must be measured per workload.
+
+Honest scope: one conversation, one cap ratio (300/150), single run. A gentler
+cap (e.g. threshold well above working-set size) is untested here and may
+behave differently. The within-run paired comparison is the finding.
+
+PRODUCT NOTE: consider a docs warning on auto_consolidate_threshold - with the
+default target=150, enabling it on evidence-dense workloads silently trades
+away most retrieval accuracy.
+
+Reproduce: OPENROUTER_API_KEY=... python benchmarks/consolidation_scale_or.py \
+    --conv 0 --threshold 300 --target 150
+Per-question labels: results/consolidation_scale/labels_{off,synth,prune}.json
