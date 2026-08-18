@@ -1,0 +1,35 @@
+Graph vs dense retrieval probe result (2026-08-18)
+
+Harness: benchmarks/ab_graph_retrieval_or.py, 2 LoCoMo conversations ingested
+WITH entity extraction (anthropic/claude-haiku-4.5 via OpenRouter), LOCAL
+all-MiniLM embedder, retrieval-only hit_rate against gold evidence dia_ids,
+top_k=30, no responder/judge.
+
+category        n   dense   graph   delta  fired
+multi-hop      43   0.281   0.297  +0.016     35
+open-domain    11   0.439   0.439  +0.000     11
+single-hop    114   0.395   0.404  +0.009     84
+temporal       63   0.698   0.730  +0.032     46
+ALL           231   0.459   0.474  +0.016
+
+Cost of graph-mode ingest, measured on the same run:
+- conv-26: 419 turns -> 4,230 records (10.1x amplification), ~2.9 CPU-hours
+  of graph building on one core plus ~1 extraction call per turn.
+- conv-30: 369 turns -> 3,444 records (9.3x).
+- Dense-mode ingest of the same turns is ~10 ms/turn with no LLM calls.
+
+READ (honest null-to-marginal): the rebuilt graph search is ACTIVE (returned a
+different result set than dense on 176/231 questions) and never regresses, but
+its gains are marginal (+0.016 aggregate, +0.016 on multi-hop, its target
+category; the largest gain is temporal +0.032). Weighed against a multi-
+thousand-fold ingest cost increase and 10x storage amplification, graph mode
+does not earn its cost on LoCoMo evidence retrieval. This closes the question
+paper 1 (Sec 5.6) left open with "the burden of proof sits with graph": on
+this evidence, dense remains the validated default.
+
+Caveats: 2 conversations, local embedder, retrieval-only (no answer accuracy);
+absolute hit rates are not comparable to the published retrieval_quality.py
+numbers (different embedder and scoring scope). Within-run paired deltas are
+the finding.
+
+Reproduce: OPENROUTER_API_KEY=... python benchmarks/ab_graph_retrieval_or.py --n-convs 2
