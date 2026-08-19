@@ -27,6 +27,7 @@ inherit:
 
 from __future__ import annotations
 
+import math
 import time
 from dataclasses import dataclass
 from typing import Any
@@ -147,6 +148,17 @@ def record_fact(
     disagree hold their beliefs side by side instead of clobbering each other.
     Use `belief_conflicts` to surface the disagreements.
     """
+    # Reject non-finite numbers at the boundary. A NaN confidence or valid_from is
+    # accepted silently by SQLite but is not JSON-representable, so it detonates much
+    # later - in an unrelated module, at report/receipt time - and permanently breaks
+    # every downstream operation on that entity until someone finds the bad fact.
+    if not math.isfinite(float(confidence)):
+        raise ValueError(
+            f"confidence must be a finite number, got {confidence!r}"
+        )
+    if valid_from is not None and not math.isfinite(float(valid_from)):
+        raise ValueError(f"valid_from must be a finite epoch, got {valid_from!r}")
+
     entity = memory.store.get(entity_id)
     if entity is None:
         raise MemoryNotFoundError(entity_id)

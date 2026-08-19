@@ -9,6 +9,7 @@ reopens the hole fails here rather than in production.
 from __future__ import annotations
 
 import numpy as np
+import pytest
 
 from genome import Memory
 from genome.explain import explain_search
@@ -156,7 +157,11 @@ def test_consolidation_hybrid_inherits_worst_parent_trust():
         m.store, user_id="u1", max_memories=4,
         synthesize_before_prune=True, trust_policy=m._trust_policy,
     )
-    hybrids = [r for r in m.list_all() if r.metadata.get("consolidation")]
+    # include_quarantined: the hybrid SHOULD be quarantined, which is the point.
+    hybrids = [
+        r for r in m.list_all(include_quarantined=True)
+        if r.metadata.get("consolidation")
+    ]
     assert hybrids, "expected a consolidation hybrid to be created"
     for h in hybrids:
         assert trust_of(h, m._trust_policy) == 0, (
@@ -197,6 +202,86 @@ def test_memories_mentioning_excludes_quarantined():
     m.link(tainted.id, ent.id, MENTIONS)
     assert tainted.id not in {r.id for r in m.memories_mentioning(ent.id)}
     m.close()
+
+
+# -- RED TEAM: list_all() leaked quarantined content ------------------------
+
+
+def test_list_all_excludes_quarantined_by_default():
+    m = Memory(storage=":memory:", trust_policy=TrustPolicy(recall_min_trust=1))
+    m.add("clean user memory", user_id="u1", provenance="user")
+    tainted = m.add("poisoned web memory", user_id="u1", provenance="web")[0]
+    assert tainted.id not in {r.id for r in m.list_all(user_id="u1")}
+    # Deliberate inspection still works.
+    assert tainted.id in {
+        r.id for r in m.list_all(user_id="u1", include_quarantined=True)
+    }
+    m.close()
+
+
+# -- RED TEAM: NaN/Inf poisons the fact timeline ----------------------------
+
+
+def test_record_fact_rejects_non_finite_numbers():
+    m = Memory(storage=":memory:")
+    ent = MemoryRecord(
+        content="Sky",
+        embedding=np.asarray(m.embed.encode("Sky"), dtype=np.float32),
+        user_id="u1", operator=ENTITY_OPERATOR,
+        metadata={"entity_type": "PERSON", "entity_name": "Sky"},
+    )
+    m.store.add(ent)
+    for bad in (float("nan"), float("inf")):
+        with pytest.raises(ValueError, match="finite"):
+            m.record_fact(ent.id, "score", "x", confidence=bad)
+        with pytest.raises(ValueError, match="finite"):
+            m.record_fact(ent.id, "score", "x", valid_from=bad)
+    m.close()
+
+
+# -- RED TEAM: journal tamper-evidence and oversized lines ------------------
+
+
+def test_journal_detects_deleted_cancelling_pair(tmp_path):
+    """Deleting a record's add AND its delete leaves final state identical, so a
+    state-only check passes. The line hash chain must still catch it."""
+    from genome.journal import verify_journal, verify_journal_integrity
+
+    path = tmp_path / "j.journal"
+    m = Memory(storage=":memory:", journal=path)
+    doomed = m.add("evidence that will be erased", user_id="u1")[0]
+    m.add("innocuous record", user_id="u1")
+    m.delete(doomed.id)
+    assert verify_journal(path, m) is True
+
+    kept = [
+        line for line in path.read_text(encoding="utf-8").splitlines()
+        if doomed.id not in line
+    ]
+    path.write_text("\n".join(kept) + "\n", encoding="utf-8")
+
+    intact, reason = verify_journal_integrity(path)
+    assert intact is False, "removing a cancelling add/delete pair must be detected"
+    assert "removed" in reason or "gap" in reason
+    assert verify_journal(path, m) is False
+    m.close()
+
+
+def test_journal_seq_survives_an_oversized_record(tmp_path):
+    """A single record can exceed any fixed tail-read window; the seq must not
+    restart (which would produce duplicate seq numbers)."""
+    import json as _json
+
+    from genome.journal import Journal
+
+    path = tmp_path / "big.journal"
+    j = Journal(path)
+    j.append({"op": "delete", "id": "mem_000000000001"})
+    j.append({"op": "delete", "id": "mem_000000000002", "pad": "x" * 800_000})
+    j.append({"op": "delete", "id": "mem_000000000003"})
+
+    seqs = [_json.loads(line)["seq"] for line in path.read_text().splitlines()]
+    assert seqs == [1, 2, 3], f"seq restarted after the oversized line: {seqs}"
 
 
 # -- #12: explain_search stays in lockstep with search() under a reranker ---

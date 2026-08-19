@@ -43,6 +43,9 @@ from genome.memory.graph import MemoryEdge
 from genome.memory.schema import MemoryRecord
 from genome.memory.store import MemoryStore
 
+#: prev_hash of the first journal line. Fixed so the genesis link is verifiable.
+GENESIS_LINE_HASH = "0" * 64
+
 
 def _dumps(obj: dict[str, Any]) -> str:
     return json.dumps(obj, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
@@ -93,29 +96,54 @@ class _SidecarLock:
             pass
 
 
-def _last_seq_in_file(path: Path) -> int:
-    """The highest seq already in the journal, read from its tail.
+def _last_line(path: Path) -> dict[str, Any] | None:
+    """The last complete journal record, read from the file's tail.
 
-    Read under the OS lock so the sequence is correct even when another process
-    holds a Journal on the same path. A single memory line is bounded at ~100 KB
-    (MemoryRecord.MAX_CONTENT_LEN), so a 512 KB tail always contains the last
-    complete line.
+    The read window GROWS until a parseable line is found rather than assuming a
+    fixed size: metadata values are not length-bounded, so a single record can be
+    far larger than any constant we might pick, and guessing wrong silently
+    restarts the sequence and produces duplicate seq numbers.
     """
     if not path.is_file():
-        return 0
+        return None
     size = path.stat().st_size
     if size == 0:
+        return None
+    window = 64 * 1024
+    while True:
+        with open(path, "rb") as handle:
+            handle.seek(max(0, size - window))
+            chunk = handle.read()
+        # Drop a leading partial line unless we are reading from the very start.
+        lines = chunk.splitlines()
+        if window < size and len(lines) > 1:
+            lines = lines[1:]
+        for line in reversed(lines):
+            if line.strip():
+                try:
+                    return json.loads(line)
+                except ValueError:
+                    continue
+        if window >= size:
+            return None
+        window *= 4
+
+
+def _last_seq_in_file(path: Path) -> int:
+    record = _last_line(path)
+    if not record:
         return 0
-    with open(path, "rb") as handle:
-        handle.seek(max(0, size - 512 * 1024))
-        tail = handle.read()
-    for line in reversed(tail.splitlines()):
-        if line.strip():
-            try:
-                return int(json.loads(line)["seq"])
-            except (ValueError, KeyError):
-                continue
-    return 0
+    try:
+        return int(record["seq"])
+    except (KeyError, TypeError, ValueError):
+        return 0
+
+
+def _line_hash(op: dict[str, Any], prev_hash: str) -> str:
+    """Hash of one journal record, chained to its predecessor."""
+    payload = {k: v for k, v in op.items() if k != "line_hash"}
+    payload["prev_hash"] = prev_hash
+    return hashlib.sha256(_dumps(payload).encode("utf-8")).hexdigest()
 
 
 class Journal:
@@ -135,9 +163,13 @@ class Journal:
 
     def append(self, op: dict[str, Any]) -> None:
         with self._lock, _SidecarLock(self.path):
-            seq = _last_seq_in_file(self.path) + 1
+            previous = _last_line(self.path)
+            seq = int(previous["seq"]) + 1 if previous else 1
+            prev_hash = (previous or {}).get("line_hash") or GENESIS_LINE_HASH
+            record = {"seq": seq, **op}
+            record["line_hash"] = _line_hash(record, prev_hash)
             with open(self.path, "a", encoding="utf-8") as handle:
-                handle.write(_dumps({"seq": seq, **op}) + "\n")
+                handle.write(_dumps(record) + "\n")
                 handle.flush()
 
     @staticmethod
@@ -381,13 +413,57 @@ def replay_journal(
             memory.store.delete_edge(op["id"])
         elif kind == "delete_edges_touching":
             memory.store.delete_edges_touching(op["id"])
+        elif kind is None and "line_hash" in op:
+            continue  # a chain-only record with no state effect
         else:  # forward-compat: an unknown op is a hard error, not a skip
             raise ValueError(f"unknown journal op {kind!r} at seq {op['seq']}")
     return memory
 
 
+def verify_journal_integrity(path: str | Path) -> tuple[bool, str]:
+    """Check the journal's own hash chain: no line removed, edited, or reordered.
+
+    This is a SEPARATE guarantee from state reproduction. Comparing replayed state
+    to live state cannot detect a tampering that cancels out - deleting a record's
+    add AND its later delete leaves the final state identical, so a state-only check
+    reports success while two lines of the audit trail are gone. The per-line hash
+    chain closes that: every line commits to its predecessor.
+    """
+    prev_hash = GENESIS_LINE_HASH
+    expected_seq = 1
+    for op in Journal.read(path):
+        if "line_hash" not in op:
+            # Written before chaining existed: verify what we can and say so.
+            return True, (
+                f"journal predates hash chaining (no line_hash at seq {op.get('seq')}); "
+                "integrity of line ordering cannot be proven for this file"
+            )
+        if op.get("seq") != expected_seq:
+            return False, (
+                f"journal line sequence gap: expected seq {expected_seq}, found "
+                f"{op.get('seq')} - a line was removed or reordered"
+            )
+        recomputed = _line_hash(op, prev_hash)
+        if recomputed != op["line_hash"]:
+            return False, (
+                f"journal line {op['seq']} fails its hash: the line was edited, or the "
+                "line before it was removed"
+            )
+        prev_hash = op["line_hash"]
+        expected_seq += 1
+    return True, f"journal intact: {expected_seq - 1} line(s) chained"
+
+
 def verify_journal(path: str | Path, memory: Any) -> bool:
-    """Replay the journal into a scratch store and compare canonical hashes."""
+    """Prove the live store matches its own history.
+
+    Two independent checks, both required:
+      1. the journal's own hash chain is unbroken (no line removed/edited/reordered);
+      2. replaying it reproduces the live store's canonical state hash.
+    """
+    intact, _reason = verify_journal_integrity(path)
+    if not intact:
+        return False
     replayed = replay_journal(path, embedding_provider=memory.embed)
     try:
         return snapshot_hash(replayed) == snapshot_hash(memory)

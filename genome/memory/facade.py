@@ -1311,10 +1311,23 @@ If no clean attribute can be extracted, output FACT_TYPE: none and CONFIDENCE: 0
         return self.store.count(user_id=user_id, agent_id=agent_id)
 
     def list_all(
-        self, *, user_id: str | None = None, agent_id: str | None = None
+        self,
+        *,
+        user_id: str | None = None,
+        agent_id: str | None = None,
+        include_quarantined: bool = False,
     ) -> list[MemoryRecord]:
-        """List all memories in the given scope. No ordering guarantee."""
-        return self.store.list_by_scope(user_id=user_id, agent_id=agent_id)
+        """List all memories in the given scope. No ordering guarantee.
+
+        Quarantined records are withheld like they are in search(): listing is a
+        recall path too, and a caller that iterates list_all() to build context for
+        a model would otherwise hand it the exact content quarantine excluded. Pass
+        `include_quarantined=True` to inspect what is being held back.
+        """
+        records = self.store.list_by_scope(user_id=user_id, agent_id=agent_id)
+        if include_quarantined:
+            return records
+        return [r for r in records if not self._is_quarantined(r)]
 
     def reset(
         self, *, user_id: str | None = None, agent_id: str | None = None
