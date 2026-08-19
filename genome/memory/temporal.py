@@ -52,6 +52,7 @@ class EntityFact:
     source_memory_id: str | None    # optional: which memory introduced this fact
     confidence: float               # [0, 1]
     metadata: dict[str, Any]
+    believed_by: str | None = None  # attribution in a shared multi-agent store
 
     @property
     def is_current(self) -> bool:
@@ -69,9 +70,10 @@ class EntityFact:
             valid_until=m.get("valid_until"),
             source_memory_id=m.get("source_memory_id"),
             confidence=m.get("confidence", 1.0),
+            believed_by=m.get("believed_by"),
             metadata={k: v for k, v in m.items() if k not in {
                 "entity_id", "fact_type", "value", "valid_from", "valid_until",
-                "source_memory_id", "confidence",
+                "source_memory_id", "confidence", "believed_by",
             }},
         )
 
@@ -105,6 +107,7 @@ def record_fact(
     source_memory_id: str | None = None,
     confidence: float = 1.0,
     invalidate_previous: bool = True,
+    believed_by: str | None = None,
 ) -> EntityFact:
     """Record a new fact about an entity as of `valid_from` (default: now).
 
@@ -112,6 +115,12 @@ def record_fact(
     fact of the same `fact_type` for this entity, its `valid_until` is set to
     `valid_from` (so the timeline closes the old fact cleanly before opening
     the new one).
+
+    `believed_by` attributes the fact to a believer (an agent id) in a shared
+    store. Invalidation is believer-aware: a new fact only closes the previous
+    current fact of the SAME believer (None matches None), so two agents that
+    disagree hold their beliefs side by side instead of clobbering each other.
+    Use `belief_conflicts` to surface the disagreements.
     """
     entity = memory.store.get(entity_id)
     if entity is None:
@@ -158,6 +167,8 @@ def record_fact(
                 if (
                     prior.metadata.get("fact_type") != fact_type
                     or prior.metadata.get("valid_until") is not None
+                    # Believer-aware: never close another believer's fact.
+                    or prior.metadata.get("believed_by") != believed_by
                 ):
                     continue
                 prior_from = prior.metadata.get("valid_from", 0)
@@ -183,6 +194,8 @@ def record_fact(
             "source_memory_id": source_memory_id,
             "confidence": confidence,
         }
+        if believed_by is not None:
+            fact_meta["believed_by"] = believed_by
         fact_record = MemoryRecord(
             content=rendered,
             embedding=np.asarray(embedding, dtype=np.float32),
@@ -349,3 +362,84 @@ __all__ = [
     "facts_valid_at",
     "merge_entity_facts",
 ]
+
+
+# ---------------------------------------------------------------------------
+# Multi-agent belief attribution
+# ---------------------------------------------------------------------------
+
+
+@dataclass
+class BeliefPosition:
+    """One believer's current stance in a conflict."""
+    believed_by: str | None
+    value: str
+    valid_from: float
+    source_memory_id: str | None
+    fact_id: str
+
+
+@dataclass
+class BeliefConflict:
+    """Believers currently disagreeing about one attribute of one entity."""
+    entity_id: str
+    fact_type: str
+    positions: list[BeliefPosition]
+
+
+def facts_believed_by(
+    memory: Any,
+    entity_id: str,
+    believer: str | None,
+    *,
+    user_id: str | None = None,
+) -> list[EntityFact]:
+    """The timeline as one believer holds it, newest first.
+
+    `believer=None` returns the unattributed (shared) timeline only -- an
+    agent's attributed beliefs never leak into the shared view, and vice versa.
+    """
+    return [
+        f for f in entity_timeline(memory, entity_id, user_id=user_id)
+        if f.believed_by == believer
+    ]
+
+
+def belief_conflicts(
+    memory: Any,
+    entity_id: str,
+    *,
+    user_id: str | None = None,
+) -> list[BeliefConflict]:
+    """Surface attributes where believers currently hold different values.
+
+    A conflict is >1 distinct current value for the same fact_type across
+    believers (including the unattributed shared view). Agreement in different
+    voices is not a conflict. Conflicts are surfaced for the caller to resolve
+    deliberately -- silently picking a winner is how shared stores rot.
+    """
+    current = current_facts(memory, entity_id, user_id=user_id)
+    by_type: dict[str, list[EntityFact]] = {}
+    for fact in current:
+        by_type.setdefault(fact.fact_type, []).append(fact)
+
+    conflicts: list[BeliefConflict] = []
+    for fact_type in sorted(by_type):
+        facts = by_type[fact_type]
+        if len({f.value for f in facts}) <= 1:
+            continue
+        conflicts.append(BeliefConflict(
+            entity_id=entity_id,
+            fact_type=fact_type,
+            positions=[
+                BeliefPosition(
+                    believed_by=f.believed_by,
+                    value=f.value,
+                    valid_from=f.valid_from,
+                    source_memory_id=f.source_memory_id,
+                    fact_id=f.id,
+                )
+                for f in sorted(facts, key=lambda f: (f.believed_by or "", f.id))
+            ],
+        ))
+    return conflicts

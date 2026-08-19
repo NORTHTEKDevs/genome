@@ -1413,9 +1413,10 @@ If no clean attribute can be extracted, output FACT_TYPE: none and CONFIDENCE: 0
         source_memory_id: str | None = None,
         confidence: float = 1.0,
         invalidate_previous: bool = True,
+        believed_by: str | None = None,
     ):
         """Record a new fact about an entity. Closes prior current fact of
-        the same type (unless invalidate_previous=False).
+        the same type AND believer (unless invalidate_previous=False).
 
         Returns an EntityFact. See `genome.memory.temporal` for details.
         """
@@ -1426,6 +1427,7 @@ If no clean attribute can be extracted, output FACT_TYPE: none and CONFIDENCE: 0
             source_memory_id=source_memory_id,
             confidence=confidence,
             invalidate_previous=invalidate_previous,
+            believed_by=believed_by,
         )
 
     def invalidate_fact(self, fact_id: str, *, at: float | None = None):
