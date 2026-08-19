@@ -137,6 +137,68 @@ def test_graph_search_excludes_quarantined_comention():
     m.close()
 
 
+# -- #8b: AUTO-consolidation cannot launder quarantined content -------------
+
+
+def test_consolidation_hybrid_inherits_worst_parent_trust():
+    """The auto-consolidation path runs without the user asking, so an unguarded
+    hybrid would silently re-admit poisoned content that quarantine excluded."""
+    from genome.memory.consolidation import consolidate
+
+    m = Memory(storage=":memory:", trust_policy=TrustPolicy(recall_min_trust=1))
+    # Two low-fitness records that will be pruned together: one poisoned.
+    m.add("web sourced claim alpha", user_id="u1", provenance="web")
+    m.add("web sourced claim beta", user_id="u1", provenance="web")
+    for i in range(4):
+        m.add(f"trusted user memory {i}", user_id="u1", provenance="user")
+
+    consolidate(
+        m.store, user_id="u1", max_memories=4,
+        synthesize_before_prune=True, trust_policy=m._trust_policy,
+    )
+    hybrids = [r for r in m.list_all() if r.metadata.get("consolidation")]
+    assert hybrids, "expected a consolidation hybrid to be created"
+    for h in hybrids:
+        assert trust_of(h, m._trust_policy) == 0, (
+            "a hybrid consolidating quarantined parents must stay quarantined"
+        )
+    m.close()
+
+
+# -- #21: graph traversal APIs respect quarantine ---------------------------
+
+
+def test_related_excludes_quarantined_by_default():
+    m = Memory(storage=":memory:", trust_policy=TrustPolicy(recall_min_trust=1))
+    anchor = m.add("anchor memory", user_id="u1", provenance="user")[0]
+    tainted = m.add("poisoned neighbour", user_id="u1", provenance="web")[0]
+    m.link(anchor.id, tainted.id, "relates_to")
+
+    neighbours = m.related(anchor.id, user_id="u1")
+    assert tainted.id not in {r.id for r in neighbours}, (
+        "related() must not be the side door quarantine closed in search()"
+    )
+    # ...but an operator can inspect what was held back, deliberately.
+    seen = m.related(anchor.id, user_id="u1", include_quarantined=True)
+    assert tainted.id in {r.id for r in seen}
+    m.close()
+
+
+def test_memories_mentioning_excludes_quarantined():
+    m = Memory(storage=":memory:", trust_policy=TrustPolicy(recall_min_trust=1))
+    ent = MemoryRecord(
+        content="Rowan",
+        embedding=np.asarray(m.embed.encode("Rowan"), dtype=np.float32),
+        user_id="u1", operator=ENTITY_OPERATOR,
+        metadata={"entity_type": "PERSON", "entity_name": "Rowan"},
+    )
+    m.store.add(ent)
+    tainted = m.add("Rowan is compromised", user_id="u1", provenance="web")[0]
+    m.link(tainted.id, ent.id, MENTIONS)
+    assert tainted.id not in {r.id for r in m.memories_mentioning(ent.id)}
+    m.close()
+
+
 # -- #12: explain_search stays in lockstep with search() under a reranker ---
 
 

@@ -22,6 +22,7 @@ from __future__ import annotations
 import math
 import time
 from dataclasses import dataclass
+from typing import Any
 
 import numpy as np
 
@@ -107,6 +108,7 @@ def consolidate(
     half_life_days: float = 30.0,
     synthesize_before_prune: bool = False,
     synthesis_operator: str = "frequency_crossover",
+    trust_policy: Any = None,
 ) -> ConsolidationResult:
     """Prune episodic memories in scope down to `max_memories` by fitness.
 
@@ -166,6 +168,21 @@ def consolidate(
                 )
                 continue
             hybrid_content = f"consolidated: {a.content[:60]} + {b.content[:60]}"
+            hybrid_meta: dict[str, Any] = {"consolidation": True}
+            if trust_policy is not None:
+                # Consolidation must not launder quarantined content into a fresh,
+                # trusted record. This path runs AUTOMATICALLY (auto_consolidate_
+                # threshold), so an unguarded hybrid would silently re-admit
+                # poisoned content that quarantine had already excluded. Trust of a
+                # hybrid = the minimum of its parents', same rule as synthesize().
+                from genome.firewall import PROVENANCE_KEY, trust_of
+
+                worst = min(a, b, key=lambda r: trust_of(r, trust_policy))
+                worst_tag = (worst.metadata or {}).get(PROVENANCE_KEY) or {}
+                hybrid_meta[PROVENANCE_KEY] = {
+                    "source": worst_tag.get("source", "consolidated"),
+                    "trust": trust_of(worst, trust_policy),
+                }
             hybrid = MemoryRecord(
                 content=hybrid_content,
                 embedding=hybrid_embedding,
@@ -173,7 +190,7 @@ def consolidate(
                 agent_id=agent_id,
                 parents=[a.id, b.id],
                 operator=synthesis_operator,
-                metadata={"consolidation": True},
+                metadata=hybrid_meta,
             )
             store.add(hybrid)
             synthesized_count += 1

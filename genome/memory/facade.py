@@ -587,6 +587,7 @@ If no clean attribute can be extracted, output FACT_TYPE: none and CONFIDENCE: 0
                     max_memories=self._auto_consolidate_target,
                     synthesize_before_prune=self._auto_consolidate_synthesize,
                     synthesis_operator=self._auto_consolidate_operator,
+                    trust_policy=self._trust_policy,
                 )
             except Exception as e:  # noqa: BLE001 - log + continue
                 self._log.warning(
@@ -1229,6 +1230,7 @@ If no clean attribute can be extracted, output FACT_TYPE: none and CONFIDENCE: 0
         direction: str = "out",
         user_id: str | None = None,
         agent_id: str | None = None,
+        include_quarantined: bool = False,
     ) -> list[MemoryRecord]:
         """Get memories linked from/to this one.
 
@@ -1240,6 +1242,10 @@ If no clean attribute can be extracted, output FACT_TYPE: none and CONFIDENCE: 0
         that scope. Given `link()` refuses cross-scope edges this is a defense
         in depth -- enforces scope on historical data from before the link()
         fix, and on records created via direct store manipulation.
+
+        Quarantine applies here too: with a TrustPolicy that quarantines low-trust
+        origins, graph traversal must not become the side door that recall closed.
+        Pass `include_quarantined=True` to inspect held-back neighbors deliberately.
         """
         if direction not in {"out", "in", "both"}:
             raise ValueError(f"direction must be out/in/both, got {direction!r}")
@@ -1258,6 +1264,8 @@ If no clean attribute can be extracted, output FACT_TYPE: none and CONFIDENCE: 0
             if user_id is not None and rec.user_id != user_id:
                 continue
             if agent_id is not None and rec.agent_id != agent_id:
+                continue
+            if not include_quarantined and self._is_quarantined(rec):
                 continue
             out.append(rec)
         return out
@@ -1377,6 +1385,7 @@ If no clean attribute can be extracted, output FACT_TYPE: none and CONFIDENCE: 0
                 half_life_days=half_life_days,
                 synthesize_before_prune=synthesize_before_prune,
                 synthesis_operator=synthesis_operator,
+                trust_policy=self._trust_policy,
             )
             # Invalidate cached search results for this scope: consolidation
             # prunes (and may synthesize) records, so a stale cache would
