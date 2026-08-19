@@ -5,27 +5,53 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
-## [Unreleased]
+## [1.1.0] - 2026-08-19
+
+Security-hardening release. Every feature below was put through an adversarial
+code review and an executable red team (attack scripts that actually ran); every
+confirmed exploit is fixed and pinned by a regression test that reproduces the
+original attack. See `tests/test_bshr_fixes.py`.
 
 ### Added
 
-- **Memory firewall** (`genome.firewall`): provenance-tagged writes with trust
-  tiers, recall quarantine for low-trust origins, and origin-bound authority -
-  a lower-trust source can never UPDATE/DELETE a higher-trust memory through
-  conflict resolution, even when the resolver LLM is fooled into asking for it.
+- **Memory firewall** (`genome.firewall`, exported from `genome`): provenance-tagged
+  writes with trust tiers, recall quarantine for low-trust origins, and origin-bound
+  authority - a lower-trust source can never UPDATE/DELETE a higher-trust memory
+  through conflict resolution, even when the resolver LLM is fooled into asking for
+  it. Quarantine is enforced on **every** read path (dense/hybrid/graph search,
+  `list_all`, `related`, `memories_mentioning`) and low-trust content cannot be
+  laundered into a trusted record via `synthesize()` or auto-consolidation: a hybrid
+  inherits the **minimum** trust of its parents.
 - **Explainable recall** (`genome.explain.explain_search`): per-candidate dense
   score, BM25 rank, fused score, and the exact exclusion reason. Deterministic,
   cache-bypassing, never touches access statistics.
 - **Journal + deterministic replay** (`genome.journal`): record every store
   mutation, reproduce the store provably (`verify_journal`), roll back
   (`until_seq`), or branch into different storage. Journals sit after
-  extraction, so replay is deterministic even with an LLM extractor.
+  extraction, so replay is deterministic even with an LLM extractor. Each line
+  commits to its predecessor with a hash, so `verify_journal_integrity` detects a
+  removed or edited line even when the deletion cancels out in final state.
 - **Multi-agent belief attribution**: `record_fact(..., believed_by=...)` with
   believer-aware invalidation (agents never clobber each other's beliefs),
   `facts_believed_by`, and `belief_conflicts` for surfacing disagreements.
 - **Neutral benchmark harness** (`benchmarks/neutral/`): N memory systems, same
   responder/judge/embedder, pairwise McNemar matrix, full-disclosure block, and
   documented adapter wiring for third-party systems.
+
+### Security
+
+Found by the red team, fixed here, each with a regression test:
+
+- Caller-supplied `metadata["_provenance"]` could forge a trust tier; it is now
+  stripped and provenance comes only from the validated `provenance=` argument.
+- `record_fact` now enforces tenant ownership of both the entity and the source
+  memory, and refuses a lower-trust fact that would close a higher-trust one.
+- `record_fact` rejects non-finite (`NaN`/`Inf`) confidence and validity times,
+  which previously persisted silently and broke downstream serialization.
+- An oversized journal record could push the last line outside a fixed tail-read
+  window and restart the sequence, producing duplicate `seq` values.
+- `AgentMemory.archival_insert` accepts `provenance` (defaulting to `agent`), so an
+  agent storing retrieved web content can mark it untrusted.
 
 ### Fixed
 
