@@ -20,8 +20,91 @@ accurately as Mem0** - while storing memories for a tiny fraction of the cost an
 completely offline.
 
 > **Honest up front:** on answer accuracy, GENOME *ties* Mem0 - we do **not** claim to beat
-> it there (two independent benchmark runs confirm parity). The advantage is cost, speed,
-> offline operation, and a temporal/auditable record Mem0 can't produce.
+> it there (six independent benchmark configurations confirm parity, none significant in
+> either direction). The advantage is cost, speed, offline operation, and a
+> temporal/auditable record Mem0 can't produce.
+
+## See it work
+
+![GENOME storing a two-year timeline and answering point-in-time questions](docs/demo.gif)
+
+Every frame is real output from [`examples/demo_timeline.py`](./examples/demo_timeline.py),
+captured by [`tools/render_demo_gif.py`](./tools/render_demo_gif.py). Run it yourself,
+no API key required:
+
+```bash
+python examples/demo_timeline.py
+```
+
+The interesting part is step 3. The same question gets three different correct answers
+depending on *when* you ask about, because the store keeps when each fact became true
+rather than overwriting it:
+
+| Question | Answer |
+|---|---|
+| What was Priya's city in May 2023? | Boston [Mar 2023 - Jan 2024] |
+| What was Priya's city in March 2024? | Seattle [Jan 2024 - Feb 2025] |
+| What is Priya's city now? | Austin [Feb 2025 - present] |
+
+The "thinking about maybe moving to Denver, nothing decided" turn is stored but never
+becomes an answer: it is a plan, not a durable fact.
+
+## How it works
+
+The write path is deliberately dumb and cheap. All the intelligence happens at read time,
+when there is a query to focus it.
+
+```mermaid
+flowchart LR
+    M["incoming message"] --> E["local embedder<br/>all-MiniLM-L6-v2"]
+    E --> S[("local store<br/>SQLite or Postgres")]
+    M -. "optional, opt-in" .-> B["belief extraction<br/>(the only LLM call)"]
+    B --> K[("bi-temporal<br/>fact log")]
+
+    Q["query"] --> R["exact cosine search<br/>over this tenant's rows"]
+    S --> R
+    R --> RR["optional cross-encoder<br/>rerank"]
+    RR --> A["context for the agent"]
+    Q --> PIT["as-of resolution<br/>facts_valid_at(entity, T)"]
+    K --> PIT
+    PIT --> A
+
+    style E fill:#0A84FF,color:#fff
+    style S fill:#1c2530,color:#fff
+    style K fill:#1c2530,color:#fff
+    style B fill:#3a3a3a,color:#fff
+```
+
+Write: embed locally, store. About 10 ms, zero LLM calls, zero network calls, and
+deterministic, so ingesting the same conversation twice produces the same store.
+
+Read: exact cosine search within the tenant's scope (no ANN index to build or update),
+with an optional local cross-encoder reranker.
+
+Bi-temporal layer (opt-in): records each fact at its **domain time**, the moment it became
+true in the world, not the moment it was ingested. That is what makes point-in-time
+questions answerable even when facts arrive out of order.
+
+### Why the record can be re-derived
+
+```mermaid
+flowchart TB
+    subgraph LLM["LLM-extraction memory"]
+        A1["message"] --> A2["LLM decides what matters<br/>(sampled, non-deterministic)"]
+        A2 --> A3[("store")]
+        A3 --> A4["replaying the same input<br/>can produce a different store"]
+    end
+    subgraph GEN["GENOME"]
+        B1["message"] --> B2["local embedding<br/>(deterministic)"]
+        B2 --> B3[("store")]
+        B3 --> B4["replaying the same input<br/>reproduces the same store"]
+    end
+    style A4 fill:#5c1f1f,color:#fff
+    style B4 fill:#1f4d33,color:#fff
+```
+
+A record that cannot be re-derived is difficult to audit. That property, not accuracy, is
+the actual argument for this design.
 
 ## Don't believe it? Prove it yourself
 
