@@ -83,12 +83,23 @@ class Memory:
         close_drain_timeout_seconds: float = 30.0,
         reranker: Any = None,
         trust_policy: Any = None,
+        journal: Any = None,
     ) -> None:
         # Store
         if isinstance(storage, MemoryStore):
             self.store = storage
         else:
             self.store = SQLiteMemoryStore(path=storage)
+
+        # Journal (opt-in): wrap the store so every mutation - including fact,
+        # entity, synthesis, and conflict-resolution writes - is recorded for
+        # deterministic replay. See genome.journal.
+        if journal is not None:
+            from genome.journal import Journal, JournalingStore
+
+            if not isinstance(journal, Journal):
+                journal = Journal(journal)
+            self.store = JournalingStore(self.store, journal)
 
         # Memory firewall (opt-in). See genome.firewall: provenance tagging is
         # always available; quarantine and origin-bound authority activate when
