@@ -115,6 +115,10 @@ git clone https://github.com/NORTHTEKDevs/genome && cd genome
 pip install -e . && python -m genome.verify
 ```
 
+The **first** run downloads the local embedding model (~90 MB, one time) before printing
+anything, so expect 30-120 seconds of apparent silence on a cold machine. Every run after
+that is instant.
+
 It writes memories with your **outbound network physically blocked** and prints a live
 pass/fail receipt - 0 network calls, 0 LLM calls, single-digit-ms writes, retrieval that works:
 

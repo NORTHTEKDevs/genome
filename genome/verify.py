@@ -107,7 +107,7 @@ def main() -> int:
     # (a skeptic checking our claims) to commands that do not exist in their install.
     print("\nReproduce the harder claims yourself, from a clone of the repo")
     print("(github.com/NORTHTEKDevs/genome -- these are not in the pip package):")
-    print("  full test suite (also runs in public CI):   pytest -q")
+    print('  full test suite (also runs in public CI):   pip install -e ".[dev]" && pytest -q')
     print("  cost model, no API key:                      python benchmarks/tco_project.py")
     print("  air-gapped latency, longer run:              python benchmarks/local_writepath.py --n 1000")
     print("  accuracy parity vs Mem0 (bring your key):    python benchmarks/head_to_head.py")

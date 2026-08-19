@@ -3,7 +3,13 @@
 """The server must be safe by default: it defaults to loopback and refuses to
 bind a non-loopback interface without an API key (the API is destructive)."""
 
-import genome.server.__main__ as srv
+import pytest
+
+# genome.server.__main__ pulls in the optional [fastapi] extra (fastapi + uvicorn).
+pytest.importorskip("fastapi", reason="requires the [fastapi] extra")
+pytest.importorskip("uvicorn", reason="requires the [fastapi] extra")
+
+import genome.server.__main__ as srv  # noqa: E402
 
 
 def _run(monkeypatch, env):
