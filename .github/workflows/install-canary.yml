@@ -26,7 +26,7 @@ jobs:
       GENOME_MCP_DB: canary-memories.db
       HF_HUB_DISABLE_PROGRESS_BARS: "1"
     steps:
-      - uses: actions/setup-python@v6
+      - uses: actions/setup-python@v7
         with:
           python-version: "3.12"
 
