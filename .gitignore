@@ -66,3 +66,11 @@ public/
 CRYSTAL.md
 *.db
 *.sqlite
+
+# raw stdout/stderr from benchmark runs (canonical results live in *_result.txt)
+benchmarks/*_run*.txt
+benchmarks/*_run*.err
+benchmarks/*sweep*.txt
+benchmarks/*sweep*.err
+benchmarks/head_to_head_locked.txt
+benchmarks/head_to_head_locked.err
