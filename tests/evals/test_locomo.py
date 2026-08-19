@@ -451,6 +451,15 @@ def test_every_memory_flag_exposed_on_locomo_config():
         # CrossEncoderReranker. Named differently (object vs bool), so it can't
         # name-match this test, but it is fully wired -- not a silent lever.
         "reranker",
+        # Bench-irrelevant: the trust firewall filters recall by write
+        # provenance, and every LoCoMo turn has the same provenance (none).
+        # With no policy configured it is inert; there is no benchmark number
+        # it could move. Its behavior is pinned by tests/test_firewall.py.
+        "trust_policy",
+        # Bench-irrelevant: journaling is write-path I/O plumbing (records
+        # mutations for replay); it changes durability, never retrieval or
+        # synthesis. Pinned by tests/test_journal.py.
+        "journal",
     }
 
     sig = inspect.signature(Memory.__init__)

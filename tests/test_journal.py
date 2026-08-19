@@ -14,7 +14,7 @@ import json
 import pytest
 
 from genome import Memory
-from genome.journal import Journal, replay_journal, snapshot_hash, verify_journal
+from genome.journal import replay_journal, snapshot_hash, verify_journal
 
 
 @pytest.fixture

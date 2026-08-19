@@ -17,8 +17,9 @@ is a pull request, not a rebuttal thread.
 from __future__ import annotations
 
 import sys
+from collections.abc import Callable
 from pathlib import Path
-from typing import Any, Callable
+from typing import Any
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))  # benchmarks/
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))  # repo root

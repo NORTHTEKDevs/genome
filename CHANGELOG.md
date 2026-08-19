@@ -7,6 +7,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Added
+
+- **Memory firewall** (`genome.firewall`): provenance-tagged writes with trust
+  tiers, recall quarantine for low-trust origins, and origin-bound authority -
+  a lower-trust source can never UPDATE/DELETE a higher-trust memory through
+  conflict resolution, even when the resolver LLM is fooled into asking for it.
+- **Explainable recall** (`genome.explain.explain_search`): per-candidate dense
+  score, BM25 rank, fused score, and the exact exclusion reason. Deterministic,
+  cache-bypassing, never touches access statistics.
+- **Journal + deterministic replay** (`genome.journal`): record every store
+  mutation, reproduce the store provably (`verify_journal`), roll back
+  (`until_seq`), or branch into different storage. Journals sit after
+  extraction, so replay is deterministic even with an LLM extractor.
+- **Multi-agent belief attribution**: `record_fact(..., believed_by=...)` with
+  believer-aware invalidation (agents never clobber each other's beliefs),
+  `facts_believed_by`, and `belief_conflicts` for surfacing disagreements.
+- **Neutral benchmark harness** (`benchmarks/neutral/`): N memory systems, same
+  responder/judge/embedder, pairwise McNemar matrix, full-disclosure block, and
+  documented adapter wiring for third-party systems.
+
 ### Fixed
 
 - **`genome.__version__` lied.** Releases 1.0.4-1.0.6 self-reported "1.0.3": the

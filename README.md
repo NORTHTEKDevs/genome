@@ -204,6 +204,47 @@ capability, not a price point.
 - **Optional bi-temporal layer:** track how facts change over time and answer "what was true
   at time T" - see below.
 
+## What determinism buys you
+
+Because nothing on the write path interprets your content, GENOME can do things an
+LLM-ingest memory system cannot do in principle:
+
+- **Memory firewall** (`genome.firewall`): tag every write with where it came from
+  (`user`, `agent`, `tool`, `web`), quarantine low-trust origins from recall, and
+  enforce origin-bound authority - web content can never UPDATE or DELETE what your
+  user said, even when a prompt-injected conflict resolver asks for it. There is
+  also no extraction step for injected content to attack: the write path has no LLM.
+
+  ```python
+  from genome import Memory
+  from genome.firewall import TrustPolicy
+
+  m = Memory(trust_policy=TrustPolicy(recall_min_trust=1))
+  m.add("I live in Anchorage", user_id="u1", provenance="user")
+  m.add(scraped_page_text, user_id="u1", provenance="web")   # quarantined
+  ```
+
+- **Explainable recall** (`genome.explain`): `explain_search()` reports every
+  candidate's dense score, BM25 rank, fused score, and - when it was not returned -
+  the exact reason (parent-filtered, quarantined, beyond the limit). Two runs agree,
+  so a recall bug can be committed as a regression test instead of a shrug.
+
+- **Journal + replay** (`genome.journal`): record every mutation and provably
+  reproduce the store - `verify_journal()` replays the history and compares
+  canonical hashes. Replay a prefix to roll back; replay into different storage to
+  branch a memory for a what-if run. The journal sits after extraction, so replay
+  is deterministic even if you configured an LLM extractor.
+
+- **Multi-agent belief attribution** (`record_fact(..., believed_by="agent-a")`):
+  agents sharing a store keep their own belief timelines - agent B disagreeing does
+  not clobber agent A's fact - and `belief_conflicts()` surfaces disagreements for
+  deliberate resolution instead of silently picking a winner.
+
+- **A neutral benchmark harness** (`benchmarks/neutral/`): run GENOME, Mem0, and a
+  full-context baseline through the same responder, judge, and embedder, with a
+  pairwise McNemar matrix and a full-disclosure block. GENOME is one row in the
+  table, not the house.
+
 ## Install
 
 ```bash

@@ -37,12 +37,12 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[2]))  # repo root
 from adapters import make_system  # noqa: E402
 from head_to_head import (  # noqa: E402
     _MODEL_DEFAULTS,
-    _StubBaseline,
     _build_llms,
     _headline_acc,
     _mcnemar,
     _need_dataset,
     _rows,
+    _StubBaseline,
     _synthetic_conversation,
 )
 

@@ -104,9 +104,9 @@ def explain_search(
     bm25_rank: dict[str, int] = {}
     fused_score: dict[str, float] = {}
     if mode == "hybrid":
-        from genome.memory.hybrid import HybridScorer, _tokenize
-
         from rank_bm25 import BM25Okapi
+
+        from genome.memory.hybrid import HybridScorer, _tokenize
 
         eligible = [
             rec for rec in in_scope
@@ -117,7 +117,9 @@ def explain_search(
             ids = list(corpus)
             bm25 = BM25Okapi([_tokenize(corpus[i]) for i in ids])
             scores = bm25.get_scores(_tokenize(query))
-            ranked = sorted(zip(ids, scores), key=lambda p: p[1], reverse=True)
+            ranked = sorted(
+                zip(ids, scores, strict=True), key=lambda p: p[1], reverse=True
+            )
             for rank, (rid, score) in enumerate(ranked, start=1):
                 if score > 0:
                     bm25_rank[rid] = rank
