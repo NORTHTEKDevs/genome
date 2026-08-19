@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Fixed
+
+- **`genome.__version__` lied.** Releases 1.0.4-1.0.6 self-reported "1.0.3": the
+  module string was bumped by hand and forgotten while `pyproject.toml` moved on.
+  The version is now derived from installed package metadata, so the module can
+  never disagree with the release again, and the smoke test pins the invariant.
+
 ## [1.0.6] - 2026-08-17
 
 ### Fixed

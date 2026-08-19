@@ -3,7 +3,15 @@
 # Copyright 2026 Northtek (FrostByte Digital LLC)
 # SPDX-License-Identifier: Apache-2.0
 
-__version__ = "1.0.3"
+# Single-sourced from package metadata (pyproject.toml) so the module can never
+# disagree with the released version again; 1.0.4-1.0.6 shipped self-reporting 1.0.3
+# because this string was bumped by hand and forgotten.
+try:
+    from importlib.metadata import version as _pkg_version
+
+    __version__ = _pkg_version("genome-memory")
+except Exception:  # running from a source tree without installed dist metadata
+    __version__ = "0.0.0+source"
 
 
 _RELATION_CONSTANTS = {"SUPERSEDES", "CONTRADICTS", "DERIVED_FROM", "RELATES_TO", "CAUSES"}
