@@ -82,12 +82,18 @@ class Memory:
         auto_consolidate_operator: str = "frequency_crossover",
         close_drain_timeout_seconds: float = 30.0,
         reranker: Any = None,
+        trust_policy: Any = None,
     ) -> None:
         # Store
         if isinstance(storage, MemoryStore):
             self.store = storage
         else:
             self.store = SQLiteMemoryStore(path=storage)
+
+        # Memory firewall (opt-in). See genome.firewall: provenance tagging is
+        # always available; quarantine and origin-bound authority activate when
+        # a TrustPolicy is supplied.
+        self._trust_policy = trust_policy
 
         # Embedding provider
         self.embed = embedding_provider or EmbeddingProvider()
@@ -216,6 +222,7 @@ class Memory:
         user_id: str | None = None,
         agent_id: str | None = None,
         metadata: dict | None = None,
+        provenance: str | None = None,
     ) -> list[MemoryRecord]:
         """Extract facts from `text` and store each as a separate memory.
 
@@ -224,6 +231,12 @@ class Memory:
         in the same scope; the LLM decides ADD / UPDATE / DELETE / NONE and
         only ADD-decided facts produce a new INSERT. Returns the list of
         newly-stored records.
+
+        `provenance` declares where the content came from ("user", "system",
+        "agent", "tool", "web") and is recorded on every stored record. With a
+        TrustPolicy on the Memory, low-trust origins can be quarantined from
+        recall and can never supersede higher-trust memories through conflict
+        resolution. See genome.firewall.
         """
         # Type-guard the public boundary. Without these, a null text field, an
         # integer ORM primary key as user_id, or pre-serialized metadata each
@@ -247,6 +260,13 @@ class Memory:
                 f"metadata must be a dict or None, got {type(metadata).__name__}. "
                 f"Pass the object itself, not a JSON string."
             )
+
+        provenance_tag = None
+        if provenance is not None:
+            from genome.firewall import provenance_metadata
+
+            # Validates the source name against the policy's tiers (or defaults).
+            provenance_tag = provenance_metadata(self._trust_policy, provenance)
 
         with self._metrics.histogram(
             "memory.add.duration", tags={"user_id": user_id or ""}
@@ -287,6 +307,24 @@ class Memory:
                         )
                         # Fall through to ADD (safe: never touch an id the
                         # resolver was never shown).
+                    elif (
+                        decision.kind in ("UPDATE", "DELETE")
+                        and decision.target_id
+                        and self._supersede_refused(decision.target_id, provenance_tag)
+                    ):
+                        # Origin-bound authority: a lower-trust origin can never
+                        # rewrite a higher-trust memory, even when the resolver
+                        # LLM was fooled into asking for it. Fall through to ADD.
+                        self._log.warning(
+                            "origin-bound authority refused a %s: incoming trust "
+                            "is below the target's; adding instead",
+                            decision.kind,
+                            extra={
+                                "target_id": decision.target_id,
+                                "user_id": user_id or "",
+                                "agent_id": agent_id or "",
+                            },
+                        )
                     elif decision.kind == "UPDATE" and decision.target_id:
                         updated = self.store.update(
                             decision.target_id,
@@ -305,12 +343,17 @@ class Memory:
                 # Per-record copy: caller-side mutation of the metadata dict
                 # must not bleed into stored records, and multi-fact add()
                 # must not have all records share one reference.
+                record_meta = dict(metadata) if metadata else {}
+                if provenance_tag is not None:
+                    from genome.firewall import PROVENANCE_KEY
+
+                    record_meta[PROVENANCE_KEY] = dict(provenance_tag)
                 rec = MemoryRecord(
                     content=fact,
                     embedding=vec,
                     user_id=user_id,
                     agent_id=agent_id,
-                    metadata=dict(metadata) if metadata else {},
+                    metadata=record_meta,
                 )
                 self.store.add(rec)
                 records.append(rec)
@@ -328,6 +371,27 @@ class Memory:
                 extra={"user_id": user_id, "agent_id": agent_id, "count": len(records)},
             )
         return records
+
+    def _supersede_refused(
+        self, target_id: str, provenance_tag: dict | None
+    ) -> bool:
+        """Origin-bound authority check for one conflict decision.
+
+        True when the policy forbids this supersede: the incoming fact's trust
+        is strictly below the target record's. Without a policy, never refuses.
+        """
+        policy = self._trust_policy
+        if policy is None or not getattr(policy, "supersede_requires_geq", False):
+            return False
+        from genome.firewall import trust_of
+
+        target = self.store.get(target_id)
+        if target is None:
+            return False
+        incoming_trust = (
+            provenance_tag["trust"] if provenance_tag else policy.untagged_trust
+        )
+        return incoming_trust < trust_of(target, policy)
 
     def _resolve_one(
         self,
@@ -714,12 +778,25 @@ If no clean attribute can be extracted, output FACT_TYPE: none and CONFIDENCE: 0
 
             q = self.embed.encode(query)
             exclude = set(exclude_ids or set())
-            if filter_parents:
+            quarantine_active = (
+                self._trust_policy is not None
+                and getattr(self._trust_policy, "recall_min_trust", None) is not None
+            )
+            if filter_parents or quarantine_active:
                 in_scope = self.store.list_by_scope(user_id=user_id, agent_id=agent_id)
-                parent_ids: set[str] = set()
-                for rec in in_scope:
-                    parent_ids.update(rec.parents)
-                exclude |= parent_ids
+                if filter_parents:
+                    parent_ids: set[str] = set()
+                    for rec in in_scope:
+                        parent_ids.update(rec.parents)
+                    exclude |= parent_ids
+                if quarantine_active:
+                    from genome.firewall import is_quarantined
+
+                    exclude |= {
+                        rec.id
+                        for rec in in_scope
+                        if is_quarantined(rec, self._trust_policy)
+                    }
 
             if mode == "dense":
                 results = self.store.search(
@@ -782,6 +859,37 @@ If no clean attribute can be extracted, output FACT_TYPE: none and CONFIDENCE: 0
                 "memory.search.count", tags={"user_id": user_id or ""}
             ).inc()
         return results
+
+    def search_quarantined(
+        self,
+        query: str,
+        *,
+        user_id: str | None = None,
+        agent_id: str | None = None,
+        limit: int = 10,
+    ) -> list[SearchResult]:
+        """Search ONLY the memories the trust policy holds out of normal recall.
+
+        Quarantine must be inspectable, not silent: this is how an operator (or
+        a review step) sees what untrusted-origin content is being withheld, and
+        decides whether to re-ingest any of it at a higher trust.
+        """
+        from genome.firewall import is_quarantined
+
+        if self._trust_policy is None:
+            return []
+        held = {
+            rec.id
+            for rec in self.store.list_by_scope(user_id=user_id, agent_id=agent_id)
+            if is_quarantined(rec, self._trust_policy)
+        }
+        if not held:
+            return []
+        q = self.embed.encode(query)
+        results = self.store.search(
+            q, user_id=user_id, agent_id=agent_id, limit=limit + len(held)
+        )
+        return [r for r in results if r.id in held][:limit]
 
     # ---------- synthesize (the differentiator) ----------
 
