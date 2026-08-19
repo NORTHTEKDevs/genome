@@ -78,6 +78,31 @@ class EntityFact:
         )
 
 
+def _fact_trust(memory: Any, source_memory_id: str | None) -> int | None:
+    """The trust of the memory that sourced a fact, or None when trust is off.
+
+    Used to enforce origin-bound authority on the fact timeline: a fact sourced
+    from a low-trust memory must not close one sourced from a high-trust memory.
+    """
+    policy = getattr(memory, "_trust_policy", None)
+    if policy is None or not getattr(policy, "supersede_requires_geq", False):
+        return None
+    from genome.firewall import trust_of
+
+    if source_memory_id is None:
+        return policy.untagged_trust
+    src = memory.store.get(source_memory_id)
+    return trust_of(src, policy) if src is not None else policy.untagged_trust
+
+
+def _refuse_close(memory: Any, incoming_trust: int | None, prior: MemoryRecord) -> bool:
+    """True when the incoming fact is too low-trust to close ``prior``."""
+    if incoming_trust is None:
+        return False
+    prior_trust = _fact_trust(memory, prior.metadata.get("source_memory_id"))
+    return prior_trust is not None and incoming_trust < prior_trust
+
+
 def _fact_records_for_entity(
     memory: Any, entity_id: str
 ) -> list[MemoryRecord]:
@@ -159,6 +184,7 @@ def record_fact(
     # valid_until at the earliest such future valid_from, so the timeline
     # stays single-current: this fact covers [now, future_from), the future
     # fact remains open from future_from onward.
+    incoming_trust = _fact_trust(memory, source_memory_id)
     new_valid_until: float | None = None
     try:
         # Close the existing current fact of the same type if requested
@@ -170,6 +196,12 @@ def record_fact(
                     # Believer-aware: never close another believer's fact.
                     or prior.metadata.get("believed_by") != believed_by
                 ):
+                    continue
+                # Origin-bound authority: a lower-trust fact must not close a
+                # higher-trust one. This is the temporal-layer counterpart of the
+                # firewall's guarantee that web content cannot overwrite what the
+                # user said - the two facts coexist as current instead.
+                if _refuse_close(memory, incoming_trust, prior):
                     continue
                 prior_from = prior.metadata.get("valid_from", 0)
                 if prior_from <= now:

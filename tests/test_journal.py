@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import json
 
+import numpy as np
 import pytest
 
 from genome import Memory
@@ -97,6 +98,69 @@ def test_replay_prefix_is_rollback(journaled):
     assert earlier.count() == 2
     assert sorted(r.content for r in earlier.list_all()) == ["first", "second"]
     earlier.close()
+
+
+def test_edge_operations_replay(journaled):
+    m, path = journaled
+    a = m.add("first node", user_id="u1")[0]
+    b = m.add("second node", user_id="u1")[0]
+    c = m.add("third node", user_id="u1")[0]
+    edge_ab = m.link(a.id, b.id, "relates_to")
+    m.link(b.id, c.id, "relates_to")
+    m.unlink(edge_ab.id)  # exercises delete_edge
+
+    replayed = replay_journal(path, embedding_provider=m.embed)
+    assert snapshot_hash(replayed) == snapshot_hash(m)
+    assert len(replayed.edges_of(b.id, direction="both", user_id="u1")) == 1
+    replayed.close()
+
+
+def test_delete_cascades_edges_on_replay(journaled):
+    m, path = journaled
+    a = m.add("node a", user_id="u1")[0]
+    b = m.add("node b", user_id="u1")[0]
+    m.link(a.id, b.id, "relates_to")
+    m.delete(a.id)  # cascades delete_edges_touching
+    replayed = replay_journal(path, embedding_provider=m.embed)
+    assert snapshot_hash(replayed) == snapshot_hash(m)
+    assert replayed.edges_of(b.id, direction="both", user_id="u1") == []
+    replayed.close()
+
+
+def test_reembed_false_update_replays_faithfully(journaled):
+    m, path = journaled
+    rec = m.add("original content", user_id="u1")[0]
+    original_embedding = np.array(rec.embedding, copy=True)
+    # Update content but keep the embedding (re_embed=False): live store keeps the
+    # old vector; replay must reproduce THAT, not silently re-embed the new content.
+    m.update(rec.id, content="rewritten content entirely different", re_embed=False)
+
+    replayed = replay_journal(path, embedding_provider=m.embed)
+    live = m.get(rec.id)
+    rep = replayed.get(rec.id)
+    assert rep.content == live.content == "rewritten content entirely different"
+    assert np.allclose(rep.embedding, original_embedding), (
+        "replay must keep the original embedding when re_embed was False"
+    )
+    replayed.close()
+
+
+def test_seq_reflects_file_not_just_memory(tmp_path):
+    """A second Journal on the same path continues the sequence, never restarts."""
+    from genome.journal import Journal
+
+    path = tmp_path / "j.journal"
+    m1 = Memory(storage=":memory:", journal=path)
+    m1.add("one", user_id="u1")
+    m1.add("two", user_id="u1")
+    m1.close()
+
+    # A fresh Journal object (as a second process would create) must not reuse seq 1.
+    j2 = Journal(path)
+    j2.append({"op": "delete", "id": "mem_xxxxxxxxxxxx"})
+    seqs = [json.loads(line)["seq"] for line in path.read_text().splitlines()]
+    assert seqs == sorted(seqs) and len(set(seqs)) == len(seqs), "seqs stay unique/ordered"
+    assert seqs[-1] == len(seqs)
 
 
 def test_no_journal_no_file(tmp_path):

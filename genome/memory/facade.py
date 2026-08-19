@@ -355,9 +355,14 @@ class Memory:
                 # must not bleed into stored records, and multi-fact add()
                 # must not have all records share one reference.
                 record_meta = dict(metadata) if metadata else {}
-                if provenance_tag is not None:
-                    from genome.firewall import PROVENANCE_KEY
+                # Provenance is a trust signal; it must come ONLY from the validated
+                # `provenance=` argument, never from caller-supplied metadata. Otherwise
+                # a caller could pass metadata={"_provenance": {"trust": 999}} and
+                # self-assign authority, defeating quarantine and origin-bound authority.
+                from genome.firewall import PROVENANCE_KEY
 
+                record_meta.pop(PROVENANCE_KEY, None)
+                if provenance_tag is not None:
                     record_meta[PROVENANCE_KEY] = dict(provenance_tag)
                 rec = MemoryRecord(
                     content=fact,
@@ -382,6 +387,20 @@ class Memory:
                 extra={"user_id": user_id, "agent_id": agent_id, "count": len(records)},
             )
         return records
+
+    def _is_quarantined(self, record: Any) -> bool:
+        """True when the trust policy holds this record out of recall.
+
+        Centralized so every retrieval path - dense, hybrid, graph expansion, and
+        synthesized-parent selection - applies the SAME quarantine test. A path that
+        forgets this is a poisoning bypass, which is exactly what the firewall exists
+        to prevent.
+        """
+        if self._trust_policy is None:
+            return False
+        from genome.firewall import is_quarantined
+
+        return is_quarantined(record, self._trust_policy)
 
     def _supersede_refused(
         self, target_id: str, provenance_tag: dict | None
@@ -987,6 +1006,23 @@ If no clean attribute can be extracted, output FACT_TYPE: none and CONFIDENCE: 0
             content = f"hybrid of: {' + '.join(short)}"
         meta = dict(metadata or {})
         meta.setdefault("parent_contents", [p.content for p in parents])
+        # A hybrid must not launder quarantined content into a fresh, trusted
+        # record. Provenance is caller-controlled (stripped above), so derive the
+        # hybrid's trust as the MINIMUM of its parents': a synthesis of untrusted
+        # inputs is at most as trusted as its least-trusted input.
+        from genome.firewall import PROVENANCE_KEY, trust_of
+
+        meta.pop(PROVENANCE_KEY, None)
+        if self._trust_policy is not None:
+            min_trust = min(trust_of(p, self._trust_policy) for p in parents)
+            worst = min(
+                parents, key=lambda p: trust_of(p, self._trust_policy)
+            )
+            worst_tag = (worst.metadata or {}).get(PROVENANCE_KEY) or {}
+            meta[PROVENANCE_KEY] = {
+                "source": worst_tag.get("source", "synthesized"),
+                "trust": min_trust,
+            }
 
         rec = MemoryRecord(
             content=content,
@@ -1160,6 +1196,8 @@ If no clean attribute can be extracted, output FACT_TYPE: none and CONFIDENCE: 0
             )[:expand_per_entity]:
                 if m.id in base_ids or m.operator == ENTITY_OPERATOR:
                     continue
+                if self._is_quarantined(m):
+                    continue  # a quarantined memory must not re-enter via graph mode
                 if cos(m) < floor:
                     continue  # relevance gate
                 rec, n = cand.get(m.id, (m, 0))

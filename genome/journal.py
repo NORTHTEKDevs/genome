@@ -48,26 +48,96 @@ def _dumps(obj: dict[str, Any]) -> str:
     return json.dumps(obj, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
 
 
+class _SidecarLock:
+    """Cross-process mutex via an atomically-created sidecar `.lock` file.
+
+    Portable (no platform-specific APIs) and, crucially, it locks a SEPARATE file
+    so re-reading the journal's own tail under the lock never deadlocks against a
+    mandatory byte-range lock on the data file. ``os.O_CREAT | O_EXCL`` is atomic
+    on POSIX and Windows; the loser spins until the holder releases.
+    """
+
+    def __init__(self, target: Path) -> None:
+        self._path = target.with_name(target.name + ".lock")
+        self._fd: int | None = None
+
+    def __enter__(self) -> _SidecarLock:
+        import os
+        import time
+
+        deadline_spins = 0
+        while True:
+            try:
+                self._fd = os.open(
+                    str(self._path), os.O_CREAT | os.O_EXCL | os.O_WRONLY
+                )
+                return self
+            except FileExistsError:
+                deadline_spins += 1
+                if deadline_spins > 5000:  # ~5s at 1ms; stale lock, break in
+                    try:
+                        self._path.unlink()
+                    except OSError:
+                        pass
+                time.sleep(0.001)
+
+    def __exit__(self, *_exc: object) -> None:
+        import os
+
+        if self._fd is not None:
+            os.close(self._fd)
+            self._fd = None
+        try:
+            self._path.unlink()
+        except OSError:
+            pass
+
+
+def _last_seq_in_file(path: Path) -> int:
+    """The highest seq already in the journal, read from its tail.
+
+    Read under the OS lock so the sequence is correct even when another process
+    holds a Journal on the same path. A single memory line is bounded at ~100 KB
+    (MemoryRecord.MAX_CONTENT_LEN), so a 512 KB tail always contains the last
+    complete line.
+    """
+    if not path.is_file():
+        return 0
+    size = path.stat().st_size
+    if size == 0:
+        return 0
+    with open(path, "rb") as handle:
+        handle.seek(max(0, size - 512 * 1024))
+        tail = handle.read()
+    for line in reversed(tail.splitlines()):
+        if line.strip():
+            try:
+                return int(json.loads(line)["seq"])
+            except (ValueError, KeyError):
+                continue
+    return 0
+
+
 class Journal:
-    """Append-only JSONL of store mutations, with a monotonic sequence."""
+    """Append-only JSONL of store mutations, with a monotonic sequence.
+
+    Concurrency: the sequence is assigned under both an in-process lock and an
+    OS-level exclusive file lock, re-deriving the next value from the file's own
+    tail, so two Journal objects on the same path (even in different processes)
+    never assign a duplicate seq. Correctness beats throughput for an audit-style
+    journal, so every append pays for the lock.
+    """
 
     def __init__(self, path: str | Path) -> None:
         self.path = Path(path)
         self.path.parent.mkdir(parents=True, exist_ok=True)
         self._lock = threading.Lock()
-        self._seq = 0
-        if self.path.is_file():
-            with open(self.path, encoding="utf-8") as handle:
-                for line in handle:
-                    if line.strip():
-                        self._seq = json.loads(line)["seq"]
 
     def append(self, op: dict[str, Any]) -> None:
-        with self._lock:
-            self._seq += 1
-            op = {"seq": self._seq, **op}
+        with self._lock, _SidecarLock(self.path):
+            seq = _last_seq_in_file(self.path) + 1
             with open(self.path, "a", encoding="utf-8") as handle:
-                handle.write(_dumps(op) + "\n")
+                handle.write(_dumps({"seq": seq, **op}) + "\n")
                 handle.flush()
 
     @staticmethod
@@ -129,6 +199,11 @@ class JournalingStore(MemoryStore):
                     "id": memory_id,
                     "content": content,
                     "metadata": metadata,
+                    # Record whether the caller supplied a fresh embedding. On
+                    # replay we must reproduce THAT choice: a content update with
+                    # re_embed=False (embedding is None) keeps the old embedding
+                    # live, so replay must not silently re-derive a different one.
+                    "reembed": embedding is not None,
                 }
             )
         return result
@@ -276,9 +351,13 @@ def replay_journal(
             )
         elif kind == "update":
             content = op.get("content")
+            # Re-embed only if the original update did (reembed defaults True for
+            # journals written before this flag existed - their updates always
+            # re-embedded, so True reproduces them).
+            reembed = op.get("reembed", True)
             vec = (
                 np.asarray(memory.embed.encode(content), dtype=np.float32)
-                if content is not None
+                if content is not None and reembed
                 else None
             )
             memory.store.update(

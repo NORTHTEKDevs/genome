@@ -71,23 +71,29 @@ def explain_search(
     agent_id: str | None = None,
     limit: int = 10,
     mode: str = "dense",
+    filter_parents: bool = True,
+    exclude_ids: set[str] | None = None,
+    reranker: Any = None,
+    rerank_pool: int = 50,
 ) -> ExplainReport:
-    """Re-derive a search and report every candidate's fate.
-
-    Mirrors ``Memory.search`` (dense and hybrid modes) with instrumentation.
-    Bypasses the response cache and does not touch access statistics, so
-    explaining a query never changes subsequent behavior.
+    """Explain a search: the authoritative final order comes from ``search()``
+    itself, so the included set is IDENTICAL to what ``search()`` returns for the
+    same arguments (including reranker, exclude_ids, and filter_parents). The
+    diagnostic score columns and per-candidate exclusion reasons are computed by a
+    separate read-only pass. The response cache is bypassed.
     """
     if mode not in {"dense", "hybrid"}:
         raise ValueError(f"explain_search supports dense/hybrid, got {mode!r}")
 
     in_scope = memory.store.list_by_scope(user_id=user_id, agent_id=agent_id)
     by_id = {rec.id: rec for rec in in_scope}
+    caller_excluded = set(exclude_ids or set())
 
-    # The two exclusion sets search() applies, kept separate so the reason is exact.
+    # The exclusion sets search() applies, kept separate so the reason is exact.
     parent_ids: set[str] = set()
-    for rec in in_scope:
-        parent_ids.update(rec.parents)
+    if filter_parents:
+        for rec in in_scope:
+            parent_ids.update(rec.parents)
     policy = getattr(memory, "_trust_policy", None)
     quarantined = {rec.id for rec in in_scope if is_quarantined(rec, policy)}
 
@@ -133,16 +139,22 @@ def explain_search(
             )
             fused_score = {rid: float(s) for rid, s in fused}
 
-    # Final ordering, derived exactly as search() derives it (exclusions, then
-    # the mode's ranking, then the limit) - but without the store touches the
-    # real path performs. test_report_matches_search_order pins the equivalence.
-    excluded = parent_ids | quarantined
-    if mode == "hybrid" and fused_score:
-        eligible_order = sorted(fused_score, key=fused_score.__getitem__, reverse=True)
-    else:
-        eligible_order = [r.id for r in dense_all if r.id not in excluded]
-    final_ids = [rid for rid in eligible_order if rid not in excluded][:limit]
-    final_rank = {rid: rank for rank, rid in enumerate(final_ids, start=1)}
+    # Authoritative final ordering: ask search() itself, with the same arguments,
+    # so parity is guaranteed by construction rather than by re-implementing (and
+    # drifting from) search()'s reranker / exclude / pool logic. Cache off.
+    final = memory.search(
+        query,
+        user_id=user_id,
+        agent_id=agent_id,
+        limit=limit,
+        filter_parents=filter_parents,
+        exclude_ids=exclude_ids,
+        use_cache=False,
+        mode=mode,
+        reranker=reranker,
+        rerank_pool=rerank_pool,
+    )
+    final_rank = {r.id: rank for rank, r in enumerate(final, start=1)}
 
     ordering = sorted(
         by_id,
@@ -157,6 +169,8 @@ def explain_search(
         rec = by_id[rid]
         if rid in final_rank:
             included, reason = True, f"included at rank {final_rank[rid]}"
+        elif rid in caller_excluded:
+            included, reason = False, "excluded: in the caller's exclude_ids"
         elif rid in parent_ids:
             included, reason = False, "excluded: parent of a synthesized memory"
         elif rid in quarantined:
