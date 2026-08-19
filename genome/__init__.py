@@ -24,6 +24,10 @@ _OBSERVABILITY_EXPORTS = {
 
 _CONFLICT_EXPORTS = {"ConflictResolver", "ConflictDecision"}
 
+#: The memory firewall. Exported at the top level because `Memory(trust_policy=...)`
+#: is a security control, and a security control nobody can find is not a control.
+_FIREWALL_EXPORTS = {"TrustPolicy", "PROVENANCE_KEY", "trust_of", "is_quarantined"}
+
 
 def __getattr__(name: str):
     # Lazy imports to avoid loading heavy deps (torch, sentence-transformers) on
@@ -55,6 +59,9 @@ def __getattr__(name: str):
     if name in _CONFLICT_EXPORTS:
         from genome.memory import conflict as _conflict
         return getattr(_conflict, name)
+    if name in _FIREWALL_EXPORTS:
+        from genome import firewall as _firewall
+        return getattr(_firewall, name)
     raise AttributeError(f"module 'genome' has no attribute {name!r}")
 
 
@@ -79,5 +86,9 @@ __all__ = [
     "get_logger",
     "ConflictResolver",
     "ConflictDecision",
+    "TrustPolicy",
+    "PROVENANCE_KEY",
+    "trust_of",
+    "is_quarantined",
     "__version__",
 ]

@@ -134,6 +134,8 @@ def record_fact(
     confidence: float = 1.0,
     invalidate_previous: bool = True,
     believed_by: str | None = None,
+    user_id: str | None = None,
+    agent_id: str | None = None,
 ) -> EntityFact:
     """Record a new fact about an entity as of `valid_from` (default: now).
 
@@ -167,6 +169,35 @@ def record_fact(
             f"record_fact expects an entity record, got "
             f"operator={entity.operator!r} for {entity_id}"
         )
+    # Tenant ownership, mirroring link()'s cross-scope refusal: a caller that names
+    # another tenant's entity_id must not be able to write facts onto their timeline.
+    if user_id is not None and entity.user_id != user_id:
+        raise ScopeError(
+            f"entity {entity_id} is not in user_id={user_id!r}",
+            hint=(
+                "Pass the entity_id of an entity in your own scope. Facts are part "
+                "of a tenant's record; writing across tenants is refused."
+            ),
+        )
+    if agent_id is not None and entity.agent_id != agent_id:
+        raise ScopeError(
+            f"entity {entity_id} is not in agent_id={agent_id!r}",
+            hint="Facts must be recorded within the entity's own scope.",
+        )
+    # A fact's provenance must belong to the same tenant as the fact.
+    if source_memory_id is not None:
+        src = memory.store.get(source_memory_id)
+        if src is not None and (
+            src.user_id != entity.user_id or src.agent_id != entity.agent_id
+        ):
+            raise ScopeError(
+                f"source memory {source_memory_id} is in a different scope than "
+                f"entity {entity_id}",
+                hint=(
+                    "A fact's source must be a memory in the same tenant; a "
+                    "cross-tenant source would forge provenance."
+                ),
+            )
 
     now = valid_from if valid_from is not None else time.time()
 

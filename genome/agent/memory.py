@@ -191,11 +191,21 @@ class AgentMemory:
         self._persist_core_block(label)
         return {"ok": True, "new_length": len(self.core_blocks[label].value)}
 
-    def archival_insert(self, content: str) -> dict[str, Any]:
-        """Add a memory to archival (long-term) storage."""
+    def archival_insert(
+        self, content: str, provenance: str = "agent"
+    ) -> dict[str, Any]:
+        """Add a memory to archival (long-term) storage.
+
+        `provenance` defaults to "agent" (the model's own conclusion) rather than
+        user-level, and should be set to "web" or "tool" when the agent is saving
+        content it retrieved. Without this an agent that browses the web and stores
+        notes would file untrusted content at user trust, where no TrustPolicy could
+        ever quarantine it. See genome.firewall.
+        """
         recs = self.memory.add(
             content, user_id=self.user_id, agent_id=self.session_id,
             metadata={"source": "agent_tool"},
+            provenance=provenance,
         )
         return {"ok": True, "ids": [r.id for r in recs]}
 

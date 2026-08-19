@@ -284,6 +284,69 @@ def test_journal_seq_survives_an_oversized_record(tmp_path):
     assert seqs == [1, 2, 3], f"seq restarted after the oversized line: {seqs}"
 
 
+# -- RED TEAM: cross-tenant fact injection ----------------------------------
+
+
+def test_record_fact_refuses_another_tenants_entity():
+    m = Memory(storage=":memory:")
+    victim = MemoryRecord(
+        content="Alice",
+        embedding=np.asarray(m.embed.encode("Alice"), dtype=np.float32),
+        user_id="tenant-b", operator=ENTITY_OPERATOR,
+        metadata={"entity_type": "PERSON", "entity_name": "Alice"},
+    )
+    m.store.add(victim)
+    from genome.errors import ScopeError
+
+    with pytest.raises(ScopeError):
+        m.record_fact(
+            victim.id, "reputation", "FRAUD - money laundering front",
+            user_id="tenant-a",
+        )
+    m.close()
+
+
+def test_record_fact_refuses_cross_tenant_source_memory():
+    m = Memory(storage=":memory:")
+    ent = MemoryRecord(
+        content="Alice",
+        embedding=np.asarray(m.embed.encode("Alice"), dtype=np.float32),
+        user_id="tenant-b", operator=ENTITY_OPERATOR,
+        metadata={"entity_type": "PERSON", "entity_name": "Alice"},
+    )
+    m.store.add(ent)
+    foreign = m.add("attacker's own note", user_id="tenant-a")[0]
+    from genome.errors import ScopeError
+
+    with pytest.raises(ScopeError):
+        m.record_fact(
+            ent.id, "reputation", "forged", source_memory_id=foreign.id,
+            user_id="tenant-b",
+        )
+    m.close()
+
+
+# -- RED TEAM: the firewall must be discoverable and agent-taggable ---------
+
+
+def test_trust_policy_is_exported_from_the_package_root():
+    import genome
+
+    assert genome.TrustPolicy is TrustPolicy
+    assert genome.PROVENANCE_KEY == PROVENANCE_KEY
+
+
+def test_agent_archival_insert_can_mark_untrusted_origin():
+    from genome.agent.memory import AgentMemory
+
+    m = Memory(storage=":memory:", trust_policy=TrustPolicy(recall_min_trust=1))
+    am = AgentMemory(m, user_id="u1", session_id="s1")
+    am.archival_insert("scraped from a hostile page", provenance="web")
+    hits = am.archival_search("scraped hostile")
+    assert not hits.get("results"), "web-provenance agent content must be quarantined"
+    m.close()
+
+
 # -- #12: explain_search stays in lockstep with search() under a reranker ---
 
 

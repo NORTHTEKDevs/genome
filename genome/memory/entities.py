@@ -315,10 +315,21 @@ def list_entities(
 
 
 def memories_mentioning(
-    memory: Memory, entity_id: str
+    memory: Memory,
+    entity_id: str,
+    *,
+    user_id: str | None = None,
+    agent_id: str | None = None,
 ) -> list[MemoryRecord]:
-    """Return all memories that mention the given entity (via MENTIONS edges)."""
-    return memory.related(entity_id, relation=MENTIONS, direction="in")
+    """Return all memories that mention the given entity (via MENTIONS edges).
+
+    Pass the caller's tenant so results are confined to it; without a scope this
+    returns whatever the edges point at, which is only safe single-tenant.
+    """
+    return memory.related(
+        entity_id, relation=MENTIONS, direction="in",
+        user_id=user_id, agent_id=agent_id,
+    )
 
 
 __all__ = [

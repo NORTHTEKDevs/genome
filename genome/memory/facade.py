@@ -1456,10 +1456,17 @@ If no clean attribute can be extracted, output FACT_TYPE: none and CONFIDENCE: 0
             self, user_id=user_id, agent_id=agent_id, entity_type=entity_type
         )
 
-    def memories_mentioning(self, entity_id: str) -> list[MemoryRecord]:
-        """Return memories that mention the given entity."""
+    def memories_mentioning(
+        self,
+        entity_id: str,
+        *,
+        user_id: str | None = None,
+        agent_id: str | None = None,
+    ) -> list[MemoryRecord]:
+        """Return memories that mention the given entity, confined to `user_id`/
+        `agent_id` when given. Quarantined memories are excluded (see `related`)."""
         from genome.memory.entities import memories_mentioning as _mm
-        return _mm(self, entity_id)
+        return _mm(self, entity_id, user_id=user_id, agent_id=agent_id)
 
     # ---------- Temporal knowledge graph (v1.1) ----------
 
@@ -1474,9 +1481,16 @@ If no clean attribute can be extracted, output FACT_TYPE: none and CONFIDENCE: 0
         confidence: float = 1.0,
         invalidate_previous: bool = True,
         believed_by: str | None = None,
+        user_id: str | None = None,
+        agent_id: str | None = None,
     ):
         """Record a new fact about an entity. Closes prior current fact of
         the same type AND believer (unless invalidate_previous=False).
+
+        Pass `user_id`/`agent_id` to assert the caller's tenant: the entity and the
+        source memory must both belong to it, or ScopeError is raised. Multi-tenant
+        callers should always pass it - it is what stops a caller from writing facts
+        onto another tenant's entity.
 
         Returns an EntityFact. See `genome.memory.temporal` for details.
         """
@@ -1488,6 +1502,8 @@ If no clean attribute can be extracted, output FACT_TYPE: none and CONFIDENCE: 0
             confidence=confidence,
             invalidate_previous=invalidate_previous,
             believed_by=believed_by,
+            user_id=user_id,
+            agent_id=agent_id,
         )
 
     def invalidate_fact(self, fact_id: str, *, at: float | None = None):
