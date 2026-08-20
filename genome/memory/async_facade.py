@@ -186,6 +186,24 @@ class AsyncMemory:
             provenance=provenance,
         )
 
+    async def search_quarantined(
+        self,
+        query: str,
+        *,
+        user_id: str | None = None,
+        agent_id: str | None = None,
+        limit: int = 10,
+    ):
+        """Inspect what the trust policy is holding out of recall. Parity with the
+        sync facade: quarantine must be inspectable, not silent, on both."""
+        return await asyncio.to_thread(
+            self._sync.search_quarantined,
+            query,
+            user_id=user_id,
+            agent_id=agent_id,
+            limit=limit,
+        )
+
     async def get(
         self,
         memory_id: str,
