@@ -181,10 +181,15 @@ def explain_search(
             )
         else:
             included, reason = False, f"excluded: beyond the top-{limit} limit"
+        # The report must not become the side channel that hands back what
+        # quarantine withheld: keep the reason and the scores, redact the text.
+        shown = (
+            "[redacted: quarantined content]" if rid in quarantined else rec.content
+        )
         candidates.append(
             CandidateExplanation(
                 id=rid,
-                content=rec.content,
+                content=shown,
                 dense_score=dense_score.get(rid),
                 dense_rank=dense_rank.get(rid),
                 bm25_rank=bm25_rank.get(rid),

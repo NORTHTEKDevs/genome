@@ -277,6 +277,11 @@ class Memory:
                 f"metadata must be a dict or None, got {type(metadata).__name__}. "
                 f"Pass the object itself, not a JSON string."
             )
+        # Checked here, before extraction/embedding: an unpaired surrogate reaches
+        # the tokenizer and dies with an opaque internal TypeError otherwise.
+        from genome.memory.schema import assert_encodable_text
+
+        assert_encodable_text(text, where="text")
 
         provenance_tag = None
         if provenance is not None:
@@ -651,6 +656,7 @@ If no clean attribute can be extracted, output FACT_TYPE: none and CONFIDENCE: 0
         *,
         user_id: str | None = None,
         agent_id: str | None = None,
+        include_quarantined: bool = False,
     ) -> MemoryRecord | None:
         """Get a single memory by id. Touches accessed_at (post-touch snapshot).
 
@@ -665,6 +671,11 @@ If no clean attribute can be extracted, output FACT_TYPE: none and CONFIDENCE: 0
         if user_id is not None and probe.user_id != user_id:
             return None
         if agent_id is not None and probe.agent_id != agent_id:
+            return None
+        # Knowing an id must not be a way around quarantine: add() hands the id
+        # back to the writer, so an agent that ingested hostile content could
+        # simply fetch it straight back by id and feed it to the model.
+        if not include_quarantined and self._is_quarantined(probe):
             return None
         self.store.touch(memory_id)
         # Patch the in-memory copy to reflect the touch -- saves a round-trip
@@ -1519,25 +1530,29 @@ If no clean attribute can be extracted, output FACT_TYPE: none and CONFIDENCE: 0
 
     def entity_timeline(
         self, entity_id: str, *, user_id: str | None = None,
+        agent_id: str | None = None,
     ):
-        """Return all facts about an entity, newest first."""
+        """Return all facts about an entity, newest first, confined to the scope."""
         from genome.memory.temporal import entity_timeline as _et
-        return _et(self, entity_id, user_id=user_id)
+        return _et(self, entity_id, user_id=user_id, agent_id=agent_id)
 
     def current_facts(
         self, entity_id: str, *, user_id: str | None = None,
+        agent_id: str | None = None,
     ):
-        """Return currently-true facts about an entity."""
+        """Return currently-true facts about an entity, confined to the scope given."""
         from genome.memory.temporal import current_facts as _cf
-        return _cf(self, entity_id, user_id=user_id)
+        return _cf(self, entity_id, user_id=user_id, agent_id=agent_id)
 
     def facts_valid_at(
         self, entity_id: str, timestamp: float,
-        *, user_id: str | None = None,
+        *, user_id: str | None = None, agent_id: str | None = None,
     ):
         """Return facts about an entity that were true at a specific timestamp."""
         from genome.memory.temporal import facts_valid_at as _fva
-        return _fva(self, entity_id, timestamp, user_id=user_id)
+        return _fva(
+            self, entity_id, timestamp, user_id=user_id, agent_id=agent_id
+        )
 
     def merge_entity_facts(self, from_entity_id: str, to_entity_id: str) -> int:
         """Move all facts from one entity to another (dedup). Same-scope only."""

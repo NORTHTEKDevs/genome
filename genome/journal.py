@@ -76,7 +76,11 @@ class _SidecarLock:
                     str(self._path), os.O_CREAT | os.O_EXCL | os.O_WRONLY
                 )
                 return self
-            except FileExistsError:
+            # PermissionError, not just FileExistsError: on Windows a genuine race
+            # between two creators of the same lock file surfaces as WinError 5.
+            # Letting it escape kills the calling thread and SILENTLY DROPS the
+            # journal record - the worst possible failure for an audit log.
+            except (FileExistsError, PermissionError):
                 deadline_spins += 1
                 if deadline_spins > 5000:  # ~5s at 1ms; stale lock, break in
                     try:
@@ -450,9 +454,23 @@ def replay_journal(
 
 
 def verify_journal_integrity(
-    path: str | Path, *, key: bytes | None = None
+    path: str | Path,
+    *,
+    key: bytes | None = None,
+    expect_last_hash: str | None = None,
+    expect_last_seq: int | None = None,
 ) -> tuple[bool, str]:
-    """Check the journal's own hash chain: no line removed, edited, or reordered.
+    """Check the journal's own hash chain: no line EDITED, REORDERED, or removed
+    from the middle.
+
+    **What a chain cannot do alone:** it cannot detect truncation of the TAIL. Drop
+    the last N lines and the surviving prefix is still perfectly self-consistent -
+    there is nothing left that references what was removed. Detecting a rollback
+    requires knowing where the log should end, which must come from outside the
+    file: pass ``expect_last_seq``/``expect_last_hash`` from a checkpoint you store
+    elsewhere (the same place you keep the HMAC key), or compare against live state
+    with :func:`verify_journal`, which catches truncation because the replayed
+    state no longer matches.
 
     This is a SEPARATE guarantee from state reproduction. Comparing replayed state
     to live state cannot detect a tampering that cancels out - deleting a record's
@@ -482,7 +500,22 @@ def verify_journal_integrity(
             )
         prev_hash = op["line_hash"]
         expected_seq += 1
-    return True, f"journal intact: {expected_seq - 1} line(s) chained"
+
+    last_seq = expected_seq - 1
+    # Tail-truncation check, only possible against an out-of-band checkpoint.
+    if expect_last_seq is not None and last_seq != expect_last_seq:
+        return False, (
+            f"journal ends at seq {last_seq} but the checkpoint says {expect_last_seq}: "
+            f"{expect_last_seq - last_seq} line(s) were truncated from the end"
+        )
+    if expect_last_hash is not None and not hmac.compare_digest(
+        prev_hash, expect_last_hash
+    ):
+        return False, (
+            "journal's final line hash does not match the checkpoint: the tail was "
+            "truncated or rewritten"
+        )
+    return True, f"journal intact: {last_seq} line(s) chained"
 
 
 def verify_journal(path: str | Path, memory: Any, *, key: bytes | None = None) -> bool:

@@ -35,6 +35,24 @@ def assert_finite_embedding(vec: np.ndarray, *, where: str = "embedding") -> Non
         )
 
 
+def assert_encodable_text(text: str, *, where: str = "content") -> None:
+    """Reject text that cannot be encoded as UTF-8.
+
+    A lone (unpaired) UTF-16 surrogate - common from malformed JS/JSON conversions
+    and a cheap DoS payload - reaches the tokenizer and crashes deep inside
+    HuggingFace with an opaque TypeError. Fail at the boundary with a message that
+    names the problem instead.
+    """
+    try:
+        text.encode("utf-8")
+    except UnicodeEncodeError as exc:
+        raise ValueError(
+            f"{where} contains characters that are not valid UTF-8 (an unpaired "
+            f"surrogate at position {exc.start}). This usually means the text came "
+            f"from a broken UTF-16 conversion; clean it before storing."
+        ) from None
+
+
 def assert_json_serializable(meta: dict, *, where: str = "metadata") -> None:
     """Fail at construction with a clear error when metadata contains values
     that the store would later choke on (datetime, numpy scalars, custom
@@ -115,6 +133,7 @@ class MemoryRecord:
                 f"content exceeds max length {self.MAX_CONTENT_LEN} "
                 f"(got {len(self.content)})"
             )
+        assert_encodable_text(self.content, where="MemoryRecord.content")
         if self.user_id is not None and len(self.user_id) > self.MAX_USER_ID_LEN:
             raise ValueError(f"user_id too long (max {self.MAX_USER_ID_LEN})")
         if self.agent_id is not None and len(self.agent_id) > self.MAX_AGENT_ID_LEN:

@@ -38,11 +38,17 @@ def test_report_matches_search_order(mem):
 
 
 def test_quarantined_candidate_is_reported_not_hidden(mem):
+    """The candidate must appear in the report (so the operator knows something was
+    withheld) but its TEXT must be redacted - otherwise the diagnostic becomes the
+    read path that quarantine exists to close."""
     report = explain_search(mem, "attacker coffee", user_id="u1", limit=5)
     held = [c for c in report.candidates if "quarantin" in c.reason.lower()]
     assert len(held) == 1
-    assert "attacker" in held[0].content.lower()
     assert held[0].included is False
+    assert "attacker" not in held[0].content.lower()
+    assert "redacted" in held[0].content.lower()
+    # The diagnostic scores are still there - only the content is withheld.
+    assert held[0].dense_score is not None
 
 
 def test_beyond_limit_is_a_named_reason(mem):

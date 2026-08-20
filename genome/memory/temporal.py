@@ -327,16 +327,20 @@ def entity_timeline(
     entity_id: str,
     *,
     user_id: str | None = None,
+    agent_id: str | None = None,
 ) -> list[EntityFact]:
     """Return all facts about an entity, ordered newest first.
 
-    If `user_id` is given, the entity must match scope or an empty list returns
-    (defense in depth, aligns with tenant-isolation pattern from R1).
+    If `user_id`/`agent_id` are given, the entity must match that scope or an empty
+    list returns. BOTH dimensions are checked: a deployment that tenants by
+    agent_id gets the same isolation as one that tenants by user_id.
     """
     ent = memory.store.get(entity_id)
     if ent is None:
         return []
     if user_id is not None and ent.user_id != user_id:
+        return []
+    if agent_id is not None and ent.agent_id != agent_id:
         return []
     return [EntityFact.from_record(r) for r in _fact_records_for_entity(memory, entity_id)]
 
@@ -346,6 +350,7 @@ def current_facts(
     entity_id: str,
     *,
     user_id: str | None = None,
+    agent_id: str | None = None,
 ) -> list[EntityFact]:
     """Return facts about an entity that are true *right now*.
 
@@ -354,7 +359,9 @@ def current_facts(
     open fact (valid_from in the future, valid_until None) would be reported as
     true now when it is not yet in effect.
     """
-    return facts_valid_at(memory, entity_id, time.time(), user_id=user_id)
+    return facts_valid_at(
+        memory, entity_id, time.time(), user_id=user_id, agent_id=agent_id
+    )
 
 
 def facts_valid_at(
@@ -363,6 +370,7 @@ def facts_valid_at(
     timestamp: float,
     *,
     user_id: str | None = None,
+    agent_id: str | None = None,
 ) -> list[EntityFact]:
     """Return facts about an entity that were true at `timestamp`.
 
@@ -375,7 +383,9 @@ def facts_valid_at(
     valid_until returns the SUCCESSOR fact, not this one. This matches the
     Zep / temporal-KG convention.
     """
-    timeline = entity_timeline(memory, entity_id, user_id=user_id)
+    timeline = entity_timeline(
+        memory, entity_id, user_id=user_id, agent_id=agent_id
+    )
     return [
         f for f in timeline
         if f.valid_from <= timestamp
