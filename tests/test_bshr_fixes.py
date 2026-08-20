@@ -347,6 +347,33 @@ def test_agent_archival_insert_can_mark_untrusted_origin():
     m.close()
 
 
+# -- RE-ATTACK: the firewall must be reachable from the async entry point ---
+
+
+def test_async_memory_supports_the_firewall():
+    """AsyncMemory is what the LangChain/LlamaIndex integrations use. If it cannot
+    take a TrustPolicy, quarantine is unreachable for every async app."""
+    import asyncio
+
+    from genome.memory import AsyncMemory
+
+    async def scenario():
+        m = AsyncMemory(
+            storage=":memory:", trust_policy=TrustPolicy(recall_min_trust=1)
+        )
+        await m.add("trusted user note", user_id="u1", provenance="user")
+        await m.add("hostile scraped page", user_id="u1", provenance="web")
+        hits = await m.search("hostile scraped", user_id="u1", limit=10)
+        contents = [h.record.content for h in hits]
+        await m.close()
+        return contents
+
+    contents = asyncio.run(scenario())
+    assert not any("hostile" in c for c in contents), (
+        "AsyncMemory must enforce quarantine like Memory does"
+    )
+
+
 # -- #12: explain_search stays in lockstep with search() under a reranker ---
 
 

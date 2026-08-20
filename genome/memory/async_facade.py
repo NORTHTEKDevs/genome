@@ -139,6 +139,8 @@ class AsyncMemory:
         embedding_provider: EmbeddingProvider | None = None,
         llm_call: MaybeAsyncLLMCallFn | None = None,
         extractor: FactExtractor | None = None,
+        trust_policy: Any = None,
+        journal: Any = None,
     ) -> None:
         # Resolve extractor
         resolved_extractor: FactExtractor
@@ -152,11 +154,16 @@ class AsyncMemory:
         else:
             resolved_extractor = IdentityExtractor()
 
-        # Underlying sync Memory
+        # Underlying sync Memory. trust_policy and journal are threaded through: this
+        # is the class the async / LangChain / LlamaIndex integrations use, and a
+        # security control that cannot be reached from the recommended entry point is
+        # not a control at all.
         self._sync = Memory(
             storage=storage,
             embedding_provider=embedding_provider,
             extractor=resolved_extractor,
+            trust_policy=trust_policy,
+            journal=journal,
         )
 
     # ---------- core ops (async) ----------
@@ -168,6 +175,7 @@ class AsyncMemory:
         user_id: str | None = None,
         agent_id: str | None = None,
         metadata: dict | None = None,
+        provenance: str | None = None,
     ) -> list[MemoryRecord]:
         return await asyncio.to_thread(
             self._sync.add,
@@ -175,6 +183,7 @@ class AsyncMemory:
             user_id=user_id,
             agent_id=agent_id,
             metadata=metadata,
+            provenance=provenance,
         )
 
     async def get(
