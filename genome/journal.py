@@ -567,6 +567,16 @@ def verify_journal_integrity(
             "journal's final line hash does not match the checkpoint: the tail was "
             "truncated or rewritten"
         )
+    if last_seq == 0 and expect_last_seq is None and expect_last_hash is None:
+        # Zero lines and no checkpoint to compare against: a journal that was never
+        # written and one truncated to nothing are the same file. Saying "intact"
+        # would certify the erased case, so say what is actually true instead.
+        return False, (
+            "journal is empty and no checkpoint was supplied, so a journal that was "
+            "never written cannot be told apart from one truncated to nothing. Pass "
+            "expect_last_seq/expect_last_hash from a checkpoint stored elsewhere, or "
+            "use verify_journal() to compare the replay against live state."
+        )
     return True, f"journal intact: {last_seq} line(s) chained"
 
 

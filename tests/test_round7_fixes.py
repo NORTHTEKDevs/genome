@@ -179,3 +179,35 @@ class TestConsolidateBoundValidation:
         )
         assert result.pruned == 4
         assert mem.count(user_id="u1", agent_id="a1") == 0
+
+
+class TestEmptyJournalIsNotIntact:
+    """Round 10: verifying zero lines with no checkpoint used to report intact.
+
+    A journal that was never written and one truncated to nothing are the same
+    file, so "intact" would certify the erased case.
+    """
+
+    def test_emptied_journal_is_not_reported_intact(self, tmp_path):
+        p = tmp_path / "j.jsonl"
+        _write_journal(p, n=3)
+        p.write_bytes(b"")
+        ok, reason = verify_journal_integrity(p)
+        assert ok is False
+        assert "empty" in reason
+
+    def test_a_checkpoint_turns_it_into_a_proven_break(self, tmp_path):
+        """With out-of-band expectations this is detected as truncation, not doubt."""
+        p = tmp_path / "j.jsonl"
+        _write_journal(p, n=3)
+        p.write_bytes(b"")
+        ok, reason = verify_journal_integrity(p, expect_last_seq=3)
+        assert ok is False
+        assert "truncated" in reason
+
+    def test_a_real_journal_still_verifies(self, tmp_path):
+        """Negative control."""
+        p = tmp_path / "j.jsonl"
+        _write_journal(p, n=3)
+        ok, reason = verify_journal_integrity(p)
+        assert ok is True, reason
