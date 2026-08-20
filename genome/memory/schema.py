@@ -51,6 +51,12 @@ def assert_encodable_text(text: str, *, where: str = "content") -> None:
             f"surrogate at position {exc.start}). This usually means the text came "
             f"from a broken UTF-16 conversion; clean it before storing."
         ) from None
+    if "\x00" in text:
+        raise ValueError(
+            f"{where} contains a NUL byte at position {text.index(chr(0))}. NUL is a "
+            "string terminator in C-based consumers (SQLite FTS, some drivers, log "
+            "shippers) and is a classic truncation/smuggling vector; strip it first."
+        )
 
 
 def assert_json_serializable(meta: dict, *, where: str = "metadata") -> None:

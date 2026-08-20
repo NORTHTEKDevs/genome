@@ -515,6 +515,15 @@ def test_lone_surrogate_is_a_clean_error_not_a_tokenizer_crash():
     m.close()
 
 
+def test_nul_byte_in_content_is_rejected():
+    """NUL terminates strings in C-based consumers downstream; accepting it is a
+    truncation/smuggling vector even though Python itself handles it fine."""
+    m = Memory(storage=":memory:")
+    with pytest.raises(ValueError, match="NUL"):
+        m.add("hello\x00world", user_id="u1")
+    m.close()
+
+
 # -- HOSTILE PASS: journal truncation is detectable with a checkpoint -------
 
 
