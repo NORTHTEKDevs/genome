@@ -28,6 +28,9 @@ from genome.memory.schema import (
     assert_finite_embedding,
 )
 from genome.memory.store import MemoryStore
+from genome.observability import get_logger
+
+_log = get_logger("memory.sqlite_store")
 
 SCHEMA_SQL = """
 CREATE TABLE IF NOT EXISTS memories (
@@ -369,23 +372,45 @@ class SQLiteMemoryStore(MemoryStore):
 
 
 def _row_to_record(row: sqlite3.Row | None) -> MemoryRecord | None:
+    """Decode one row, or return None if the row itself is unreadable.
+
+    A row can be undecodable without anything else being wrong: a stored
+    embedding whose declared dimension no longer matches its blob (an embedding
+    model changed under an existing database), a non-finite value that arrived
+    through a restore or a migration rather than through ``add``, or malformed
+    JSON in a metadata column.
+
+    These are isolated per row on purpose. Letting the exception propagate meant
+    a SINGLE bad row made ``search`` and ``list_by_scope`` raise for the ENTIRE
+    scope, so one corrupt record denied access to every healthy one beside it.
+    Skipping the row keeps the rest retrievable; the ERROR log is what makes the
+    loss visible, since the caller sees only a shorter result list.
+    """
     if row is None:
         return None
-    dim = row["embedding_dim"]
-    emb = np.frombuffer(row["embedding"], dtype=np.float32, count=dim).copy()
-    return MemoryRecord(
-        id=row["id"],
-        content=row["content"],
-        embedding=emb,
-        user_id=row["user_id"],
-        agent_id=row["agent_id"],
-        created_at=row["created_at"],
-        accessed_at=row["accessed_at"],
-        access_count=row["access_count"],
-        parents=json.loads(row["parents"]),
-        operator=row["operator"],
-        metadata=json.loads(row["metadata"]),
-    )
+    try:
+        dim = row["embedding_dim"]
+        emb = np.frombuffer(row["embedding"], dtype=np.float32, count=dim).copy()
+        return MemoryRecord(
+            id=row["id"],
+            content=row["content"],
+            embedding=emb,
+            user_id=row["user_id"],
+            agent_id=row["agent_id"],
+            created_at=row["created_at"],
+            accessed_at=row["accessed_at"],
+            access_count=row["access_count"],
+            parents=json.loads(row["parents"]),
+            operator=row["operator"],
+            metadata=json.loads(row["metadata"]),
+        )
+    except (ValueError, TypeError) as exc:
+        _log.error(
+            "skipping unreadable memory row; it is excluded from every result "
+            "until it is repaired or deleted",
+            extra={"memory_id": row["id"], "error": repr(exc)},
+        )
+        return None
 
 
 def _row_to_edge(row: sqlite3.Row | None) -> MemoryEdge | None:

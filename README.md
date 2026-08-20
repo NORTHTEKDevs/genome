@@ -75,8 +75,12 @@ flowchart LR
     style B fill:#3a3a3a,color:#fff
 ```
 
-Write: embed locally, store. About 10 ms, zero LLM calls, zero network calls, and
-deterministic, so ingesting the same conversation twice produces the same store.
+Write: embed locally, store. About 10 ms, zero LLM calls, zero network calls. The
+embedding is deterministic -- the same text always yields the same vector, with no
+sampled extraction step deciding what matters -- so what gets stored is a function
+of the input, and replaying a journal reproduces that store exactly. (Ids and
+timestamps are stamped per write, so two independent ingests of the same
+conversation agree on content and vectors, not on record ids.)
 
 Read: exact cosine search within the tenant's scope (no ANN index to build or update),
 with an optional local cross-encoder reranker.

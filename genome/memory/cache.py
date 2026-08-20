@@ -16,6 +16,7 @@ from concurrent mutation.
 from __future__ import annotations
 
 import hashlib
+import json
 import threading
 from collections import OrderedDict
 from dataclasses import dataclass
@@ -61,9 +62,13 @@ class ResponseCache:
         epoch: int,
         mode: str = "dense",
     ) -> str:
-        raw = (
-            f"{query.strip().lower()}|{user_id}|{agent_id}|"
-            f"{limit}|{filter_parents}|{epoch}|{mode}"
+        # JSON-encode rather than join on a delimiter: a raw "|" join lets a
+        # tenant whose id contains "|" collide with a different tenant
+        # (("a|b", "c") and ("a", "b|c") produced the same key), which serves
+        # one tenant's cached search results to another. JSON quoting also keeps
+        # None distinct from the string "None".
+        raw = json.dumps(
+            [query.strip().lower(), user_id, agent_id, limit, filter_parents, epoch, mode]
         )
         return hashlib.sha256(raw.encode("utf-8")).hexdigest()
 

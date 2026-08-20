@@ -125,6 +125,12 @@ def consolidate(
     all fact history -- no error, no warning. `max_memories` therefore bounds
     episodic memories only, which is the growth that actually needs bounding.
     """
+    if max_memories < 0:
+        # Without this, a negative bound silently becomes a Python negative
+        # slice: max_memories=-1 keeps len-1 records and prunes exactly one,
+        # the opposite of the "keep at most N" contract, with no error.
+        raise ValueError(f"max_memories must be >= 0, got {max_memories}")
+
     all_records = store.list_by_scope(user_id=user_id, agent_id=agent_id)
     before = len(all_records)
 
@@ -149,10 +155,22 @@ def consolidate(
 
     synthesized_count = 0
     if synthesize_before_prune and len(to_prune) >= 2:
-        # Pair up low-fitness memories and synthesize a hybrid from each pair
-        for i in range(0, len(to_prune) - 1, 2):
-            a = to_prune[i]
-            b = to_prune[i + 1]
+        # Pair up low-fitness memories and synthesize a hybrid from each pair.
+        # Pairs must share a scope. An unscoped consolidate (user_id and
+        # agent_id both None) lists every tenant's records, so pairing across
+        # that boundary would splice two tenants' plaintext into one hybrid --
+        # and writing it under the CALL's scope would additionally relocate that
+        # content into the null scope. Group first, then pair within a group and
+        # write the hybrid under the pair's own scope.
+        by_scope: dict[tuple[str | None, str | None], list[MemoryRecord]] = {}
+        for r in to_prune:
+            by_scope.setdefault((r.user_id, r.agent_id), []).append(r)
+        pairs: list[tuple[MemoryRecord, MemoryRecord, str | None, str | None]] = []
+        for (pair_user, pair_agent), group in by_scope.items():
+            for i in range(0, len(group) - 1, 2):
+                pairs.append((group[i], group[i + 1], pair_user, pair_agent))
+
+        for a, b, pair_user, pair_agent in pairs:
             try:
                 hybrid_embedding = recombine(
                     [a.embedding, b.embedding], operator=synthesis_operator
@@ -186,8 +204,8 @@ def consolidate(
             hybrid = MemoryRecord(
                 content=hybrid_content,
                 embedding=hybrid_embedding,
-                user_id=user_id,
-                agent_id=agent_id,
+                user_id=pair_user,
+                agent_id=pair_agent,
                 parents=[a.id, b.id],
                 operator=synthesis_operator,
                 metadata=hybrid_meta,

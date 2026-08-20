@@ -43,9 +43,21 @@ import numpy as np
 from genome.memory.graph import MemoryEdge
 from genome.memory.schema import MemoryRecord
 from genome.memory.store import MemoryStore
+from genome.observability import get_logger
+
+_log = get_logger("journal")
 
 #: prev_hash of the first journal line. Fixed so the genesis link is verifiable.
 GENESIS_LINE_HASH = "0" * 64
+
+
+class JournalCorruptionError(ValueError):
+    """A journal line could not be parsed and it was not the final line.
+
+    Distinct from a torn tail, which :meth:`Journal.read` recovers from: this
+    means an operation in the middle of the log is unreadable, so no replay can
+    faithfully reproduce the store.
+    """
 
 
 def _dumps(obj: dict[str, Any]) -> str:
@@ -207,11 +219,42 @@ class Journal:
 
     @staticmethod
     def read(path: str | Path) -> list[dict[str, Any]]:
-        ops = []
-        with open(path, encoding="utf-8") as handle:
-            for line in handle:
-                if line.strip():
-                    ops.append(json.loads(line))
+        """Parse the journal, tolerating a torn final line.
+
+        A malformed LAST line is dropped with a warning. That is the signature of
+        a crash mid-append -- a partially flushed line -- and the prefix before it
+        is intact and replayable. Propagating the decode error instead (as this
+        once did) made the journal unreadable in precisely the situation it exists
+        for: recovering after a crash.
+
+        A malformed INTERIOR line raises :class:`JournalCorruptionError`. Skipping
+        it would silently drop an operation from the replayed state, which is
+        worse than refusing to replay at all. Dropping the tail is a documented
+        blind spot of the hash chain either way (see
+        :func:`verify_journal_integrity`); losing a middle line is not.
+        """
+        ops: list[dict[str, Any]] = []
+        bad: tuple[int, str] | None = None
+        with open(path, "rb") as handle:
+            for lineno, raw in enumerate(handle, start=1):
+                if bad is not None:
+                    raise JournalCorruptionError(
+                        f"journal line {bad[0]} of {path} is malformed and is NOT "
+                        f"the final line ({bad[1]}); the journal is corrupted in "
+                        "the middle rather than merely truncated by a crash, so "
+                        "replaying it would silently omit an operation"
+                    )
+                if not raw.strip():
+                    continue
+                try:
+                    ops.append(json.loads(raw.decode("utf-8")))
+                except (UnicodeDecodeError, json.JSONDecodeError) as exc:
+                    bad = (lineno, str(exc))
+        if bad is not None:
+            _log.warning(
+                "dropping torn final journal line",
+                extra={"path": str(path), "line": bad[0], "error": bad[1]},
+            )
         return ops
 
 
@@ -480,7 +523,16 @@ def verify_journal_integrity(
     """
     prev_hash = GENESIS_LINE_HASH
     expected_seq = 1
-    for op in Journal.read(path):
+    try:
+        lines = Journal.read(path)
+    except JournalCorruptionError as exc:
+        # This function promises a verdict, not an exception: an unreadable line
+        # IS a verification failure, and callers (CLI, API) must be able to
+        # report it rather than crash.
+        return False, str(exc)
+    except OSError as exc:
+        return False, f"journal could not be read: {exc}"
+    for op in lines:
         if "line_hash" not in op:
             # Written before chaining existed: verify what we can and say so.
             return True, (
