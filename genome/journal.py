@@ -32,6 +32,7 @@ state, not memory state, and are excluded from the hash.
 from __future__ import annotations
 
 import hashlib
+import hmac
 import json
 import threading
 from pathlib import Path
@@ -139,11 +140,21 @@ def _last_seq_in_file(path: Path) -> int:
         return 0
 
 
-def _line_hash(op: dict[str, Any], prev_hash: str) -> str:
-    """Hash of one journal record, chained to its predecessor."""
+def _line_hash(op: dict[str, Any], prev_hash: str, key: bytes | None = None) -> str:
+    """Hash of one journal record, chained to its predecessor.
+
+    With ``key``, this is HMAC-SHA256 instead of a bare hash. That is the difference
+    between tamper-EVIDENT and tamper-PROOF against an attacker who has write access
+    to the journal file: an unkeyed chain can be recomputed by anyone (SHA-256 needs
+    no secret), so a determined attacker edits a line and rechains the rest. Without
+    the key they cannot produce a valid chain at all.
+    """
     payload = {k: v for k, v in op.items() if k != "line_hash"}
     payload["prev_hash"] = prev_hash
-    return hashlib.sha256(_dumps(payload).encode("utf-8")).hexdigest()
+    encoded = _dumps(payload).encode("utf-8")
+    if key is not None:
+        return hmac.new(key, encoded, hashlib.sha256).hexdigest()
+    return hashlib.sha256(encoded).hexdigest()
 
 
 class Journal:
@@ -154,11 +165,29 @@ class Journal:
     tail, so two Journal objects on the same path (even in different processes)
     never assign a duplicate seq. Correctness beats throughput for an audit-style
     journal, so every append pays for the lock.
+
+    **Tamper-evidence vs tamper-proof.** Every line commits to its predecessor, so a
+    removed, edited, or reordered line is detectable. Unkeyed, that stops accidental
+    and casual tampering but NOT an attacker with write access who simply recomputes
+    the whole chain - SHA-256 requires no secret. Pass ``key`` (any bytes, kept
+    outside the journal's own directory - an env var, a secrets manager, an HSM) to
+    make the chain an HMAC, which such an attacker cannot forge::
+
+        Memory(journal=Journal("mem.journal", key=os.environb[b"GENOME_JOURNAL_KEY"]))
+
+    Verification must then supply the same key. A journal written with a key and
+    verified without one FAILS loudly rather than silently degrading.
     """
 
-    def __init__(self, path: str | Path) -> None:
+    def __init__(self, path: str | Path, *, key: bytes | None = None) -> None:
         self.path = Path(path)
         self.path.parent.mkdir(parents=True, exist_ok=True)
+        if key is not None and not isinstance(key, (bytes, bytearray)):
+            raise TypeError(
+                f"journal key must be bytes, got {type(key).__name__}. Encode a "
+                "string key explicitly so the byte representation is unambiguous."
+            )
+        self._key = bytes(key) if key is not None else None
         self._lock = threading.Lock()
 
     def append(self, op: dict[str, Any]) -> None:
@@ -167,7 +196,7 @@ class Journal:
             seq = int(previous["seq"]) + 1 if previous else 1
             prev_hash = (previous or {}).get("line_hash") or GENESIS_LINE_HASH
             record = {"seq": seq, **op}
-            record["line_hash"] = _line_hash(record, prev_hash)
+            record["line_hash"] = _line_hash(record, prev_hash, self._key)
             with open(self.path, "a", encoding="utf-8") as handle:
                 handle.write(_dumps(record) + "\n")
                 handle.flush()
@@ -420,7 +449,9 @@ def replay_journal(
     return memory
 
 
-def verify_journal_integrity(path: str | Path) -> tuple[bool, str]:
+def verify_journal_integrity(
+    path: str | Path, *, key: bytes | None = None
+) -> tuple[bool, str]:
     """Check the journal's own hash chain: no line removed, edited, or reordered.
 
     This is a SEPARATE guarantee from state reproduction. Comparing replayed state
@@ -443,25 +474,28 @@ def verify_journal_integrity(path: str | Path) -> tuple[bool, str]:
                 f"journal line sequence gap: expected seq {expected_seq}, found "
                 f"{op.get('seq')} - a line was removed or reordered"
             )
-        recomputed = _line_hash(op, prev_hash)
-        if recomputed != op["line_hash"]:
+        recomputed = _line_hash(op, prev_hash, key)
+        if not hmac.compare_digest(recomputed, str(op["line_hash"])):
             return False, (
-                f"journal line {op['seq']} fails its hash: the line was edited, or the "
-                "line before it was removed"
+                f"journal line {op['seq']} fails its hash: the line was edited, the "
+                "line before it was removed, or the wrong key was supplied"
             )
         prev_hash = op["line_hash"]
         expected_seq += 1
     return True, f"journal intact: {expected_seq - 1} line(s) chained"
 
 
-def verify_journal(path: str | Path, memory: Any) -> bool:
+def verify_journal(path: str | Path, memory: Any, *, key: bytes | None = None) -> bool:
     """Prove the live store matches its own history.
 
     Two independent checks, both required:
       1. the journal's own hash chain is unbroken (no line removed/edited/reordered);
       2. replaying it reproduces the live store's canonical state hash.
+
+    Supply the same ``key`` the journal was written with. Verifying a keyed journal
+    without the key fails - it does not silently fall back to an unkeyed check.
     """
-    intact, _reason = verify_journal_integrity(path)
+    intact, _reason = verify_journal_integrity(path, key=key)
     if not intact:
         return False
     replayed = replay_journal(path, embedding_provider=memory.embed)

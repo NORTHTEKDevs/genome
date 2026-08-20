@@ -84,6 +84,7 @@ class Memory:
         reranker: Any = None,
         trust_policy: Any = None,
         journal: Any = None,
+        journal_key: bytes | None = None,
     ) -> None:
         # Store
         if isinstance(storage, MemoryStore):
@@ -98,7 +99,12 @@ class Memory:
             from genome.journal import Journal, JournalingStore
 
             if not isinstance(journal, Journal):
-                journal = Journal(journal)
+                journal = Journal(journal, key=journal_key)
+            elif journal_key is not None:
+                raise ValueError(
+                    "pass journal_key only with a path; a Journal instance already "
+                    "carries its own key (Journal(path, key=...))"
+                )
             self.store = JournalingStore(self.store, journal)
 
         # Memory firewall (opt-in). See genome.firewall: provenance tagging is

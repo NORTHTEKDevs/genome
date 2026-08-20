@@ -233,7 +233,16 @@ LLM-ingest memory system cannot do in principle:
   reproduce the store - `verify_journal()` replays the history and compares
   canonical hashes. Replay a prefix to roll back; replay into different storage to
   branch a memory for a what-if run. The journal sits after extraction, so replay
-  is deterministic even if you configured an LLM extractor.
+  is deterministic even if you configured an LLM extractor. Each line chains to its
+  predecessor, so a removed or edited line is detected even when the change cancels
+  out in the final state.
+
+  ```python
+  # Tamper-EVIDENT by default. Pass a key (kept outside the journal's directory)
+  # to make it tamper-PROOF: an unkeyed chain can be recomputed by anyone with
+  # write access, an HMAC chain cannot.
+  m = Memory(journal="mem.journal", journal_key=os.environb[b"GENOME_JOURNAL_KEY"])
+  ```
 
 - **Multi-agent belief attribution** (`record_fact(..., believed_by="agent-a")`):
   agents sharing a store keep their own belief timelines - agent B disagreeing does

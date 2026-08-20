@@ -31,6 +31,12 @@ original attack. See `tests/test_bshr_fixes.py`.
   extraction, so replay is deterministic even with an LLM extractor. Each line
   commits to its predecessor with a hash, so `verify_journal_integrity` detects a
   removed or edited line even when the deletion cancels out in final state.
+- **Keyed (tamper-proof) journals**: `Journal(path, key=...)` /
+  `Memory(journal=path, journal_key=...)` makes the line chain an HMAC instead of a
+  bare hash. Unkeyed, the chain is tamper-*evident* - it catches removed/edited lines
+  but an attacker with write access can recompute the whole chain, since SHA-256
+  needs no secret. Keyed, they cannot forge it at all. Verification with the wrong
+  key, or no key, fails closed rather than degrading silently.
 - **Multi-agent belief attribution**: `record_fact(..., believed_by=...)` with
   believer-aware invalidation (agents never clobber each other's beliefs),
   `facts_believed_by`, and `belief_conflicts` for surfacing disagreements.

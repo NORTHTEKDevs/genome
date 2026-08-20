@@ -374,6 +374,84 @@ def test_async_memory_supports_the_firewall():
     )
 
 
+# -- RE-ATTACK: keyed journal defeats a full adversarial rechain ------------
+
+
+def _rechain_journal(path, *, drop_substring, key=None):
+    """Simulate the strongest journal attack: delete lines, then RENUMBER seq and
+    RECOMPUTE every line_hash so the chain is internally perfect again."""
+    import json as _json
+
+    from genome.journal import GENESIS_LINE_HASH, _line_hash
+
+    kept = [
+        _json.loads(line)
+        for line in path.read_text(encoding="utf-8").splitlines()
+        if line.strip() and drop_substring not in line
+    ]
+    prev = GENESIS_LINE_HASH
+    rebuilt = []
+    for i, op in enumerate(kept, start=1):
+        op["seq"] = i
+        op.pop("line_hash", None)
+        op["line_hash"] = _line_hash(op, prev, key)
+        prev = op["line_hash"]
+        rebuilt.append(_json.dumps(op, sort_keys=True, separators=(",", ":")))
+    path.write_text("\n".join(rebuilt) + "\n", encoding="utf-8")
+
+
+def test_unkeyed_journal_can_be_rechained_documented_limit(tmp_path):
+    """Honest baseline: an UNKEYED chain is tamper-evident, not tamper-proof. An
+    attacker with file access can rechain. This test pins that documented limit so
+    nobody mistakes the unkeyed mode for proof."""
+    from genome.journal import verify_journal_integrity
+
+    path = tmp_path / "plain.journal"
+    m = Memory(storage=":memory:", journal=path)
+    doomed = m.add("evidence to erase", user_id="u1")[0]
+    m.add("cover story", user_id="u1")
+    m.delete(doomed.id)
+    _rechain_journal(path, drop_substring=doomed.id, key=None)
+    intact, _ = verify_journal_integrity(path)
+    assert intact is True, "unkeyed chains are forgeable - this is the documented limit"
+    m.close()
+
+
+def test_keyed_journal_defeats_a_full_rechain(tmp_path):
+    """With a key the attacker cannot forge the chain at all, even rewriting every
+    line: HMAC needs the secret they do not have."""
+    from genome.journal import verify_journal_integrity
+
+    key = b"a-secret-held-outside-the-journal-directory"
+    path = tmp_path / "keyed.journal"
+    m = Memory(storage=":memory:", journal=path, journal_key=key)
+    doomed = m.add("evidence to erase", user_id="u1")[0]
+    m.add("cover story", user_id="u1")
+    m.delete(doomed.id)
+    assert verify_journal_integrity(path, key=key)[0] is True
+
+    # The attacker rechains perfectly - but without the key.
+    _rechain_journal(path, drop_substring=doomed.id, key=None)
+    intact, reason = verify_journal_integrity(path, key=key)
+    assert intact is False, "a keyed chain must not accept an attacker's rechain"
+    assert "key" in reason or "edited" in reason
+    m.close()
+
+
+def test_keyed_journal_rejects_verification_without_the_key(tmp_path):
+    """A keyed journal must fail closed when verified with no key, never silently
+    degrade to an unkeyed check."""
+    from genome.journal import verify_journal_integrity
+
+    path = tmp_path / "keyed2.journal"
+    m = Memory(storage=":memory:", journal=path, journal_key=b"k")
+    m.add("a record", user_id="u1")
+    assert verify_journal_integrity(path, key=b"k")[0] is True
+    assert verify_journal_integrity(path)[0] is False
+    assert verify_journal_integrity(path, key=b"wrong")[0] is False
+    m.close()
+
+
 # -- #12: explain_search stays in lockstep with search() under a reranker ---
 
 

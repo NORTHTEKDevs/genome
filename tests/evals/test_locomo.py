@@ -460,6 +460,9 @@ def test_every_memory_flag_exposed_on_locomo_config():
         # mutations for replay); it changes durability, never retrieval or
         # synthesis. Pinned by tests/test_journal.py.
         "journal",
+        # Bench-irrelevant: the HMAC key for the journal's line chain. Affects
+        # tamper-evidence of the write log only; no retrieval path reads it.
+        "journal_key",
     }
 
     sig = inspect.signature(Memory.__init__)
