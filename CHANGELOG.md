@@ -5,12 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
-## [1.1.0] - 2026-08-19
+## [1.1.0] - 2026-08-25
 
 Security-hardening release. Every feature below was put through an adversarial
-code review and an executable red team (attack scripts that actually ran); every
-confirmed exploit is fixed and pinned by a regression test that reproduces the
-original attack. See `tests/test_bshr_fixes.py`.
+code review, an executable red team (attack scripts that actually ran), a
+re-attack pass aimed at the fixes themselves, and a final hostile pass told to
+assume nothing had been fixed. Every confirmed exploit is fixed and pinned by a
+regression test that reproduces the original attack. See
+`tests/test_bshr_fixes.py`.
 
 ### Added
 
@@ -43,6 +45,11 @@ original attack. See `tests/test_bshr_fixes.py`.
 - **Neutral benchmark harness** (`benchmarks/neutral/`): N memory systems, same
   responder/judge/embedder, pairwise McNemar matrix, full-disclosure block, and
   documented adapter wiring for third-party systems.
+- **`AsyncMemory` reaches parity with the sync facade**: `trust_policy`,
+  `journal`/`journal_key`, `add(provenance=...)`, and `search_quarantined()`. The
+  firewall was previously unreachable from the async path, which is the one the
+  LangChain and LlamaIndex integrations use - a security control absent from the
+  recommended entry point is not a control.
 
 ### Security
 
@@ -59,12 +66,48 @@ Found by the red team, fixed here, each with a regression test:
 - `AgentMemory.archival_insert` accepts `provenance` (defaulting to `agent`), so an
   agent storing retrieved web content can mark it untrusted.
 
+Found by the later hostile and re-attack passes:
+
+- **`get()` by id bypassed quarantine entirely** - and `add()` hands the caller
+  that id, so the quarantine was one call away from being pointless.
+- `explain_search`'s report printed the quarantined text it was excluding, which
+  defeated the exclusion for anyone reading the explanation.
+- **Cross-tenant temporal reads**: `entity_timeline`, `current_facts` and
+  `facts_valid_at` had no `agent_id` parameter at all, so an agent-tenanted
+  deployment could read another agent's facts.
+- **Cross-tenant cache collision**: `ResponseCache` joined key parts with a raw
+  `|`, so `("a|b", "c")` and `("a", "b|c")` hashed identically and one tenant was
+  served another's cached search results without ever reaching a scope check.
+  Keys are now JSON-encoded, which also keeps `None` distinct from `"None"`.
+- **`consolidate()` spliced tenants together**: it paired adjacent low-fitness
+  records with no scope check, so an unscoped call merged two tenants' plaintext
+  into one hybrid written under a null scope. It now groups by scope and pairs
+  only within a group.
+- Content containing NUL bytes is rejected: a C-based downstream consumer
+  truncates at the NUL, so the text a reviewer sees and the text a tool receives
+  could differ. Lone UTF-16 surrogates are rejected too - they crashed the
+  tokenizer from `Memory.add`.
+
 ### Fixed
 
 - **`genome.__version__` lied.** Releases 1.0.4-1.0.6 self-reported "1.0.3": the
   module string was bumped by hand and forgotten while `pyproject.toml` moved on.
   The version is now derived from installed package metadata, so the module can
   never disagree with the release again, and the smoke test pins the invariant.
+  The same test now also pins `server.json` (the MCP registry manifest), which is
+  the other place the version is transcribed by hand.
+- **A torn journal line killed the recovery path.** `Journal.read()` raised on a
+  malformed line, and a torn final line is exactly what a crash mid-append
+  produces - so the reader died on the case it exists for. A torn tail is now
+  dropped with a warning; an interior malformed line still raises
+  `JournalCorruptionError`, because silently skipping one would drop an operation
+  from the replay.
+- **An emptied journal verified as intact.** `verify_journal_integrity` walked
+  zero lines and reported "journal intact: 0 line(s) chained", certifying the
+  erased case. With no checkpoint to compare against it now says so instead; with
+  `expect_last_seq` truncation was already detected.
+- `_SidecarLock` caught only `FileExistsError`, so Windows lock contention
+  (`WinError 5`) killed the writer thread and silently dropped journal records.
 
 ## [1.0.6] - 2026-08-17
 

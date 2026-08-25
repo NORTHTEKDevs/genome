@@ -6,12 +6,12 @@
     "url": "https://github.com/NORTHTEKDevs/genome",
     "source": "github"
   },
-  "version": "1.0.6",
+  "version": "1.1.0",
   "packages": [
     {
       "registryType": "pypi",
       "identifier": "genome-memory",
-      "version": "1.0.6",
+      "version": "1.1.0",
       "transport": {
         "type": "stdio"
       }
