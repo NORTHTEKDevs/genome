@@ -77,6 +77,13 @@ jobs:
   publish:
     name: Publish to PyPI
     needs: build
+    # Trusted Publishing has to be configured on PyPI before this job can do
+    # anything but fail with `invalid-publisher`. Until the repository variable
+    # PYPI_TRUSTED_PUBLISHER is set to "true", a tag still builds the artifacts and
+    # runs every gate above - it just skips the upload, so cutting a release by hand
+    # does not leave a red run on a repository whose whole pitch is verifiability.
+    # Set it once the publisher entry exists: gh variable set PYPI_TRUSTED_PUBLISHER --body true
+    if: vars.PYPI_TRUSTED_PUBLISHER == 'true'
     runs-on: ubuntu-latest
     # The environment gate is what makes Trusted Publishing safe: it scopes the OIDC
     # identity, and it is where you add a manual approval rule if you ever want one.
@@ -95,3 +102,9 @@ jobs:
         uses: pypa/gh-action-pypi-publish@release/v1
         # No `password:` here, deliberately. Omitting it is what selects Trusted
         # Publishing over token auth.
+        with:
+          # A version already on PyPI is a no-op, not a failure: 1.1.0 was uploaded
+          # by hand before Trusted Publishing existed, and re-tagging a released
+          # version should be harmless. Versions are still immutable - this only
+          # skips a file that is already there.
+          skip-existing: true
