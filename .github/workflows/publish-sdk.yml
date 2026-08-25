@@ -26,6 +26,11 @@ permissions:
 jobs:
   publish:
     name: Publish to npm
+    # Same guard as release.yml: until the Trusted Publisher entry exists on
+    # npmjs.com this job can only fail, and a tag should not leave a red run for
+    # a release that shipped. Flip it when the entry is created:
+    #   gh variable set NPM_TRUSTED_PUBLISHER --body true
+    if: vars.NPM_TRUSTED_PUBLISHER == 'true'
     runs-on: ubuntu-latest
     permissions:
       id-token: write # required for OIDC; this is the whole mechanism
