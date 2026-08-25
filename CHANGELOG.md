@@ -5,6 +5,40 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [1.2.0] - 2026-08-25
+
+The firewall reaches the HTTP server, which was the one entry point 1.1.0 missed.
+
+1.1.0 shipped provenance tiers and quarantine, and the red team's standing lesson
+from that release was that a security control absent from an entry point is not a
+control there - the same gap was found and closed once already on `AsyncMemory`,
+the path the LangChain and LlamaIndex integrations use. The REST server was the
+third entry point: it built its `Memory` with no trust policy and had no field to
+declare provenance, so every HTTP write was untagged, nothing could ever be
+quarantined, and the firewall was unreachable for anyone running GENOME as a
+service or through the TypeScript SDK.
+
+### Added
+
+- `POST /v1/memories` accepts `provenance` (`system`, `user`, `agent`, `tool`,
+  `web`). An unknown source is a 400 naming the valid ones, not a 500. Putting a
+  tag in `metadata` still does not work - the facade strips a forged
+  `_provenance`, so this field is the only way to declare an origin.
+- `POST /v1/search/quarantined` returns what the trust policy is holding out of
+  normal recall. Quarantine that cannot be inspected is indistinguishable from
+  data loss; this is how an operator sees what is being withheld and decides
+  whether to re-ingest any of it at a higher trust. Empty when no policy is
+  configured, and scope-enforced like every other read.
+- `GENOME_RECALL_MIN_TRUST` arms the firewall for a deployment (an integer tier,
+  0=web through 4=system). Off by default, because turning quarantine on changes
+  what search returns for an existing deployment. A malformed value fails at
+  startup rather than leaving the firewall silently disarmed.
+
+### TypeScript SDK 1.1.0
+
+- `add({ provenance })` and `searchQuarantined()` mirror the two endpoints above,
+  with a `Provenance` union type so a typo is a compile error rather than a 400.
+
 ## [1.1.0] - 2026-08-25
 
 Security-hardening release. Every feature below was put through an adversarial

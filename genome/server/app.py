@@ -113,6 +113,25 @@ def validate_env_config() -> list[str]:
             except ValueError:
                 issues.append(f"{name} must be an integer, got {v!r}")
 
+    # The firewall knob. A typo here would silently leave the deployment with no
+    # quarantine at all, which is the failure mode a security control must never
+    # have, so it is a startup error rather than a shrug.
+    raw_trust = os.environ.get("GENOME_RECALL_MIN_TRUST")
+    if raw_trust is not None and raw_trust != "":
+        try:
+            level = int(raw_trust)
+        except ValueError:
+            issues.append(
+                f"GENOME_RECALL_MIN_TRUST must be an integer trust tier "
+                f"(0=web, 1=tool, 2=agent, 3=user, 4=system), got {raw_trust!r}"
+            )
+        else:
+            if not 0 <= level <= 4:
+                issues.append(
+                    f"GENOME_RECALL_MIN_TRUST must be between 0 and 4 "
+                    f"(0=web, 1=tool, 2=agent, 3=user, 4=system), got {level}"
+                )
+
     # API key presence warning: if the server listens on 0.0.0.0 without an
     # API key, that's almost certainly a misconfiguration. We warn but don't
     # refuse (e.g. local dev on localhost is fine).
@@ -144,6 +163,7 @@ def _build_memory_from_env() -> Memory:
 
     storage = os.environ.get("GENOME_STORAGE", ":memory:")
     cache_size = int(os.environ.get("GENOME_CACHE_SIZE", "1024"))
+    trust_policy = _trust_policy_from_env()
 
     if storage.startswith(("postgresql://", "postgres://")):
         from genome.embeddings import EmbeddingProvider
@@ -160,8 +180,26 @@ def _build_memory_from_env() -> Memory:
             storage=store,
             embedding_provider=provider,
             cache_size=cache_size,
+            trust_policy=trust_policy,
         )
-    return Memory(storage=storage, cache_size=cache_size)
+    return Memory(
+        storage=storage, cache_size=cache_size, trust_policy=trust_policy
+    )
+
+
+def _trust_policy_from_env():
+    """Build the trust policy, or None when the firewall is not armed.
+
+    Off by default: turning quarantine on for an existing deployment changes what
+    search returns, so it is an explicit decision. `validate_env_config` has
+    already rejected a malformed value by the time this runs.
+    """
+    raw = os.environ.get("GENOME_RECALL_MIN_TRUST")
+    if raw is None or raw == "":
+        return None
+    from genome.firewall import TrustPolicy
+
+    return TrustPolicy(recall_min_trust=int(raw))
 
 
 def _constant_time_api_key_eq(provided: str | None, expected: str) -> bool:
@@ -407,12 +445,18 @@ def create_app(memory: Memory | None = None):
     def add_memory(req: AddRequest):
         _require_scope(req.user_id, req.agent_id)
         mem = _memory()
-        records = mem.add(
-            req.text,
-            user_id=req.user_id,
-            agent_id=req.agent_id,
-            metadata=req.metadata,
-        )
+        try:
+            records = mem.add(
+                req.text,
+                user_id=req.user_id,
+                agent_id=req.agent_id,
+                metadata=req.metadata,
+                provenance=req.provenance,
+            )
+        except ValueError as exc:
+            # An unknown provenance name is a client mistake, not a server fault:
+            # answer with the valid sources rather than a 500 the caller cannot act on.
+            raise HTTPException(status_code=400, detail=str(exc)) from None
         return [RecordOut.from_record(r) for r in records]
 
     @app.get(
@@ -480,6 +524,35 @@ def create_app(memory: Memory | None = None):
             agent_id=req.agent_id,
             limit=req.limit,
             filter_parents=req.filter_parents,
+        )
+        return [
+            SearchHit(
+                id=r.id,
+                content=r.content,
+                score=r.score,
+                metadata=r.record.metadata,
+            )
+            for r in results
+        ]
+
+    @app.post(
+        "/v1/search/quarantined", response_model=list[SearchHit],
+        dependencies=[Depends(require_api_key)],
+    )
+    def search_quarantined(req: SearchRequest):
+        """The memories the trust policy is holding out of normal recall.
+
+        Quarantine has to be inspectable or it is indistinguishable from data
+        loss: this is how an operator sees what untrusted-origin content is being
+        withheld and decides whether any of it should be re-ingested at a higher
+        trust. Empty when no policy is configured - nothing is being withheld.
+        """
+        _require_scope(req.user_id, req.agent_id)
+        results = _memory().search_quarantined(
+            req.query,
+            user_id=req.user_id,
+            agent_id=req.agent_id,
+            limit=req.limit,
         )
         return [
             SearchHit(

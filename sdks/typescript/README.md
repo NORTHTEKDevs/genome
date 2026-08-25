@@ -17,7 +17,7 @@ ESM package; on Node 20.19+ / 22+, CommonJS `require()` works too. Any modern br
 ## Quickstart
 
 First, run the genome server (from the Python package). **The server is default-deny: it
-refuses to serve without an API key**, so set one — otherwise every call below returns
+refuses to serve without an API key**, so set one - otherwise every call below returns
 `503`.
 
 ```bash
@@ -80,6 +80,17 @@ await mem.link({
 
 // Enforce tenant isolation on reads
 await mem.get("mem_xyz", { userId: "alice" }); // 404 if it's actually bob's
+
+// Memory firewall: tag where content came from, and see what is being withheld.
+// Requires the server to be armed with GENOME_RECALL_MIN_TRUST.
+await mem.add({ text: scrapedPage, userId: "alice", provenance: "web" });
+await mem.add({ text: "I bank with First National", userId: "alice", provenance: "user" });
+
+// The scraped page is held out of normal recall...
+const recalled = await mem.search({ query: "banking", userId: "alice" });
+
+// ...but is inspectable, so quarantine is never mistaken for data loss.
+const withheld = await mem.searchQuarantined({ query: "banking", userId: "alice" });
 ```
 
 ## API
@@ -88,13 +99,14 @@ All methods are async. Full type definitions ship with the package.
 
 | Method | HTTP |
 |---|---|
-| `new Memory({ baseUrl, apiKey?, fetch?, timeoutMs? })` | — |
+| `new Memory({ baseUrl, apiKey?, fetch?, timeoutMs? })` | - |
 | `mem.health()` | `GET /health` |
-| `mem.add({ text, userId?, agentId?, metadata? })` | `POST /v1/memories` |
+| `mem.add({ text, userId?, agentId?, metadata?, provenance? })` | `POST /v1/memories` |
 | `mem.get(id, { userId?, agentId? })` | `GET /v1/memories/:id` |
 | `mem.update(id, { content?, metadata?, reEmbed? }, scope?)` | `PATCH /v1/memories/:id` |
 | `mem.delete(id, { userId?, agentId? })` | `DELETE /v1/memories/:id` |
 | `mem.search({ query, userId?, agentId?, limit?, filterParents? })` | `POST /v1/search` |
+| `mem.searchQuarantined({ query, userId?, agentId?, limit? })` | `POST /v1/search/quarantined` |
 | `mem.synthesize({ memoryIds, operator?, userId?, ... })` | `POST /v1/synthesize` |
 | `mem.link({ fromId, toId, relation, weight?, metadata? })` | `POST /v1/edges` |
 | `mem.unlink(edgeId)` | `DELETE /v1/edges/:id` |
@@ -116,7 +128,7 @@ try {
 }
 ```
 
-`delete()` and `unlink()` return `false` on 404 instead of throwing — consistent with the sync Python behavior.
+`delete()` and `unlink()` return `false` on 404 instead of throwing - consistent with the sync Python behavior.
 
 ## Requirements
 

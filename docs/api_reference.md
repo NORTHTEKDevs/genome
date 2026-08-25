@@ -246,14 +246,22 @@ Environment variables:
 - `GENOME_EMBED_MODEL`: sentence-transformers model name
 - `GENOME_CACHE_SIZE`: response cache LRU capacity
 - `GENOME_API_KEY`: if set, required in `X-API-Key` header
+- `GENOME_RECALL_MIN_TRUST`: arms the memory firewall. An integer trust tier
+  (`0`=web, `1`=tool, `2`=agent, `3`=user, `4`=system); memories below it are
+  held out of `/v1/search` and readable only through `/v1/search/quarantined`.
+  Unset means no policy and no quarantine, which is the pre-1.2.0 behaviour.
+  A malformed value is a startup error, never a silently disarmed firewall.
 
 REST endpoints:
 - `GET /health` -- readiness + cache stats
-- `POST /v1/memories` -- add
+- `POST /v1/memories` -- add (optional `provenance`: `system|user|agent|tool|web`;
+  an unknown source is a 400 naming the valid ones)
 - `GET /v1/memories/{id}` -- get
 - `PATCH /v1/memories/{id}` -- update
 - `DELETE /v1/memories/{id}` -- delete
 - `POST /v1/search` -- cosine search
+- `POST /v1/search/quarantined` -- what the trust policy is withholding, so
+  quarantine is inspectable rather than indistinguishable from data loss
 - `POST /v1/synthesize` -- recombine
 - `POST /v1/edges` -- link
 - `DELETE /v1/edges/{id}` -- unlink

@@ -76,11 +76,22 @@ export interface MemoryOptions {
 
 // ---------- request types ----------
 
+/** Where content came from, highest trust to lowest. */
+export type Provenance = "system" | "user" | "agent" | "tool" | "web";
+
 export interface AddRequest {
   text: string;
   userId?: string;
   agentId?: string;
   metadata?: Record<string, unknown>;
+  /**
+   * Origin of this content. Optional; untagged writes behave as before.
+   * Tagging is what lets the server's trust policy hold low-trust origins out
+   * of recall and refuse a lower-trust source superseding a higher-trust
+   * memory. Putting it in `metadata` does not work: the server strips a forged
+   * `_provenance` key, so this field is the only way to declare it.
+   */
+  provenance?: Provenance;
 }
 
 export interface SearchRequest {
@@ -246,6 +257,7 @@ export class Memory {
         user_id: req.userId,
         agent_id: req.agentId,
         metadata: req.metadata,
+        provenance: req.provenance,
       },
     });
   }
@@ -302,6 +314,25 @@ export class Memory {
         agent_id: req.agentId,
         limit: req.limit ?? 10,
         filter_parents: req.filterParents ?? true,
+      },
+    });
+  }
+
+  /**
+   * The memories the server's trust policy is holding out of normal recall.
+   *
+   * Quarantine has to be inspectable or it is indistinguishable from data loss.
+   * Use this to see what untrusted-origin content is being withheld and decide
+   * whether any of it should be re-ingested at a higher trust. Returns an empty
+   * list when the server has no trust policy configured: nothing is withheld.
+   */
+  async searchQuarantined(req: SearchRequest): Promise<SearchHit[]> {
+    return this.request<SearchHit[]>("POST", "/v1/search/quarantined", {
+      body: {
+        query: req.query,
+        user_id: req.userId,
+        agent_id: req.agentId,
+        limit: req.limit ?? 10,
       },
     });
   }

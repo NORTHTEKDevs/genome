@@ -32,6 +32,14 @@ class AddRequest(BaseModel):
     user_id: str | None = Field(default=None, max_length=_MAX_ID_LEN)
     agent_id: str | None = Field(default=None, max_length=_MAX_ID_LEN)
     metadata: dict[str, Any] | None = None
+    provenance: str | None = Field(default=None, max_length=_MAX_ID_LEN)
+    """Where this content came from: system, user, agent, tool, or web.
+
+    Optional, and untagged writes behave exactly as before. Supplying it is what
+    lets the trust policy quarantine low-trust origins and refuse a lower-trust
+    source superseding a higher-trust memory. The facade strips a forged
+    ``metadata["_provenance"]``, so this field is the only way to declare it.
+    """
 
 
 class UpdateRequest(BaseModel):
