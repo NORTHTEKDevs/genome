@@ -5,6 +5,31 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Fixed
+
+Four findings from an external code review (2026-08-29), each pinned by a test.
+
+- **Journal is now write-ahead and fsync'd.** The journal line was appended
+  AFTER the store committed and was flushed but never fsync'd, so a crash or a
+  power loss could leave committed mutations with no journal record. The line
+  is now made durable (`os.fsync`) before the store mutates, and a mutation
+  that fails after its line is durable is cancelled by a reversing line, so
+  replay still reproduces the live store. Every append now pays one fsync.
+- **Journal lock can no longer be stolen from a slow holder.** The sidecar
+  lock broke a "stale" lock after a fixed spin count, so on Linux a holder
+  whose critical section outlasted it lost the mutex mid-section and two
+  processes appended concurrently. It is now an OS advisory lock (`flock` on
+  POSIX, `msvcrt.locking` on Windows) with no timeout; the kernel releases it
+  when the holder exits or dies. The `<journal>.lock` sidecar is now permanent.
+- **MCP `forget` no longer deletes an unrelated memory.** It deleted the
+  nearest neighbour of any query unconditionally. It now refuses below a
+  relevance floor (`min_score`, default 0.5) and reports the best candidate.
+- **Docker image can write its SQLite volume.** `/data` was not created in the
+  image, so Docker created the mount point root-owned and the non-root server
+  (uid 1001) could not open the database. The image now creates and owns it.
+
 ## [1.2.0] - 2026-08-25
 
 The firewall reaches the HTTP server, which was the one entry point 1.1.0 missed.

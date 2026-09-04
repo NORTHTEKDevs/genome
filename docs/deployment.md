@@ -39,6 +39,8 @@ flyctl open
 
 Your server is now at `https://my-genome.fly.dev/docs` with SQLite persistence.
 
+**Volume ownership.** The image runs as uid 1001 and creates `/data` owned by that user, so a Docker named volume (`-v genome-data:/data`) works as-is. A Fly volume, like any bind mount, arrives with its own ownership (normally root). If the server logs `unable to open database file`, chown the mount once: `flyctl ssh console -C "chown -R 1001:1001 /data"`.
+
 **To upgrade to Postgres** (recommended beyond ~10k memories/user):
 ```bash
 flyctl postgres create --name my-genome-pg
@@ -52,7 +54,7 @@ Note: the pgvector extension needs to be enabled manually on the Fly postgres in
 
 ## Railway (~3 min, easiest for beginners)
 
-Railway has the lowest barrier — click-deploy with a Docker template detected from the repo.
+Railway has the lowest barrier - click-deploy with a Docker template detected from the repo.
 
 1. `railway login`
 2. `railway init` in the genome repo, link to a new project.
@@ -65,7 +67,7 @@ Railway has the lowest barrier — click-deploy with a Docker template detected 
    GENOME_PORT = 8080
    ```
 5. Deploy: `railway up`.
-6. `railway domain` — generates a public URL.
+6. `railway domain` - generates a public URL.
 
 Important: Railway's Postgres plugin doesn't have pgvector preinstalled. Run this via `railway connect postgresql`:
 ```sql
@@ -109,7 +111,7 @@ databases:
 
 Then push the repo + click "New Blueprint" in the Render dashboard. Render builds the Dockerfile and wires everything up.
 
-For pgvector, Render supports it on Postgres 15+ — enable it the first time via:
+For pgvector, Render supports it on Postgres 15+ - enable it the first time via:
 ```sql
 CREATE EXTENSION vector;
 ```

@@ -30,9 +30,13 @@ RUN pip install ".[fastapi,postgres]"
 RUN python -c "from sentence_transformers import SentenceTransformer; \
     SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2')"
 
-# Non-root user
+# Non-root user. /data is created and owned HERE, in the image: a fresh named
+# volume inherits the image directory's ownership, whereas a mount point Docker
+# has to create itself is root-owned and uid 1001 cannot open the SQLite file.
+# (Bind mounts and cloud volumes keep their own ownership; chown them yourself.)
 RUN useradd --create-home --uid 1001 genome \
- && chown -R genome:genome /app
+ && mkdir -p /data \
+ && chown -R genome:genome /app /data
 USER genome
 
 ENV GENOME_STORAGE=/data/memory.db \
