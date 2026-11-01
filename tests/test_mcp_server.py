@@ -25,19 +25,23 @@ def _tools():
     return asyncio.run(server.mcp.list_tools())
 
 
+def _schema(tool):
+    # mcp 1.x names the field inputSchema; 2.x renamed it input_schema
+    return getattr(tool, "inputSchema", None) or tool.input_schema
+
+
 def test_exactly_the_four_tools_are_registered():
     assert {t.name for t in _tools()} == set(EXPECTED)
 
 
 def test_tool_argument_schemas():
     for t in _tools():
-        schema = getattr(t, "inputSchema", None) or getattr(t, "input_schema")
-        assert set(schema["properties"]) == EXPECTED[t.name], t.name
+        assert set(_schema(t)["properties"]) == EXPECTED[t.name], t.name
         assert t.description, f"{t.name} has no description for the client"
 
 
 def test_destructive_tools_require_their_target():
-    required = {t.name: set((getattr(t, "inputSchema", None) or t.input_schema).get("required", [])) for t in _tools()}
+    required = {t.name: set(_schema(t).get("required", [])) for t in _tools()}
     assert required["forget"] == {"query"}
     assert required["remember"] == {"content"}
     assert required["reset_memories"] == set()
