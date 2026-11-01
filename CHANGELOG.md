@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Changed
+
+- The MCP server (`genome-mcp`) now supports mcp 2.x as well as 1.x. The `mcp`
+  requirement is widened from `>=1.2,<2` to `>=1.2,<3`. mcp 2.x renamed
+  `FastMCP` to `MCPServer`; the server imports whichever the installed SDK
+  provides. Tool names, arguments and outputs are unchanged.
+- New `tests/test_mcp_server.py` checks the tools a client actually sees
+  (names, argument schemas, required fields) rather than calling the Python
+  functions directly.
+
 ## [1.2.1] - 2026-09-03
 
 ### Fixed
