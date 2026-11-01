@@ -9,8 +9,8 @@ authors:
     email: info@northtek.io
 repository-code: "https://github.com/NORTHTEKDevs/genome"
 license: Apache-2.0
-version: 1.2.0
-date-released: 2026-08-25
+version: 1.2.1
+date-released: 2026-09-03
 preferred-citation:
   type: article
   title: "Do Agents Need an LLM to Remember? An Evaluation of LLM-Free Memory Ingestion"

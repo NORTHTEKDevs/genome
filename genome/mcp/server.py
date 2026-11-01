@@ -85,15 +85,20 @@ def recall(query: str, limit: int = 5, user_id: str = "default") -> str:
 
 
 @mcp.tool()
-def forget(query: str, user_id: str = "default") -> str:
-    """Delete the single memory most relevant to `query`.
+def forget(query: str, user_id: str = "default", min_score: float = 0.5) -> str:
+    """Delete the single memory most relevant to `query`, if it is relevant enough.
 
-    Destructive. Finds the best-matching memory and removes it. If nothing
-    matches, nothing is deleted.
+    Destructive. Finds the best-matching memory and removes it only when its
+    relevance (cosine similarity, -1..1) reaches `min_score`. Below the floor
+    nothing is deleted and the best candidate is reported so the query can be
+    sharpened. Without the floor, any query against a non-empty memory deletes
+    its nearest neighbour, however unrelated.
 
     Args:
         query: Describes the memory to remove.
         user_id: Namespace to delete from (default "default").
+        min_score: Relevance floor (default 0.5). Lower it only when the
+            reported candidate is confirmed to be the memory meant.
     """
     query = (query or "").strip()
     if not query:
@@ -102,6 +107,13 @@ def forget(query: str, user_id: str = "default") -> str:
     if not hits:
         return f"Nothing to forget: no memory matched '{query}' (user={user_id})."
     top = hits[0]
+    if top.score < min_score:
+        return (
+            f"Not forgetting: the closest memory to '{query}' scored only "
+            f"{top.score:.2f} (min_score {min_score:.2f}): {top.content}. "
+            "Sharpen the query so it names that memory, or if this is the one "
+            "meant, call forget again with a lower min_score."
+        )
     ok = memory().delete(top.id, user_id=user_id)
     return f"Forgot: {top.content}" if ok else f"Could not delete the matched memory ({top.id})."
 

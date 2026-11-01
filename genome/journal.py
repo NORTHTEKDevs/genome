@@ -31,14 +31,23 @@ state, not memory state, and are excluded from the hash.
 
 from __future__ import annotations
 
+import errno
 import hashlib
 import hmac
 import json
+import os
+import sys
 import threading
+import time
 from pathlib import Path
 from typing import Any
 
 import numpy as np
+
+if sys.platform == "win32":
+    import msvcrt
+else:
+    import fcntl
 
 from genome.memory.graph import MemoryEdge
 from genome.memory.schema import MemoryRecord
@@ -65,12 +74,23 @@ def _dumps(obj: dict[str, Any]) -> str:
 
 
 class _SidecarLock:
-    """Cross-process mutex via an atomically-created sidecar `.lock` file.
+    """Cross-process mutex: an OS advisory lock on a sidecar ``.lock`` file.
 
-    Portable (no platform-specific APIs) and, crucially, it locks a SEPARATE file
-    so re-reading the journal's own tail under the lock never deadlocks against a
-    mandatory byte-range lock on the data file. ``os.O_CREAT | O_EXCL`` is atomic
-    on POSIX and Windows; the loser spins until the holder releases.
+    Why an OS lock and not create-with-O_EXCL-and-spin: a create-based lock
+    cannot tell a dead holder from a slow one, so it needs a break-in timeout,
+    and any holder whose critical section outlasts that timeout has its mutex
+    stolen mid-section. (On Windows the old break-in happened to fail, because
+    an open file cannot be unlinked; on Linux it succeeded and two processes
+    then appended concurrently.) An OS advisory lock is released by the kernel
+    when the holder exits or dies, and by nothing else, so no timeout exists to
+    misfire.
+
+    Why a sidecar and not the journal itself: on Windows ``msvcrt.locking`` is a
+    MANDATORY byte-range lock, so locking the data file would block the tail
+    re-read done under the lock. The sidecar is created once and never unlinked:
+    deleting a lock file another process may already have open reintroduces the
+    two-inode race, where two holders each lock a different file of the same
+    name. A zero-byte ``<journal>.lock`` beside the journal is the price.
     """
 
     def __init__(self, target: Path) -> None:
@@ -78,39 +98,39 @@ class _SidecarLock:
         self._fd: int | None = None
 
     def __enter__(self) -> _SidecarLock:
-        import os
-        import time
-
-        deadline_spins = 0
-        while True:
-            try:
-                self._fd = os.open(
-                    str(self._path), os.O_CREAT | os.O_EXCL | os.O_WRONLY
-                )
-                return self
-            # PermissionError, not just FileExistsError: on Windows a genuine race
-            # between two creators of the same lock file surfaces as WinError 5.
-            # Letting it escape kills the calling thread and SILENTLY DROPS the
-            # journal record - the worst possible failure for an audit log.
-            except (FileExistsError, PermissionError):
-                deadline_spins += 1
-                if deadline_spins > 5000:  # ~5s at 1ms; stale lock, break in
+        fd = os.open(str(self._path), os.O_CREAT | os.O_RDWR)
+        try:
+            if sys.platform == "win32":
+                # Non-blocking attempts in a short sleep loop: LK_LOCK gives up
+                # after ten one-second retries, and a long holder must be waited
+                # on, not failed on. Locks byte 0 from the fresh fd's position 0.
+                while True:
                     try:
-                        self._path.unlink()
-                    except OSError:
-                        pass
-                time.sleep(0.001)
+                        msvcrt.locking(fd, msvcrt.LK_NBLCK, 1)
+                        break
+                    except OSError as exc:
+                        if exc.errno not in (errno.EACCES, errno.EDEADLK):
+                            raise
+                        time.sleep(0.005)
+            else:
+                fcntl.flock(fd, fcntl.LOCK_EX)
+        except BaseException:
+            os.close(fd)
+            raise
+        self._fd = fd
+        return self
 
     def __exit__(self, *_exc: object) -> None:
-        import os
-
-        if self._fd is not None:
-            os.close(self._fd)
-            self._fd = None
+        fd, self._fd = self._fd, None
+        if fd is None:
+            return
         try:
-            self._path.unlink()
-        except OSError:
-            pass
+            if sys.platform == "win32":
+                msvcrt.locking(fd, msvcrt.LK_UNLCK, 1)
+            else:
+                fcntl.flock(fd, fcntl.LOCK_UN)
+        finally:
+            os.close(fd)
 
 
 def _last_line(path: Path) -> dict[str, Any] | None:
@@ -216,6 +236,11 @@ class Journal:
             with open(self.path, "a", encoding="utf-8") as handle:
                 handle.write(_dumps(record) + "\n")
                 handle.flush()
+                # flush() only hands the line to the OS page cache; fsync is what
+                # makes it survive a power loss. The store fsyncs on commit, and
+                # a journal that can lose lines the store kept cannot claim to
+                # reproduce it.
+                os.fsync(handle.fileno())
 
     @staticmethod
     def read(path: str | Path) -> list[dict[str, Any]]:
@@ -264,30 +289,53 @@ class JournalingStore(MemoryStore):
     Sitting at the store boundary means every higher-level operation - facts,
     entities, synthesis, conflict-resolution updates - is captured without any
     feature-specific journaling code, by construction.
+
+    **Ordering: write-ahead.** The journal line is made durable BEFORE the inner
+    store mutates, the same discipline as a database WAL. A crash between the
+    two can leave the journal AHEAD of the store - replay reproduces the intent
+    and ``verify_journal`` reports the gap - but never BEHIND it, which would be
+    a committed mutation with no record: the one failure an audit log cannot
+    have. Records carry their own ids and timestamps (see MemoryRecord), so the
+    line needs nothing the store assigns.
+
+    **A mutation that fails after its line is durable** (a dim-mismatch
+    ValueError, a NaN embedding, a lost connection) is cancelled by a second
+    line that reverses it - add/delete, update/update-back, add_edge/delete_edge
+    - so replay still reproduces the live store and the caller still sees the
+    error. Deletes cascade over edges and have no exact inverse in the journal's
+    vocabulary: a delete that raises after its line leaves the journal one line
+    ahead, which ``verify_journal`` reports, exactly like a crash.
     """
 
     def __init__(self, inner: MemoryStore, journal: Journal) -> None:
         self.inner = inner
         self.journal = journal
 
-    # -- mutations (journaled) ----------------------------------------------
+    # -- mutations (journaled, write-ahead) ---------------------------------
 
     def add(self, record: MemoryRecord) -> MemoryRecord:
-        stored = self.inner.add(record)
         self.journal.append(
             {
                 "op": "add",
-                "id": stored.id,
-                "content": stored.content,
-                "user_id": stored.user_id,
-                "agent_id": stored.agent_id,
-                "created_at": stored.created_at,
-                "parents": list(stored.parents),
-                "operator": stored.operator,
-                "metadata": stored.metadata,
+                "id": record.id,
+                "content": record.content,
+                "user_id": record.user_id,
+                "agent_id": record.agent_id,
+                "created_at": record.created_at,
+                "parents": list(record.parents),
+                "operator": record.operator,
+                "metadata": record.metadata,
             }
         )
-        return stored
+        try:
+            return self.inner.add(record)
+        except Exception:
+            # Cancel the line - unless a record with this id exists after all
+            # (the add failed BECAUSE of it): deleting that one would be a
+            # second bug on top of the first.
+            if self.inner.get(record.id) is None:
+                self.journal.append({"op": "delete", "id": record.id})
+            raise
 
     def update(
         self,
@@ -297,58 +345,76 @@ class JournalingStore(MemoryStore):
         embedding: np.ndarray | None = None,
         metadata: dict | None = None,
     ) -> MemoryRecord | None:
-        result = self.inner.update(
-            memory_id, content=content, embedding=embedding, metadata=metadata
+        existing = self.inner.get(memory_id)
+        if existing is None:
+            return None
+        # Record whether the caller supplied a fresh embedding. On replay we
+        # must reproduce THAT choice: a content update with re_embed=False
+        # (embedding is None) keeps the old embedding live, so replay must not
+        # silently re-derive a different one.
+        reembed = embedding is not None
+        self.journal.append(
+            {
+                "op": "update",
+                "id": memory_id,
+                "content": content,
+                "metadata": metadata,
+                "reembed": reembed,
+            }
         )
-        if result is not None:
+        try:
+            return self.inner.update(
+                memory_id, content=content, embedding=embedding, metadata=metadata
+            )
+        except Exception:
             self.journal.append(
                 {
                     "op": "update",
                     "id": memory_id,
-                    "content": content,
-                    "metadata": metadata,
-                    # Record whether the caller supplied a fresh embedding. On
-                    # replay we must reproduce THAT choice: a content update with
-                    # re_embed=False (embedding is None) keeps the old embedding
-                    # live, so replay must not silently re-derive a different one.
-                    "reembed": embedding is not None,
+                    "content": existing.content,
+                    "metadata": existing.metadata,
+                    "reembed": reembed,
                 }
             )
-        return result
+            raise
 
     def delete(self, memory_id: str) -> bool:
-        deleted = self.inner.delete(memory_id)
-        if deleted:
-            self.journal.append({"op": "delete", "id": memory_id})
-        return deleted
+        if self.inner.get(memory_id) is None:
+            return False
+        self.journal.append({"op": "delete", "id": memory_id})
+        return self.inner.delete(memory_id)
 
     def add_edge(self, edge: MemoryEdge) -> MemoryEdge:
-        stored = self.inner.add_edge(edge)
         self.journal.append(
             {
                 "op": "add_edge",
-                "id": stored.id,
-                "from_id": stored.from_id,
-                "to_id": stored.to_id,
-                "relation": stored.relation,
-                "weight": stored.weight,
-                "created_at": stored.created_at,
-                "metadata": stored.metadata,
+                "id": edge.id,
+                "from_id": edge.from_id,
+                "to_id": edge.to_id,
+                "relation": edge.relation,
+                "weight": edge.weight,
+                "created_at": edge.created_at,
+                "metadata": edge.metadata,
             }
         )
-        return stored
+        try:
+            return self.inner.add_edge(edge)
+        except Exception:
+            if self.inner.get_edge(edge.id) is None:
+                self.journal.append({"op": "delete_edge", "id": edge.id})
+            raise
 
     def delete_edge(self, edge_id: str) -> bool:
-        deleted = self.inner.delete_edge(edge_id)
-        if deleted:
-            self.journal.append({"op": "delete_edge", "id": edge_id})
-        return deleted
+        if self.inner.get_edge(edge_id) is None:
+            return False
+        self.journal.append({"op": "delete_edge", "id": edge_id})
+        return self.inner.delete_edge(edge_id)
 
     def delete_edges_touching(self, memory_id: str) -> int:
-        count = self.inner.delete_edges_touching(memory_id)
-        if count:
-            self.journal.append({"op": "delete_edges_touching", "id": memory_id})
-        return count
+        if not (self.inner.edges_from(memory_id) or self.inner.edges_to(memory_id)):
+            return 0
+        self.journal.append({"op": "delete_edges_touching", "id": memory_id})
+        return self.inner.delete_edges_touching(memory_id)
 
     # -- reads (pass-through) -----------------------------------------------
 
