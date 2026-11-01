@@ -17,11 +17,14 @@ import os
 import sys
 from pathlib import Path
 
-from mcp.server.fastmcp import FastMCP
+try:  # mcp >= 2: FastMCP was renamed MCPServer; decorators and run() are unchanged
+    from mcp.server.mcpserver import MCPServer
+except ImportError:  # mcp 1.x
+    from mcp.server.fastmcp import FastMCP as MCPServer
 
 from genome import Memory
 
-mcp = FastMCP("genome-memory")
+mcp = MCPServer("genome-memory")
 
 _mem: Memory | None = None
 
@@ -133,7 +136,7 @@ def reset_memories(user_id: str = "default") -> str:
 def main() -> None:
     # Load the embedder and its full import graph (torch, sentence-transformers,
     # sklearn, scipy) on the MAIN thread before the event loop starts. FastMCP
-    # runs sync tools in a worker thread, and importing scipy/sklearn inside
+    # (and MCPServer in mcp 2.x) runs sync tools in a worker thread, and importing scipy/sklearn inside
     # that thread deadlocks on Windows (import-lock deadlock: the first
     # remember/recall hangs forever). Eager init also means the first tool call
     # answers in milliseconds instead of paying the model load.
