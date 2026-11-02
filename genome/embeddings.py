@@ -48,7 +48,17 @@ class EmbeddingProvider:
 class _SentenceTransformerBackend:
     def __init__(self, model_name: str) -> None:
         from sentence_transformers import SentenceTransformer
-        self._model = SentenceTransformer(model_name)
+
+        # Local cache first. A plain SentenceTransformer(name) asks the Hugging
+        # Face Hub for metadata on every load even when the model is on disk, so
+        # with the network down startup failed (unreachable proxy) or stalled for
+        # minutes of retries before using the cache. Only a model that is not on
+        # disk yet goes to the network. This also pins the snapshot embeddings
+        # were stored with: a silently updated model would change the vectors.
+        try:
+            self._model = SentenceTransformer(model_name, local_files_only=True)
+        except Exception:  # noqa: BLE001 -- any local miss means: try the normal load
+            self._model = SentenceTransformer(model_name)
         self.dim = self._model.get_sentence_embedding_dimension()
 
     def encode(self, text: str) -> np.ndarray:
