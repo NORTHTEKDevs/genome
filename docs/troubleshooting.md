@@ -25,6 +25,11 @@ You imported `PostgresMemoryStore` without installing the extra.
 
 **Fix:** `pip install "genome-memory[fastapi]"` or `pip install "genome-memory[all]"`.
 
+### `ImportError: cannot import name 'eval_type_backport'` when `genome-mcp` starts
+
+mcp 1.21.0 and older cannot be imported with pydantic 2.14 or newer. GENOME 1.3.2 and later require mcp 1.21.1 or newer, so upgrading fixes it.
+**Fix:** `pip install -U "genome-memory[mcp]"`. That moves mcp to its newest release; add `"mcp<2"` to stay on 1.x. If another package in the environment needs mcp below 1.21.1, skip the upgrade and keep pydantic below 2.14 instead: `pip install "pydantic<2.14"`.
+
 ## First-run
 
 ### Embedding model download hangs or fails
