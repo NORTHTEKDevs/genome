@@ -5,6 +5,33 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Fixed
+
+- **The MCP server now reports GENOME's version to clients.** The initialize
+  handshake's `serverInfo.version` was the mcp SDK's own version on mcp 1.x
+  (for example `1.27.0`) and an empty string on mcp 2.x, because the server
+  never passed its version to the SDK. It now reports `genome.__version__` on
+  both lines: mcp 2.x takes it as a constructor argument, and on mcp 1.x it is
+  set on the lowlevel server, since FastMCP has no such argument (it silently
+  drops one up to 1.12.2 and raises `TypeError` from 1.12.3).
+- **The MCP server starts on mcp 1.7 to 1.13.** Those releases call
+  `issubclass()` on each tool parameter's annotation, and the module's
+  `from __future__ import annotations` turned every annotation into a string,
+  so importing `genome.mcp.server` raised `TypeError: issubclass() arg 1 must
+  be a class`. The future import is removed. Verified on mcp 1.2.0, 1.6.0,
+  1.7.0, 1.12.2, 1.12.3, 1.13.1, 1.14.0, 1.27.0, 1.30.0, 2.0.0 and 2.3.0.
+  Separately, mcp 1.21.0 and older cannot be imported at all with pydantic
+  2.14 or newer (they use a pydantic internal that 2.14 removed); with those
+  mcp releases, keep pydantic below 2.14.
+
+### Changed
+
+- CI now also runs the MCP server tests on mcp 1.x: 1.2.0 and 1.13.1 (with
+  pydantic below 2.14, see above) and the newest 1.x. A default install
+  resolves mcp 2.x, so the 1.x path had no CI coverage.
+
 ## [1.3.0] - 2026-11-01
 
 ### Fixed

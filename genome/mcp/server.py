@@ -11,7 +11,9 @@ Cursor, ...) and the agent gets persistent memory across sessions.
 Storage: `$GENOME_MCP_DB` if set, else `~/.genome/memories.db` (created on first use).
 Run:     `genome-mcp`  (stdio transport)  or  `python -m genome.mcp.server`
 """
-from __future__ import annotations
+# No `from __future__ import annotations` in this module: mcp 1.7-1.13 call
+# issubclass() on every tool parameter's annotation, the strings that import
+# produces make it raise TypeError, and the server could not start there.
 
 import os
 import sys
@@ -19,12 +21,34 @@ from pathlib import Path
 
 try:  # mcp >= 2: FastMCP was renamed MCPServer; decorators and run() are unchanged
     from mcp.server.mcpserver import MCPServer
+
+    _MCP2 = True
 except ImportError:  # mcp 1.x
     from mcp.server.fastmcp import FastMCP as MCPServer
 
-from genome import Memory
+    _MCP2 = False
 
-mcp = MCPServer("genome-memory")
+from genome import Memory, __version__
+
+
+def _new_server(version: str) -> MCPServer:
+    """The MCP server, reporting `version` to clients as serverInfo.version.
+
+    mcp 2.x takes the version as a constructor argument. FastMCP (mcp 1.x) has
+    none: it silently drops an unknown `version=` up to 1.12.2 and raises
+    TypeError from 1.12.3. Its lowlevel server puts a plain `version` attribute
+    into the initialization options FastMCP builds when it starts serving, on
+    every release from 1.2.0. Left unset, clients saw the SDK's own version on
+    1.x and an empty string on 2.x.
+    """
+    if _MCP2:
+        return MCPServer("genome-memory", version=version)
+    server = MCPServer("genome-memory")
+    server._mcp_server.version = version
+    return server
+
+
+mcp = _new_server(__version__)
 
 _mem: Memory | None = None
 
