@@ -5,6 +5,27 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Fixed
+
+- **`genome-memory[mcp]` now requires mcp 1.21.1 or later** (was 1.2). mcp
+  1.21.0 and older import a pydantic internal that pydantic 2.14 removed, so
+  with pydantic 2.14 or newer installed, `genome-mcp` failed at startup with
+  `ImportError: cannot import name 'eval_type_backport'`. Their metadata
+  allows pydantic 2.14, so pip could pick that pairing whenever something held
+  mcp back. 1.21.1 is the first release that imports with pydantic 2.14, and
+  GENOME's MCP tests pass on it with pydantic 2.14.2. The `dev` and `all`
+  extras carry the same floor. An environment pinned to an older mcp has to
+  move to 1.21.1 or later to install this release. For anyone who hits the
+  error on an older GENOME, docs/troubleshooting.md now covers it.
+
+### Changed
+
+- CI runs the mcp 1.x tests on 1.21.1 (the new floor) and the newest 1.x, and
+  checks that both got pydantic 2.14 or newer, in place of the 1.2.0 and
+  1.13.1 runs that needed pydantic below 2.14.
+
 ## [1.3.1] - 2026-11-01
 
 ### Fixed
