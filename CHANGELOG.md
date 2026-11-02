@@ -7,6 +7,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Fixed
+
+- **A cached embedding model now loads with no network calls.** GENOME runs
+  offline, but `SentenceTransformer(name)` asked the Hugging Face Hub for
+  metadata on every load even when the model was already on disk. With the
+  network down, startup failed outright behind an unreachable proxy
+  (`ProxyError` after ~76 s) or stalled for ~5 minutes of retries before using
+  the cache, so `genome-mcp` looked broken to any MCP client with a startup
+  timeout. The local sentence-transformers backend now loads from the cache
+  first (`local_files_only=True`) and goes to the network only when the model
+  is not on disk yet. Measured on a warm cache: 7 s with the network blocked,
+  where it used to fail or take 297 s. Side effect, intended: the model no
+  longer silently updates to a newer Hub revision, which would have changed
+  the vectors next to already-stored embeddings. To pick up a new revision,
+  re-download it (`huggingface-cli download <model>`). Pinned by a test that
+  builds the provider in a fresh process with every socket blocked.
+- Two REST config tests (`test_firewall_api.py`) loaded the real embedding
+  model, and through it the network, to check the trust policy. They now use
+  the fake embedder; one of them failed intermittently on a network blip.
+
 ### Changed
 
 - The MCP server (`genome-mcp`) now supports mcp 2.x as well as 1.x. The `mcp`

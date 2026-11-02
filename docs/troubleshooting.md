@@ -31,7 +31,7 @@ You imported `PostgresMemoryStore` without installing the extra.
 
 The default provider downloads `sentence-transformers/all-MiniLM-L6-v2` (~80 MB) on first use.
 - Confirm you have network access.
-- On air-gapped systems, pre-download with `huggingface-cli download sentence-transformers/all-MiniLM-L6-v2`.
+- On air-gapped systems, pre-download with `huggingface-cli download sentence-transformers/all-MiniLM-L6-v2`. Once the model is in the cache, GENOME loads it with no network calls (from 1.3.0; older releases contact the Hub on every start unless `HF_HUB_OFFLINE=1` is set).
 - Set `HF_HOME=/path/to/cache` if you want a custom cache location.
 
 ### First `m.add()` takes 30-60 seconds

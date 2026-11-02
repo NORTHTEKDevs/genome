@@ -147,7 +147,19 @@ def test_quarantined_search_respects_tenant_scope(guarded):
 # -- configuration ----------------------------------------------------------
 
 
-def test_recall_min_trust_env_var_arms_the_firewall(monkeypatch):
+@pytest.fixture
+def no_model_download(monkeypatch):
+    """`_build_memory_from_env` builds a full Memory, whose default embedder loads
+    sentence-transformers from the Hugging Face Hub. These tests are about the
+    trust policy, not embeddings, so the real model is swapped for the fake one:
+    a network blip mid-suite used to fail them (HEAD adapter_config.json raises
+    ProxyError/ConnectionError even when the model is already cached)."""
+    import genome.memory.facade as facade
+
+    monkeypatch.setattr(facade, "EmbeddingProvider", lambda: FakeEmbeddingProvider(dim=16))
+
+
+def test_recall_min_trust_env_var_arms_the_firewall(monkeypatch, no_model_download):
     """The knob that turns the firewall on for a real deployment."""
     from genome.server.app import _build_memory_from_env
 
@@ -165,7 +177,7 @@ def test_recall_min_trust_env_var_arms_the_firewall(monkeypatch):
         mem.close()
 
 
-def test_no_policy_is_built_when_the_env_var_is_absent(monkeypatch):
+def test_no_policy_is_built_when_the_env_var_is_absent(monkeypatch, no_model_download):
     """Negative control: the default deployment behaves exactly as before."""
     from genome.server.app import _build_memory_from_env
 
