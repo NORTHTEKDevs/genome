@@ -100,3 +100,43 @@ jobs:
         env:
           POSTGRES_DSN: "postgresql://genome:genome@localhost:5432/memorydb"
         run: pytest tests/memory/test_postgres_store.py -v
+
+  # Separate job: a default install resolves mcp 2.x, so without this the mcp 1.x
+  # (FastMCP) path of genome/mcp/server.py is never tested, though pyproject still
+  # supports it. Three points on the 1.x line: the floor, the last release of
+  # 1.7-1.13 (where string annotations made tool registration raise TypeError),
+  # and the newest 1.x.
+  test-mcp1x:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # mcp 1.21.0 and older import a pydantic internal that pydantic 2.14
+          # removed (an upstream break), so those legs need an older pydantic.
+          - mcp: "mcp==1.2.0"
+            pydantic: "pydantic<2.14"
+          - mcp: "mcp==1.13.1"
+            pydantic: "pydantic<2.14"
+          - mcp: "mcp<2"
+            pydantic: "pydantic"
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install package with ${{ matrix.mcp }} and ${{ matrix.pydantic }}
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev]" "${{ matrix.mcp }}" "${{ matrix.pydantic }}"
+
+      - name: Confirm an mcp 1.x SDK is what got installed
+        run: python -c "import importlib.metadata as m; v = m.version('mcp'); print('mcp', v); assert v.startswith('1.'), v"
+
+      - name: Run the MCP server tests
+        run: pytest tests/test_mcp_server.py tests/test_mcp_forget.py -v
