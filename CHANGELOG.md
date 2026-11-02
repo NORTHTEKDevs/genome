@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
-## [Unreleased]
+## [1.3.0] - 2026-11-01
 
 ### Fixed
 
@@ -33,6 +33,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   requirement is widened from `>=1.2,<2` to `>=1.2,<3`. mcp 2.x renamed
   `FastMCP` to `MCPServer`; the server imports whichever the installed SDK
   provides. Tool names, arguments and outputs are unchanged.
+- The `sentence-transformers` requirement is widened from `>=2.7,<6.0` to
+  `>=2.7,<7.0`, so a fresh install can get 6.x. CI for this release ran the
+  full suite on sentence-transformers 6.2.0.
 - New `tests/test_mcp_server.py` checks the tools a client actually sees
   (names, argument schemas, required fields) rather than calling the Python
   functions directly.
